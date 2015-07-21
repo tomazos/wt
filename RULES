@@ -1,0 +1,102 @@
+library:
+  name = bigint
+  headers:
+    bigint.h
+
+test:
+  name = bigint_test
+  sources:
+    bigint_test.cc
+  dependencies:
+    bigint
+
+library:
+  name = collection_functions
+  headers:
+    collection_functions.h
+
+test:
+  name = collection_functions_test
+  sources:
+    collection_functions_test.cc
+  dependencies:
+    collection_functions
+
+library:
+  name = error
+  headers:
+    error.h
+
+test:
+  name = error_test
+  sources:
+    error_test.cc
+  dependencies:
+    error
+
+library:
+  name = must
+  headers:
+    must.h
+
+test:
+  name = must_test
+  sources:
+    must_test.cc
+  dependencies:
+    must
+
+library:
+  name = primitives
+  headers:
+    primitives.h
+
+test:
+  name = primitives_test
+  sources:
+    primitives_test.cc
+  dependencies:
+    primitives
+
+library:
+  name = process
+  headers:
+    process.h
+
+library:
+  name = string_functions
+  headers:
+    string_functions.h
+
+test:
+  name = string_functions_test
+  sources:
+    string_functions_test.cc
+  dependencies:
+    string_functions
+
+library:
+  name = testing
+  headers:
+    testing.h
+  sources:
+    testing.cc
+
+library:
+  name = time
+  headers:
+    time.h
+  sources:
+    time.cc
+
+test:
+  name = time_test
+  sources:
+    time_test.cc
+  dependencies:
+    time
+
+program:
+  name = whee
+  sources:
+    whee.cc
