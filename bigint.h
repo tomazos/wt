@@ -2,7 +2,7 @@
 
 #include <boost/multiprecision/cpp_int.hpp>
 
-#include "primitives.h"
+#include "string_functions.h"
 
 class bigint {
  public:
@@ -56,6 +56,10 @@ class bigint {
   friend inline bigint operator<=(const bigint& a, const bigint& b);
   friend inline bigint operator>=(const bigint& a, const bigint& b);
 };
+
+inline string EncodeAsString(bigint i) {
+  return EncodeSignedIntegerAsString(i);
+}
 
 inline bigint operator+(const bigint& a, const bigint& b) {
   return bigint(a.m + b.m);

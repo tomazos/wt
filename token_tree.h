@@ -1,16 +1,28 @@
 #pragma once
 
+#include <boost/algorithm/string/join.hpp>
+#include <boost/filesystem.hpp>
+#include <vector>
+#include <memory>
+
+#include "string_functions.h"
+
 namespace token_tree {
 
 struct Entity {
   virtual ~Entity() = default;
+  virtual string ToString() const = 0;
 };
 
 struct Leaf : Entity {
   string token;
 
-  Leaf(const string& token_in) : token(token_in);
-}
+  Leaf(const string& token_in) : token(token_in) {}
+
+  string ToString() const override {
+    return EncodeAsString("LEAF(", token, ")");
+  }
+};
 
 struct KeyVal : Entity {
   string key;
@@ -18,17 +30,31 @@ struct KeyVal : Entity {
 
   KeyVal(const string& key_in, const string& value_in)
       : key(key_in), value(value_in) {}
-}
+
+  string ToString() const override {
+    return EncodeAsString("KEYVAL(", key, ",", value, ")");
+  }
+};
 
 struct Sequence : public Entity {
+  string key;
   std::vector<std::unique_ptr<Entity>> elements;
 
-  void add_element(std::unique_ptr<Entity> element) {
-    elements.push_back(element);
-  }
-}
+  Sequence(const string& key_in) : key(key_in) {}
 
-Sequence
-ParseTokenTreeFile(const boost::filesystem::path& token_tree_file);
+  void AddElement(std::unique_ptr<Entity> element) {
+    elements.push_back(std::move(element));
+  }
+  string ToString() const override {
+    std::vector<string> element_strings;
+    for (const auto& element : elements)
+      element_strings.push_back(element->ToString());
+    return EncodeAsString("SEQUENCE(", key, ", [",
+                          boost::algorithm::join(element_strings, ", "), "])");
+  }
+};
+
+std::unique_ptr<Sequence> ParseSequenceFile(
+    const boost::filesystem::path& token_tree_file);
 
 }  // namespace token_tree

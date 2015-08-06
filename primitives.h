@@ -1,13 +1,28 @@
 #pragma once
 
+#include <chrono>
 #include <cstdint>
 #include <experimental/optional>
+#include <mutex>
 #include <string>
 #include <type_traits>
+#include <thread>
 
 #define STATIC_ASSERT(cond) static_assert(cond, #cond);
 
 using std::string;
+
+using Mutex = std::mutex;
+using LockGuard = std::lock_guard<std::mutex>;
+
+using namespace std::chrono_literals;
+
+template <typename Time>
+void Sleep(Time amount) {
+  std::this_thread::sleep_for(amount);
+}
+
+inline auto Now() { return std::chrono::high_resolution_clock::now(); }
 
 using std::experimental::optional;
 using std::experimental::nullopt;

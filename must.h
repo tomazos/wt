@@ -1,11 +1,12 @@
 #pragma once
 
+#include <iostream>
 #include <utility>
 
-#include "error.h"
-#include "primitives.h"
+#include "error_class.h"
 #include "string_functions.h"
 
+#define DUMPEXPR(expr) DumpExprImpl(__FILE__, __LINE__, #expr, (expr));
 #define FAIL(...) FailImpl(__FILE__, __LINE__, ##__VA_ARGS__)
 #define MUST(condition, ...) \
   MustImpl(bool(condition), #condition, __FILE__, __LINE__, ##__VA_ARGS__)
@@ -23,6 +24,11 @@
   MustLessEqualImpl(lhs, rhs, #lhs, #rhs, __FILE__, __LINE__, ##__VA_ARGS__)
 #define MUST_GE(lhs, rhs, ...) \
   MustGreaterEqualImpl(lhs, rhs, #lhs, #rhs, __FILE__, __LINE__, ##__VA_ARGS__)
+
+template <typename Expr>
+void DumpExprImpl(const char* file, int64 line, const char* expr_string, Expr&& expr) {
+  std::cout << EncodeAsString(file, ":", line, ":", 1, ": ", expr_string, " = ", std::forward<Expr>(expr)) << std::endl;
+}
 
 template <typename... Args>
 [[noreturn]] void ThrowError(const char* file, int64 line, Args&&... args) {

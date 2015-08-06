@@ -2,6 +2,8 @@ library:
   name = bigint
   headers:
     bigint.h
+  dependencies:
+    string_functions
 
 test:
   name = bigint_test
@@ -9,6 +11,7 @@ test:
     bigint_test.cc
   dependencies:
     bigint
+    testing
 
 library:
   name = collection_functions
@@ -21,23 +24,37 @@ test:
     collection_functions_test.cc
   dependencies:
     collection_functions
+    testing
 
 library:
-  name = error
+  name = error_class
   headers:
-    error.h
+    error_class.h
 
 test:
-  name = error_test
+  name = error_class_test
   sources:
-    error_test.cc
+    error_class_test.cc
   dependencies:
-    error
+    error_class
+    testing
+
+library:
+  name = file_functions
+  headers:
+    file_functions.h
+  sources:
+    file_functions.cc
+  dependencies:
+    must
 
 library:
   name = must
   headers:
     must.h
+  dependencies:
+    error_class
+    string_functions
 
 test:
   name = must_test
@@ -45,6 +62,12 @@ test:
     must_test.cc
   dependencies:
     must
+    testing
+
+library:
+  name = process
+  headers:
+    process.h
 
 library:
   name = primitives
@@ -56,7 +79,7 @@ test:
   sources:
     primitives_test.cc
   dependencies:
-    primitives
+    testing
 
 library:
   name = process
@@ -64,15 +87,33 @@ library:
     process.h
 
 library:
+  name = rand_float
+  headers:
+    rand_float.h
+  sources:
+    rand_float.cc
+
+test:
+  name = rand_float_test
+  sources:
+    rand_float_test.cc
+  dependencies:
+    rand_float
+    testing
+
+library:
   name = string_functions
   headers:
     string_functions.h
+  dependencies:
+    collection_functions
 
 test:
   name = string_functions_test
   sources:
     string_functions_test.cc
   dependencies:
+    bigint
     string_functions
 
 library:
@@ -81,22 +122,22 @@ library:
     testing.h
   sources:
     testing.cc
+  dependencies:
+    must
 
 library:
-  name = time
+  name = token_tree
   headers:
-    time.h
+    token_tree.h
   sources:
-    time.cc
-
-test:
-  name = time_test
-  sources:
-    time_test.cc
+    token_tree.cc
   dependencies:
-    time
+    file_functions
 
 program:
   name = whee
   sources:
     whee.cc
+  dependencies:
+    process
+    token_tree

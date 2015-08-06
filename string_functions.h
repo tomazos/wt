@@ -1,10 +1,12 @@
 #pragma once
 
+#include <cctype>
 #include <vector>
 #include <sstream>
 
-#include "bigint.h"
 #include "collection_functions.h"
+
+inline bool IsSpace(char c) { return std::isspace(c); }
 
 inline string EncodeAsString(string str);
 inline string EncodeAsString(const char* str);
@@ -17,8 +19,6 @@ inline string EncodeAsString(uint8 i);
 inline string EncodeAsString(uint16 i);
 inline string EncodeAsString(uint32 i);
 inline string EncodeAsString(uint64 i);
-
-inline string EncodeAsString(bigint i);
 
 inline string EncodeAsString(string str) { return std::move(str); }
 
@@ -113,8 +113,4 @@ inline string EncodeAsString(uint32 i) {
 
 inline string EncodeAsString(uint64 i) {
   return EncodeUnsignedIntegerAsString(i);
-}
-
-inline string EncodeAsString(bigint i) {
-  return EncodeSignedIntegerAsString(i);
 }

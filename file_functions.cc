@@ -1,5 +1,11 @@
 #include "file_functions.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+#include "must.h"
+
 const char* GetErrnoString() {
   constexpr size_t buflen = 256;
   thread_local char buf[buflen];
@@ -10,7 +16,8 @@ string GetFileContents(const boost::filesystem::path& path) {
   const uintmax_t file_size_result = file_size(path);
   MUST_NE(static_cast<uintmax_t>(-1), file_size_result, "file_size (", path,
           ") failed");
-  MUST_LE(file_size_result, SSIZE_MAX, "file too large");
+  MUST_LE(file_size_result, uintmax_t(std::numeric_limits<ssize_t>::max()),
+          "file too large");
 
   string result(size_t(file_size_result), '\0');
   const string pathname = path.string();

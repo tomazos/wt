@@ -1,0 +1,63 @@
+program:
+  name = accelerometer_read
+  sources:
+    accelerometer_read.cc
+  dependencies:
+    /must
+    /wiring/wiring
+
+library:
+  name = ladybug
+  headers:
+    ladybug.h
+  sources:
+    ladybug.cc
+  dependencies:
+    motor_subsystem
+    sonar_subsystem
+
+program:
+  name = ladybug_motor_set
+  sources:
+    ladybug_motor_set.cc
+  dependencies:
+    ladybug
+    /must
+
+program:
+  name = ladybug_sonar_ping
+  sources:
+    ladybug_sonar_ping.cc
+  dependencies:
+    ladybug
+
+library:
+  name = motor_subsystem
+  headers:
+    motor_subsystem.h
+  sources:
+    motor_subsystem.cc
+  dependencies:
+    subsystem
+    /rand_float
+    /wiring/wiring
+
+library:
+  name = sonar_subsystem
+  headers:
+    sonar_subsystem.h
+  sources:
+    sonar_subsystem.cc
+  dependencies:
+    subsystem
+    /wiring/wiring
+
+library:
+  name = subsystem
+  headers:
+    subsystem.h
+  sources:
+    subsystem.cc
+  dependencies:
+    /must
+

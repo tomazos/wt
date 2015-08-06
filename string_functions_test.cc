@@ -3,6 +3,8 @@
 #include <cstdio>
 #include <limits>
 
+#include "bigint.h"
+
 #define CHECK_STRING(expected, ...)                      \
   {                                                      \
     const string observed = EncodeAsString(__VA_ARGS__); \
