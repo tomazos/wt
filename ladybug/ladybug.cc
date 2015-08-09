@@ -16,5 +16,4 @@ LadyBug::LadyBug()
                   kLeftMotorDirectionPin2),
       right_wheel_(kRightMotorEnablePin, kRightMotorDirectionPin1,
                    kRightMotorDirectionPin2),
-      sonar_(kSonarTriggerPin, kSonarEchoPin) {
-}
+      sonar_(kSonarTriggerPin, kSonarEchoPin) {}

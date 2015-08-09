@@ -1,0 +1,14 @@
+library:
+  name = args
+  headers:
+    args.h
+  sources:
+    args.cc
+
+library:
+  name = noargs
+  headers:
+    noargs.h
+  sources:
+    noargs.cc
+

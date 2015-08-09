@@ -8,7 +8,7 @@ class SonarSubsystem : public Subsystem {
  public:
   SonarSubsystem(int trigger_pin, int echo_pin);
   ~SonarSubsystem();
-  
+
   using Listener = std::function<void(float64 meters)>;
   void AddListener(Listener listener);
 

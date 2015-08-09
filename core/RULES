@@ -1,0 +1,113 @@
+library:
+  name = bigint
+  headers:
+    bigint.h
+  dependencies:
+    string_functions
+
+test:
+  name = bigint_test
+  sources:
+    bigint_test.cc
+  dependencies:
+    bigint
+    /testing
+
+library:
+  name = collection_functions
+  headers:
+    collection_functions.h
+
+test:
+  name = collection_functions_test
+  sources:
+    collection_functions_test.cc
+  dependencies:
+    collection_functions
+    /testing
+
+library:
+  name = error_class
+  headers:
+    error_class.h
+
+test:
+  name = error_class_test
+  sources:
+    error_class_test.cc
+  dependencies:
+    error_class
+    /testing
+
+library:
+  name = file_functions
+  headers:
+    file_functions.h
+  sources:
+    file_functions.cc
+  dependencies:
+    must
+
+library:
+  name = must
+  headers:
+    must.h
+  dependencies:
+    error_class
+    string_functions
+
+test:
+  name = must_test
+  sources:
+    must_test.cc
+  dependencies:
+    must
+    /testing
+
+library:
+  name = process
+  headers:
+    process.h
+
+library:
+  name = process
+  headers:
+    process.h
+
+library:
+  name = random
+  headers:
+    random.h
+  sources:
+    random.cc
+
+test:
+  name = rand_float_test
+  sources:
+    rand_float_test.cc
+  dependencies:
+    random
+    /testing
+
+program:
+  name = rand_id_gen
+  sources:
+    rand_id_gen.cc
+  dependencies:
+    random
+    /main/noargs
+
+library:
+  name = string_functions
+  headers:
+    string_functions.h
+  dependencies:
+    collection_functions
+
+test:
+  name = string_functions_test
+  sources:
+    string_functions_test.cc
+  dependencies:
+    bigint
+    string_functions

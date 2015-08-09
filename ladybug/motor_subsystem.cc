@@ -1,7 +1,7 @@
 #include "ladybug/motor_subsystem.h"
 
-#include "must.h"
-#include "rand_float.h"
+#include "core/must.h"
+#include "core/random.h"
 #include "wiring/wiring.h"
 
 MotorSubsystem::MotorSubsystem(int enable_pin, int direction1_pin,

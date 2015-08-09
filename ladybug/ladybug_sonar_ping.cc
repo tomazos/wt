@@ -5,8 +5,9 @@
 int main() {
   try {
     LadyBug ladybug;
-    ladybug.AddSonarListener(
-        [](float64 meters) { std::cout << meters * 1000 << "mm" << std::endl; });
+    ladybug.AddSonarListener([](float64 meters) {
+      std::cout << meters * 1000 << "mm" << std::endl;
+    });
 
     std::getchar();
   } catch (const std::exception& e) {

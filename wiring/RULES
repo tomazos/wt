@@ -1,4 +1,14 @@
 library:
+  name = i2c_device
+  headers:
+    i2c_device.h
+  sources:
+    i2c_device.cc
+  dependencies:
+    wiring
+    /core/must
+    
+library:
   name = wiring
   headers:
     wiring.h
@@ -56,3 +66,5 @@ library:
     sn3218.c
     drcSerial.c
     wpiExtensions.c
+  dependencies:
+    /core/must

@@ -7,7 +7,7 @@
 SonarSubsystem::SonarSubsystem(int trigger_pin, int echo_pin)
     : trigger_pin_(trigger_pin), echo_pin_(echo_pin) {
   SetupWiringIfNeeded();
-      
+
   pinMode(trigger_pin_, OUTPUT);
   pinMode(echo_pin_, INPUT);
 
@@ -15,9 +15,7 @@ SonarSubsystem::SonarSubsystem(int trigger_pin, int echo_pin)
   Start();
 }
 
-SonarSubsystem::~SonarSubsystem() {
-  Stop();
-}
+SonarSubsystem::~SonarSubsystem() { Stop(); }
 
 void SonarSubsystem::AddListener(std::function<void(float64 meters)> listener) {
   LockGuard l(mutex_);
@@ -51,7 +49,7 @@ void SonarSubsystem::TriggerSonar() {
 
 int64 SonarSubsystem::ListenSonarEchoMicros() {
   std::cout << "waiting" << std::endl;
-  
+
   auto start = Now();
   while (digitalRead(echo_pin_) == LOW) start = Now();
 

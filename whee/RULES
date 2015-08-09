@@ -1,0 +1,18 @@
+library:
+  name = token_tree
+  headers:
+    token_tree.h
+  sources:
+    token_tree.cc
+  dependencies:
+    /core/file_functions
+
+program:
+  name = whee
+  sources:
+    whee.cc
+  dependencies:
+    /core/process
+    /core/file_functions
+    token_tree
+    /main/args

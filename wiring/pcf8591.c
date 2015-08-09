@@ -25,6 +25,8 @@
 
 #include <unistd.h>
 
+#include "core/must.h"
+
 #include "wiring/wiringPi.h"
 #include "wiring/wiringPiI2C.h"
 
@@ -39,7 +41,7 @@ static void myAnalogWrite(struct wiringPiNodeStruct *node, int pin, int value) {
   unsigned char b[2];
   b[0] = 0x40;
   b[1] = value & 0xFF;
-  write(node->fd, b, 2);
+  MUST_EQ(2, write(node->fd, b, 2));
 }
 
 /*

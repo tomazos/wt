@@ -33,6 +33,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "core/must.h"
 #include "wiring/wiringSerial.h"
 
 /*
@@ -167,7 +168,9 @@ void serialClose(const int fd) { close(fd); }
  *********************************************************************************
  */
 
-void serialPutchar(const int fd, const unsigned char c) { write(fd, &c, 1); }
+void serialPutchar(const int fd, const unsigned char c) {
+  MUST_EQ(1, write(fd, &c, 1));
+}
 
 /*
  * serialPuts:
@@ -175,7 +178,9 @@ void serialPutchar(const int fd, const unsigned char c) { write(fd, &c, 1); }
  *********************************************************************************
  */
 
-void serialPuts(const int fd, const char *s) { write(fd, s, strlen(s)); }
+void serialPuts(const int fd, const char *s) {
+  MUST_EQ(ssize_t(strlen(s)), write(fd, s, strlen(s)));
+}
 
 /*
  * serialPrintf:
