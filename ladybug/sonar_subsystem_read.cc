@@ -1,11 +1,14 @@
-#include "ladybug/ladybug.h"
+#include "ladybug/sonar_subsystem.h"
 
 #include <iostream>
 
+constexpr int kSonarTriggerPin = 29;
+constexpr int kSonarEchoPin = 28;
+
 int main() {
   try {
-    LadyBug ladybug;
-    ladybug.AddSonarListener([](float64 meters) {
+    SonarSubsystem sonar(kSonarTriggerPin, kSonarEchoPin);
+    sonar.AddListener([](float64 meters) {
       std::cout << meters * 1000 << "mm" << std::endl;
     });
 

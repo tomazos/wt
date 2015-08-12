@@ -26,6 +26,14 @@ test:
     collection_functions
     /testing
 
+test:
+  name = endian_test
+  sources:
+    endian_test.cc
+  dependencies:
+    must
+    /testing
+
 library:
   name = error_class
   headers:

@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+message LadyBugState {
+  required double left = 1;
+  required double right = 2;
+
+  required double sonar = 3;
+
+  required double ax = 4;
+  required double ay = 5;
+  required double az = 6;
+
+  required double gx = 7;
+  required double gy = 8;
+  required double gz = 9;
+
+  required double mx = 11;
+  required double my = 12;
+  required double mz = 13;
+};
+

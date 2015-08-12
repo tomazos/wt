@@ -41,15 +41,12 @@ void SonarSubsystem::Tick() {
 }
 
 void SonarSubsystem::TriggerSonar() {
-  std::cout << "triggering" << std::endl;
   digitalWrite(trigger_pin_, HIGH);
   Sleep(10us);
   digitalWrite(trigger_pin_, LOW);
 }
 
 int64 SonarSubsystem::ListenSonarEchoMicros() {
-  std::cout << "waiting" << std::endl;
-
   auto start = Now();
   while (digitalRead(echo_pin_) == LOW) start = Now();
 

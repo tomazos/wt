@@ -1,7 +1,10 @@
+#include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <map>
+#include <regex>
 #include <set>
+#include <sstream>
 #include <vector>
 
 #include "main/args.h"
@@ -12,8 +15,19 @@
 
 using namespace boost::filesystem;
 using boost::filesystem::path;
+using boost::algorithm::split;
 
 const string source_root_sentinal = "FynmfH4Tn6CA";
+
+string ReplaceSourceRootSentinal(const string& input) {
+  static const std::regex re("\\.whee\\/.*\\/" + source_root_sentinal + "\\/");
+  std::vector<string> lines_in, lines_out;
+  std::ostringstream oss;
+  split(lines_in, input, boost::is_any_of("\n"));
+  for (const string& line_in : lines_in)
+    oss << std::regex_replace(line_in, re, "") << std::endl;
+  return oss.str();
+}
 
 class Whee {
  public:
@@ -176,24 +190,58 @@ class Whee {
     bool operator>=(const RuleRef& that) const { return !(*this < that); }
   };
 
+  static string ProtoToH(const string& s) {
+    return path(s).stem().string() + ".pb.h";
+  }
+
+  static string ProtoToCC(const string& s) {
+    return path(s).stem().string() + ".pb.cc";
+  }
+
   struct Rule {
     string name;
     string full_name;
-    enum RuleKind { LIBRARY, PROGRAM, TEST };
+    enum RuleKind { PROTO, LIBRARY, PROGRAM, TEST };
     RuleKind kind;
-    std::vector<string> headers;
-    std::vector<string> sources;
+    std::vector<string> raw_headers;
+    std::vector<string> raw_sources;
     std::vector<RuleRef> dependencies;
+
+    std::vector<string> cc_headers() const {
+      if (kind != PROTO) {
+        return raw_headers;
+      }
+
+      std::vector<string> headers;
+
+      for (const string& raw_source : raw_sources)
+        headers.push_back(ProtoToH(raw_source));
+
+      return headers;
+    }
+
+    std::vector<string> cc_sources() const {
+      if (kind != PROTO) {
+        return raw_sources;
+      }
+
+      std::vector<string> sources;
+
+      for (const string& raw_source : raw_sources)
+        sources.push_back(ProtoToCC(raw_source));
+
+      return sources;
+    }
   };
 
-  struct SourceFile {
-    string filename;
-    std::time_t last_write_time;
-  };
+  //  struct SourceFile {
+  //    string filename;
+  //    std::time_t last_write_time;
+  //  };
 
   struct SourceDirectory {
     std::map<string, Rule> rules;
-    std::map<string, SourceFile> files;
+    //    std::map<string, SourceFile> files;
   };
 
   using SourceTree = std::map<string, SourceDirectory>;
@@ -216,10 +264,11 @@ class Whee {
         directory = directory.substr(source_root_strlen);
       }
       if (source_path.filename() != "RULES") {
-        const string filename = source_path.filename().string();
-        MUST(Insert(source_tree[directory].files, filename,
-                    SourceFile{filename, last_write_time(source_path)}),
-             "duplicate filename ", filename);
+        //        const string filename = source_path.filename().string();
+        //        MUST(Insert(source_tree[directory].files, filename,
+        //                    SourceFile{filename,
+        //                    last_write_time(source_path)}),
+        //             "duplicate filename ", filename);
       } else {
         auto rules_sequence = token_tree::ParseSequenceFile(source_path);
         for (const auto& rule_element : rules_sequence->elements) {
@@ -227,7 +276,9 @@ class Whee {
               dynamic_cast<token_tree::Sequence*>(rule_element.get());
           MUST(rule_sequence, "Unexpected element: ", rule_element->ToString());
           Rule rule;
-          if (rule_sequence->key == "library") {
+          if (rule_sequence->key == "proto") {
+            rule.kind = Rule::PROTO;
+          } else if (rule_sequence->key == "library") {
             rule.kind = Rule::LIBRARY;
           } else if (rule_sequence->key == "program") {
             rule.kind = Rule::PROGRAM;
@@ -256,11 +307,11 @@ class Whee {
               }
 
               if (section_sequence->key == "headers") {
-                MUST(rule.headers.empty());
-                rule.headers = std::move(pathlist);
+                MUST(rule.raw_headers.empty());
+                rule.raw_headers = std::move(pathlist);
               } else if (section_sequence->key == "sources") {
-                MUST(rule.sources.empty());
-                rule.sources = std::move(pathlist);
+                MUST(rule.raw_sources.empty());
+                rule.raw_sources = std::move(pathlist);
               } else if (section_sequence->key == "dependencies") {
                 MUST(rule.dependencies.empty());
                 for (const string& dependency : pathlist) {
@@ -299,6 +350,19 @@ class Whee {
     string tool_prefix;
   };
 
+  string GenProtoCommand(const path& source, const path& pb_root,
+                         const std::vector<path> include_paths,
+                         const path& pb_stderr) {
+    std::vector<string> include_paths_strings;
+    for (const path& include_path : include_paths)
+      include_paths_strings.push_back("--proto_path=" + include_path.string());
+
+    return EncodeAsString("protoc ",
+                          boost::algorithm::join(include_paths_strings, " "),
+                          " --cpp_out=", pb_root.string(), " ", source.string(),
+                          " 2> ", pb_stderr.string());
+  }
+
   string CompileCommand(const Platform& platform, const path& source,
                         const path& object, const path& primitives_header,
                         const std::vector<path> include_paths) {
@@ -331,7 +395,7 @@ class Whee {
         platform.tool_prefix, "g++ -std=gnu++14 -g -O3 -static -o ",
         program.string(), " -Wl,--start-group ",
         boost::algorithm::join(library_strings, " "),
-        " -Wl,--end-group -lboost_filesystem -lboost_system "
+        " -Wl,--end-group -lboost_filesystem -lboost_system -lprotobuf "
         "-Wl,--whole-archive -lpthread -Wl,--no-whole-archive");
   }
 
@@ -348,11 +412,12 @@ class Whee {
 
       for (const auto& rule_kv : directory.rules) {
         const string& rule_name = rule_kv.first;
+        const Rule& rule = rule_kv.second;
 
         RuleRef me(directory_name, rule_name);
         std::set<RuleRef> deps;
         deps.insert(me);
-        deps.insert(primitives_rule);
+        if (rule.kind != Rule::PROTO) deps.insert(primitives_rule);
         bool deps_added;
         do {
           deps_added = false;
@@ -383,7 +448,102 @@ class Whee {
     return ruledeps;
   }
 
-  void HardLinkSourceFiles(const SourceTree& source_tree,
+  void HardLinkProtoFiles(const SourceTree& source_tree,
+                          const path& protos_superroot) {
+    remove_all(protos_superroot);
+
+    for (const auto& directory_kv : source_tree) {
+      const string& directory_name = directory_kv.first;
+      const SourceDirectory& directory = directory_kv.second;
+
+      for (const auto& rule_kv : directory.rules) {
+        const string& rule_name = rule_kv.first;
+        const Rule& rule = rule_kv.second;
+
+        if (rule.kind != Rule::PROTO) continue;
+
+        const path protos_root = protos_superroot / directory_name / rule_name /
+                                 source_root_sentinal;
+
+        for (const string& proto : rule.raw_sources) {
+          const path origin_proto = GetSourceRoot() / directory_name / proto;
+          const path linked_proto = protos_root / directory_name / proto;
+          create_directories(protos_root / directory_name);
+          create_hard_link(origin_proto, linked_proto);
+        }
+      }
+    }
+  }
+
+  void GenProtoFiles(const SourceTree& source_tree,
+                     const path& protos_superroot, const path& pb_root,
+                     const std::map<RuleRef, std::set<RuleRef>>& ruledeps) {
+    for (const auto& directory_kv : source_tree) {
+      const string& directory_name = directory_kv.first;
+      const SourceDirectory& directory = directory_kv.second;
+
+      const path pb_directory = pb_root / directory_name;
+
+      create_directories(pb_directory);
+
+      for (const auto& rule_kv : directory.rules) {
+        const string& rule_name = rule_kv.first;
+        const Rule& rule = rule_kv.second;
+
+        if (rule.kind != Rule::PROTO) continue;
+
+        RuleRef me(directory_name, rule_name);
+
+        const path protos_root = protos_superroot / directory_name / rule_name /
+                                 source_root_sentinal;
+
+        std::vector<path> include_paths;
+        std::time_t protos_last_write_time = 0;
+
+        for (const RuleRef& dep : ruledeps.at(me)) {
+          include_paths.push_back(protos_superroot / dep.directory / dep.name /
+                                  source_root_sentinal);
+          const SourceDirectory& dep_directory = source_tree.at(dep.directory);
+          const Rule& dep_rule = dep_directory.rules.at(dep.name);
+          for (const string& proto_name : dep_rule.raw_sources) {
+            std::time_t proto_last_write_time =
+                last_write_time(GetSourceRoot() / dep.directory / proto_name);
+            if (proto_last_write_time > protos_last_write_time)
+              protos_last_write_time = proto_last_write_time;
+          }
+        }
+
+        for (const string& source_file : rule.raw_sources) {
+          const path source = protos_root / directory_name / source_file;
+          const path pb_header = pb_directory / ProtoToH(source_file);
+          const path pb_source = pb_directory / ProtoToCC(source_file);
+          const path pb_stderr =
+              pb_directory / (source.stem().string() + ".pb.stderr");
+
+          if (!exists(pb_header) || !exists(pb_source) ||
+              last_write_time(pb_header) <= protos_last_write_time ||
+              last_write_time(pb_source) <= protos_last_write_time) {
+            optional<Error> error;
+            try {
+              ExecuteShellCommand(
+                  GenProtoCommand(source, pb_root, include_paths, pb_stderr));
+            } catch (const Error& e) {
+              error = e;
+            }
+
+            string stderr = GetFileContents(pb_stderr);
+            std::cerr << ReplaceSourceRootSentinal(stderr);
+            std::cerr.flush();
+            if (error) {
+              throw * error;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  void HardLinkSourceFiles(const SourceTree& source_tree, const path& pb_root,
                            const path& headers_superroot,
                            const path& units_superroot) {
     remove_all(headers_superroot);
@@ -392,6 +552,7 @@ class Whee {
     for (const auto& directory_kv : source_tree) {
       const string& directory_name = directory_kv.first;
       const SourceDirectory& directory = directory_kv.second;
+      const path pb_directory = pb_root / directory_name;
 
       for (const auto& rule_kv : directory.rules) {
         const string& rule_name = rule_kv.first;
@@ -402,18 +563,35 @@ class Whee {
         const path units_root =
             units_superroot / directory_name / rule_name / source_root_sentinal;
 
-        for (const string& header : rule.headers) {
-          const path origin_header = GetSourceRoot() / directory_name / header;
-          const path linked_header = headers_root / directory_name / header;
-          create_directories(headers_root / directory_name);
-          create_hard_link(origin_header, linked_header);
-        }
+        if (rule.kind == Rule::PROTO) {
+          for (const string& proto : rule.raw_sources) {
+            const path pb_header = pb_directory / ProtoToH(proto);
+            const path pb_unit = pb_directory / ProtoToCC(proto);
 
-        for (const string& unit : rule.sources) {
-          const path origin_unit = GetSourceRoot() / directory_name / unit;
-          const path linked_unit = units_root / directory_name / unit;
-          create_directories(units_root / directory_name);
-          create_hard_link(origin_unit, linked_unit);
+            const path linked_pb_header =
+                headers_root / directory_name / ProtoToH(proto);
+            const path linked_pb_unit =
+                units_root / directory_name / ProtoToCC(proto);
+            create_directories(headers_root / directory_name);
+            create_hard_link(pb_header, linked_pb_header);
+            create_directories(units_root / directory_name);
+            create_hard_link(pb_unit, linked_pb_unit);
+          }
+        } else {
+          for (const string& header : rule.raw_headers) {
+            const path origin_header =
+                GetSourceRoot() / directory_name / header;
+            const path linked_header = headers_root / directory_name / header;
+            create_directories(headers_root / directory_name);
+            create_hard_link(origin_header, linked_header);
+          }
+
+          for (const string& unit : rule.raw_sources) {
+            const path origin_unit = GetSourceRoot() / directory_name / unit;
+            const path linked_unit = units_root / directory_name / unit;
+            create_directories(units_root / directory_name);
+            create_hard_link(origin_unit, linked_unit);
+          }
         }
       }
     }
@@ -432,10 +610,17 @@ class Whee {
 
     const path primitives_header = canonical(GetSourceRoot() / "primitives.h");
 
+    const path protos_superroot = GetWheeDir() / "proto";
+    const path pb_root = GetWheeDir() / "proto-gen";
     const path headers_superroot = GetWheeDir() / "headers";
     const path units_superroot = GetWheeDir() / "units";
 
-    HardLinkSourceFiles(source_tree, headers_superroot, units_superroot);
+    HardLinkProtoFiles(source_tree, protos_superroot);
+
+    GenProtoFiles(source_tree, protos_superroot, pb_root, ruledeps);
+
+    HardLinkSourceFiles(source_tree, pb_root, headers_superroot,
+                        units_superroot);
 
     for (const Platform& platform : platforms) {
       const path build_root = GetWheeDir() / "build" / platform.name;
@@ -465,39 +650,50 @@ class Whee {
           std::vector<path> include_paths;
           std::time_t source_last_write_time = 0;
 
-          for (const string& unit_name : rule.sources) {
+          for (const string& unit_name : rule.cc_sources()) {
             std::time_t unit_last_write_time =
-                directory.files.at(unit_name).last_write_time;
+                last_write_time(units_root / directory_name / unit_name);
             if (unit_last_write_time > source_last_write_time)
               source_last_write_time = unit_last_write_time;
           }
 
           for (const RuleRef& dep : ruledeps.at(me)) {
-            include_paths.push_back(headers_superroot / dep.directory /
-                                    dep.name / source_root_sentinal);
+            const path dep_headers_root = headers_superroot / dep.directory /
+                                          dep.name / source_root_sentinal;
+            include_paths.push_back(dep_headers_root);
             const SourceDirectory& dep_directory =
                 source_tree.at(dep.directory);
             const Rule& dep_rule = dep_directory.rules.at(dep.name);
-            for (const string& header_name : dep_rule.headers) {
-              std::time_t header_last_write_time =
-                  dep_directory.files.at(header_name).last_write_time;
+            for (const string& header_name : dep_rule.cc_headers()) {
+              std::time_t header_last_write_time = last_write_time(
+                  dep_headers_root / dep.directory / header_name);
               if (header_last_write_time > source_last_write_time)
                 source_last_write_time = header_last_write_time;
             }
           }
 
           std::vector<path> objects;
-          for (const string& source_file : rule.sources) {
+          for (const string& source_file : rule.cc_sources()) {
             const path source = units_root / directory_name / source_file;
             const path object =
                 build_directory / (source.stem().string() + ".o");
             if (!exists(object) ||
                 last_write_time(object) <= source_last_write_time) {
-              ExecuteShellCommand(CompileCommand(
-                  platform, source, object, primitives_header, include_paths));
+              optional<Error> error;
+              try {
+                ExecuteShellCommand(CompileCommand(platform, source, object,
+                                                   primitives_header,
+                                                   include_paths));
+              } catch (const Error& e) {
+                error = e;
+              }
+
               string stderr = GetFileContents(object.string() + ".stderr");
-              std::cerr << stderr;
+              std::cerr << ReplaceSourceRootSentinal(stderr);
               std::cerr.flush();
+              if (error) {
+                throw * error;
+              }
             }
             objects.push_back(object);
           }

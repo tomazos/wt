@@ -1,10 +1,28 @@
-program:
-  name = accelerometer_read
+library:
+  name = accelerometer_subsystem
+  headers:
+    accelerometer_subsystem.h
   sources:
-    accelerometer_read.cc
+    accelerometer_subsystem.cc
   dependencies:
-    /core/must
+    subsystem
     /wiring/i2c_device
+
+program:
+  name = accelerometer_subsystem_read
+  sources:
+    accelerometer_subsystem_read.cc
+  dependencies:
+    accelerometer_subsystem
+    /main/noargs
+
+program:
+  name = donuts
+  sources:
+    donuts.cc
+  dependencies:
+    ladybug
+    /main/noargs
 
 library:
   name = ladybug
@@ -13,8 +31,17 @@ library:
   sources:
     ladybug.cc
   dependencies:
+    accelerometer_subsystem
+    gyroscope_subsystem
+    magnetometer_subsystem
     motor_subsystem
     sonar_subsystem
+    ladybug_state
+
+proto:
+  name = ladybug_state
+  sources:
+    ladybug_state.proto
 
 program:
   name = ladybug_motor_set
@@ -23,13 +50,43 @@ program:
   dependencies:
     ladybug
     /core/must
+    /main/args
+
+library:
+  name = gyroscope_subsystem
+  headers:
+    gyroscope_subsystem.h
+  sources:
+    gyroscope_subsystem.cc
+  dependencies:
+    subsystem
+    /wiring/i2c_device
 
 program:
-  name = ladybug_sonar_ping
+  name = gyroscope_subsystem_read
   sources:
-    ladybug_sonar_ping.cc
+    gyroscope_subsystem_read.cc
   dependencies:
-    ladybug
+    gyroscope_subsystem
+    /main/noargs
+
+library:
+  name = magnetometer_subsystem
+  headers:
+    magnetometer_subsystem.h
+  sources:
+    magnetometer_subsystem.cc
+  dependencies:
+    subsystem
+    /wiring/i2c_device
+
+program:
+  name = magnetometer_subsystem_read
+  sources:
+    magnetometer_subsystem_read.cc
+  dependencies:
+    magnetometer_subsystem
+    /main/noargs
 
 library:
   name = motor_subsystem
@@ -42,6 +99,14 @@ library:
     /core/random
     /wiring/wiring
 
+program:
+  name = random_walk
+  sources:
+    random_walk.cc
+  dependencies:
+    ladybug
+    /main/noargs
+
 library:
   name = sonar_subsystem
   headers:
@@ -51,6 +116,13 @@ library:
   dependencies:
     subsystem
     /wiring/wiring
+
+program:
+  name = sonar_subsystem_read
+  sources:
+    sonar_subsystem_read.cc
+  dependencies:
+    sonar_subsystem
 
 library:
   name = subsystem

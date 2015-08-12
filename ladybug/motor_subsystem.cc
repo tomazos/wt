@@ -35,12 +35,12 @@ void MotorSubsystem::SetEnable(bool enable) {
 void MotorSubsystem::SetDirection(const Direction direction) {
   switch (direction) {
     case FORWARD:
-      digitalWrite(direction1_pin_, LOW);
-      digitalWrite(direction2_pin_, HIGH);
-      break;
-    case BACKWARD:
       digitalWrite(direction1_pin_, HIGH);
       digitalWrite(direction2_pin_, LOW);
+      break;
+    case BACKWARD:
+      digitalWrite(direction1_pin_, LOW);
+      digitalWrite(direction2_pin_, HIGH);
       break;
     case NEUTRAL:
       digitalWrite(direction1_pin_, HIGH);
