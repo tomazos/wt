@@ -3,7 +3,7 @@
 constexpr int MAGNETOMETER_I2C_ADDRESS = 0x1E;
 
 constexpr int CRA_REG_M = 0x00;
-constexpr int CRB_REG_M = 0x00;
+constexpr int CRB_REG_M = 0x01;
 constexpr int MR_REG_M = 0x02;
 
 constexpr int OUT_X_H_M = 0x03;

@@ -37,7 +37,29 @@ class bigint {
   bigint operator-() const { return bigint(-m); }
 
   bigint operator<<(int x) const { return bigint(m << x); }
-  bigint operator>>(int y) const { return bigint(m >> y); }
+  bigint operator>>(int x) const { return bigint(m >> x); }
+  bigint& operator<<=(int x) {
+    m <<= x;
+    return *this;
+  }
+  bigint& operator>>=(int x) {
+    m >>= x;
+    return *this;
+  }
+
+#define DEFINE_BIGINT_ASSIGNOP(op)         \
+  bigint& operator op(const bigint& rhs) { \
+    m op rhs.m;                            \
+    return *this;                          \
+  }
+
+  DEFINE_BIGINT_ASSIGNOP(+= )
+  DEFINE_BIGINT_ASSIGNOP(-= )
+  DEFINE_BIGINT_ASSIGNOP(*= )
+  DEFINE_BIGINT_ASSIGNOP(/= )
+  DEFINE_BIGINT_ASSIGNOP(%= )
+  DEFINE_BIGINT_ASSIGNOP(&= )
+  DEFINE_BIGINT_ASSIGNOP(|= )
 
  private:
   bigint(boost::multiprecision::cpp_int m_in) : m(std::move(m_in)) {}
@@ -49,48 +71,37 @@ class bigint {
   friend inline bigint operator*(const bigint& a, const bigint& b);
   friend inline bigint operator/(const bigint& a, const bigint& b);
   friend inline bigint operator%(const bigint& a, const bigint& b);
-  friend inline bigint operator==(const bigint& a, const bigint& b);
-  friend inline bigint operator!=(const bigint& a, const bigint& b);
-  friend inline bigint operator<(const bigint& a, const bigint& b);
-  friend inline bigint operator>(const bigint& a, const bigint& b);
-  friend inline bigint operator<=(const bigint& a, const bigint& b);
-  friend inline bigint operator>=(const bigint& a, const bigint& b);
+  friend inline bool operator==(const bigint& a, const bigint& b);
+  friend inline bool operator!=(const bigint& a, const bigint& b);
+  friend inline bool operator<(const bigint& a, const bigint& b);
+  friend inline bool operator>(const bigint& a, const bigint& b);
+  friend inline bool operator<=(const bigint& a, const bigint& b);
+  friend inline bool operator>=(const bigint& a, const bigint& b);
 };
 
 inline string EncodeAsString(bigint i) {
   return EncodeSignedIntegerAsString(i);
 }
 
-inline bigint operator+(const bigint& a, const bigint& b) {
-  return bigint(a.m + b.m);
-}
-inline bigint operator-(const bigint& a, const bigint& b) {
-  return bigint(a.m - b.m);
-}
-inline bigint operator*(const bigint& a, const bigint& b) {
-  return bigint(a.m * b.m);
-}
-inline bigint operator/(const bigint& a, const bigint& b) {
-  return bigint(a.m / b.m);
-}
-inline bigint operator%(const bigint& a, const bigint& b) {
-  return bigint(a.m % b.m);
-}
-inline bigint operator==(const bigint& a, const bigint& b) {
-  return bigint(a.m == b.m);
-}
-inline bigint operator!=(const bigint& a, const bigint& b) {
-  return bigint(a.m != b.m);
-}
-inline bigint operator<(const bigint& a, const bigint& b) {
-  return bigint(a.m < b.m);
-}
-inline bigint operator>(const bigint& a, const bigint& b) {
-  return bigint(a.m > b.m);
-}
-inline bigint operator<=(const bigint& a, const bigint& b) {
-  return bigint(a.m <= b.m);
-}
-inline bigint operator>=(const bigint& a, const bigint& b) {
-  return bigint(a.m >= b.m);
-}
+#define DEFINE_BIGINT_BINOP(op)                                 \
+  inline bigint operator op(const bigint& a, const bigint& b) { \
+    return bigint(a.m op b.m);                                  \
+  }
+
+DEFINE_BIGINT_BINOP(+)
+DEFINE_BIGINT_BINOP(-)
+DEFINE_BIGINT_BINOP(*)
+DEFINE_BIGINT_BINOP(/ )
+DEFINE_BIGINT_BINOP(% )
+
+#define DEFINE_BIGINT_RELOP(op)                               \
+  inline bool operator op(const bigint& a, const bigint& b) { \
+    return a.m op b.m;                                        \
+  }
+
+DEFINE_BIGINT_RELOP(== )
+DEFINE_BIGINT_RELOP(!= )
+DEFINE_BIGINT_RELOP(< )
+DEFINE_BIGINT_RELOP(> )
+DEFINE_BIGINT_RELOP(<= )
+DEFINE_BIGINT_RELOP(>= )

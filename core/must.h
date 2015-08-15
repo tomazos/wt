@@ -1,10 +1,15 @@
 #pragma once
 
 #include <iostream>
+#include <system_error>
 #include <utility>
 
 #include "core/error_class.h"
 #include "core/string_functions.h"
+
+#define THROW_ERRNO(...)                                 \
+  throw std::system_error(errno, std::system_category(), \
+                          EncodeAsString(__VA_ARGS__))
 
 #define DUMPEXPR(expr) DumpExprImpl(__FILE__, __LINE__, #expr, (expr));
 #define FAIL(...) FailImpl(__FILE__, __LINE__, ##__VA_ARGS__)

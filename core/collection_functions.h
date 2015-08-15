@@ -63,3 +63,8 @@ bool Insert(Collection& collection, const Key& key, Value&& value) {
     return false;
   }
 }
+
+template <typename Collection>
+void Reverse(Collection& collection) {
+  std::reverse(collection.begin(), collection.end());
+}

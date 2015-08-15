@@ -15,7 +15,7 @@ void Main() {
   });
 
   while (true) {
-    Sleep(1s);
+    Sleep(10ms);
     LockGuard l(mutex);
 
     DUMPEXPR(nupdates);
