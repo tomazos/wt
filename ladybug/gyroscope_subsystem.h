@@ -5,6 +5,8 @@
 
 class GyroscopeSubsystem : public Subsystem {
  public:
+  static constexpr float64 kFrequencyHertz = 100;
+
   GyroscopeSubsystem();
   ~GyroscopeSubsystem();
 

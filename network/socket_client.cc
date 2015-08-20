@@ -13,8 +13,7 @@ void Main() {
 
   sock.Shutdown(SHUT_WR);
 
-  for (I i = 0; i < k; i++) MUST_EQ(sock.ReceiveInteger(), i * 2);
+  for (I i = 0; i < k; i++) MUST_EQ(sock.ReceiveInteger().value(), i * 2);
 
-  char buf;
-  MUST_EQ(sock.TryReceive(&buf, 1), 0u);
+  MUST(!sock.ReceiveInteger());
 }

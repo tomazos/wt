@@ -16,6 +16,24 @@ program:
     accelerometer_subsystem
     /main/noargs
 
+library:
+  name = camera_subsystem
+  headers:
+    camera_subsystem.h
+  sources:
+    camera_subsystem.cc
+  dependencies:
+    subsystem
+    /raspicam/raspicam
+
+program:
+  name = camera_subsystem_read
+  sources:
+    camera_subsystem_read.cc
+  dependencies:
+    camera_subsystem
+    /main/noargs
+
 program:
   name = donuts
   sources:
@@ -32,16 +50,25 @@ library:
     ladybug.cc
   dependencies:
     accelerometer_subsystem
+    camera_subsystem
     gyroscope_subsystem
     magnetometer_subsystem
     motor_subsystem
     sonar_subsystem
     ladybug_state
 
-proto:
-  name = ladybug_state
+library:
+  name = ladybug_client
+  headers:
+    ladybug_client.h
   sources:
-    ladybug_state.proto
+    ladybug_client.cc
+  dependencies:
+    ladybug_network
+    ladybug_state
+    /core/must
+    /main/args
+    /network/socket
 
 program:
   name = ladybug_motor_set
@@ -51,6 +78,26 @@ program:
     ladybug
     /core/must
     /main/args
+
+proto:
+  name = ladybug_state
+  sources:
+    ladybug_state.proto
+
+library:
+  name = ladybug_network
+  headers:
+    ladybug_network.h
+
+program:
+  name = ladybug_server
+  sources:
+    ladybug_server.cc
+  dependencies:
+    ladybug
+    ladybug_network
+    /main/noargs
+    /network/socket
 
 library:
   name = gyroscope_subsystem

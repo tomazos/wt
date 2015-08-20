@@ -93,6 +93,7 @@ class Whee {
    - whee help: this message
    - whee init <dir>: Sets up dir as a source tree root.
    - whee tidy: tidies up the source tree.
+   - whee build: builds the source tree.
   )";
 
     static constexpr char helptext_init[] = R"(
@@ -348,6 +349,7 @@ class Whee {
   struct Platform {
     string name;
     string tool_prefix;
+    string lib_path;
   };
 
   string GenProtoCommand(const path& source, const path& pb_root,
@@ -395,8 +397,13 @@ class Whee {
         platform.tool_prefix, "g++ -std=gnu++14 -g -O3 -static -o ",
         program.string(), " -Wl,--start-group ",
         boost::algorithm::join(library_strings, " "),
-        " -Wl,--end-group -lboost_filesystem -lboost_system -lprotobuf "
-        "-Wl,--whole-archive -lpthread -Wl,--no-whole-archive");
+        " -lboost_filesystem -lboost_system -lprotobuf "
+        "-Wl,--whole-archive -lpthread -Wl,--no-whole-archive -lmmal "
+        "-lmmal_core -lmmal_util -lmmal_components -lvcos "
+        "-Wl,--whole-archive -lmmal_vc_client -Wl,--no-whole-archive "
+        "-lvchiq_arm -lmmal -lmmal_core -lmmal_util -lmmal_components "
+        "-lvcos -lvcsm -Wl,--end-group ",
+        platform.lib_path);
   }
 
   using RuleDeps = std::map<RuleRef, std::set<RuleRef>>;
@@ -598,11 +605,12 @@ class Whee {
   }
 
   void Build(const std::vector<string>& args) {
-    struct Platform native = {"native", ""};
-    struct Platform zubu = {"zubu", "x86_64-zubu-linux-gnu-"};
-    struct Platform zipi = {"zipi", "arm-zipi-linux-gnueabihf-"};
+    struct Platform native = {"native", "", "-L/usr/local/lib"};
+    struct Platform zubu = {"zubu", "x86_64-zubu-linux-gnu-", ""};
+    struct Platform zipi = {"zipi", "arm-zipi-linux-gnueabihf-", ""};
+    struct Platform zapi = {"zapi", "arm-zapi-linux-gnueabihf-", ""};
 
-    static std::vector<Platform> platforms = {native, zubu, zipi};
+    static std::vector<Platform> platforms = {native, zubu, zipi, zapi};
     const SourceTree source_tree = GetSourceTree();
 
     std::map<RuleRef, std::set<RuleRef>> ruledeps =

@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "ladybug/accelerometer_subsystem.h"
+#include "ladybug/camera_subsystem.h"
 #include "ladybug/gyroscope_subsystem.h"
 #include "ladybug/magnetometer_subsystem.h"
 #include "ladybug/motor_subsystem.h"
@@ -52,6 +53,7 @@ class LadyBug {
   AccelerometerSubsystem accelerometer_;
   GyroscopeSubsystem gyroscope_;
   MagnetometerSubsystem magnetometer_;
+  CameraSubsystem camera_;
 
   LadyBug(const LadyBug&) = delete;
   LadyBug(LadyBug&&) = delete;

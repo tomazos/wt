@@ -29,6 +29,9 @@ using std::experimental::nullopt;
 using std::experimental::in_place;
 using std::experimental::make_optional;
 
+namespace google {}
+using namespace google;
+
 using int8 = std::int8_t;
 using int16 = std::int16_t;
 using int32 = std::int32_t;

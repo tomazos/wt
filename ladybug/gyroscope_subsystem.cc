@@ -18,9 +18,10 @@ constexpr int OUT_Z_H_G = 0x2D;
 constexpr int FIFO_CTRL_G = 0x2E;
 constexpr int FIFO_SRC_G = 0x2F;
 
+// http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/DM00060659.pdf
 GyroscopeSubsystem::GyroscopeSubsystem() : device(GYROSCOPE_I2C_ADDRESS) {
   device.write_uint8(CTRL_REG1_G, 0b0001'1111);
-  device.write_uint8(CTRL_REG4_G, 0b0010'0000);
+  device.write_uint8(CTRL_REG4_G, 0b0001'0000);
   device.write_uint8(CTRL_REG5_G, 0b0100'0000);
   device.write_uint8(FIFO_CTRL_G, 0b0000'000'0);
   device.write_uint8(FIFO_CTRL_G, 0b0100'0000);
@@ -31,7 +32,7 @@ GyroscopeSubsystem::~GyroscopeSubsystem() { Stop(); }
 
 float64 GyroscopeSubsystem::ReadAngularRateReg(int OUT_H, int OUT_L) {
   int16 g = (device.read_uint8(OUT_L) | (device.read_uint8(OUT_H) << 8));
-  return (float64(g) / float64(1 << 15)) * 2000;
+  return (float64(g) / float64(1 << 15)) * 2 * M_PI * 500.0 / 360.0;
 }
 
 void GyroscopeSubsystem::Tick() {

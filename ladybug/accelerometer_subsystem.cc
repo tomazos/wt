@@ -21,6 +21,7 @@ constexpr int OUT_Z_H_A = 0x2D;
 constexpr int FIFO_CTRL_REG_A = 0x2E;
 constexpr int FIFO_SRC_REG_A = 0x2F;
 
+// http://www.st.com/web/en/resource/technical/document/datasheet/DM00027543.pdf
 AccelerometerSubsystem::AccelerometerSubsystem()
     : device(ACCELEROMETER_I2C_ADDRESS) {
   device.write_uint8(CTRL_REG1_A, 0b0101'011'1);

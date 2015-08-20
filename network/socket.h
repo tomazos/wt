@@ -3,6 +3,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
+#include <google/protobuf/message.h>
 
 #include "core/bigint.h"
 
@@ -30,13 +31,23 @@ class Socket {
   void Send(const void* buf, size_t len);
   void SendInteger(bigint n);
   void SendString(const string& str);
+  void SendMessage(const protobuf::Message& message);
 
   size_t TryReceive(void* buf, size_t len);
   void Receive(void* buf, size_t len);
-  bigint ReceiveInteger();
-  string ReceiveString();
+  optional<bigint> ReceiveInteger();
+  optional<string> ReceiveString();
+  [[gnu::warn_unused_result]] bool ReceiveMessage(protobuf::Message& message);
 
   void Shutdown(int how);
+
+  void Flush();
+
+  void GetOpt(int level, int optname, void* optval, socklen_t* optlen);
+  int GetOptInt(int level, int optname);
+
+  void SetOpt(int level, int optname, const void* optval, socklen_t optlen);
+  void SetOptInt(int level, int optname, int optval);
 
  private:
   Socket(int fd) : fd_(fd) {}

@@ -1,0 +1,35 @@
+library:
+  name = raspicam
+  headers:
+    exceptions.h
+    private_impl.h
+    private_still_impl.h
+    raspicam.h
+    raspicam_still.h
+    raspicamtypes.h
+    scaler.h
+    threadcondition.h
+    private_types.h
+  sources:
+    raspicam.cc
+    raspicam_still.cc
+    threadcondition.cc
+    private_impl.cc
+    private_still_impl.cc
+  dependencies:
+    /core/must
+
+program:
+  name = raspicam_test
+  sources:
+    raspicam_test.cc
+  dependencies:
+    raspicam
+
+library:
+  name = vcsm
+  headers:
+    vmcs_sm_ioctl.h
+    user-vcsm.h
+  sources:
+    user-vcsm.c

@@ -2,6 +2,8 @@
 
 #include <cstring>
 #include <netdb.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -108,6 +110,13 @@ void Socket::SendString(const string& str) {
   Send(str.data(), str.size());
 }
 
+void Socket::SendMessage(const protobuf::Message& message) {
+  string message_string;
+  if (!message.SerializeToString(&message_string))
+    FAIL("SerializeToString failed.");
+  SendString(message_string);
+}
+
 size_t Socket::TryReceive(void* const buf, const size_t len) {
   ssize_t recv_result = recv(fd_, buf, len, 0 /*flags*/);
   if (recv_result == -1) {
@@ -117,26 +126,47 @@ size_t Socket::TryReceive(void* const buf, const size_t len) {
 }
 
 void Socket::Receive(void* buf, size_t len) {
+  if (len == 0) return;
   char* ptr = static_cast<char*>(buf);
   const char* end = ptr + len;
   while (ptr < end) {
     size_t received_bytes = TryReceive(ptr, end - ptr);
-    if (received_bytes == 0) {
-      FAIL("Unexpected end-of-stream.");
-    }
+    if (received_bytes == 0) FAIL("Unexpected end-of-stream.");
     ptr += received_bytes;
   }
 }
 
-bigint Socket::ReceiveInteger() {
-  bigint result = 0;
+optional<bigint> Socket::ReceiveInteger() {
   uint8 m;
-  do {
+  size_t first_receive = TryReceive(&m, 1);
+  if (first_receive == 0) return nullopt;
+  bigint result = (m & 0b0111'1111);
+  while (m & 0b1000'0000) {
     Receive(&m, 1);
     result <<= 7;
     result |= (m & 0b0111'1111);
-  } while (m & 0b1000'0000);
+  }
   return result;
+}
+
+optional<string> Socket::ReceiveString() {
+  optional<bigint> string_length = ReceiveInteger();
+  if (!string_length) return nullopt;
+  MUST_LE(*string_length, std::numeric_limits<size_t>::max());
+  string result(size_t(*string_length), '\0');
+  Receive(&result[0], result.size());
+  return result;
+}
+
+[[gnu::warn_unused_result]] bool Socket::ReceiveMessage(
+    protobuf::Message& message) {
+  optional<string> message_string = ReceiveString();
+  if (!message_string) return false;
+  const bool parse_success = message.ParseFromString(*message_string);
+  if (!parse_success) {
+    FAIL("ParseFromString failed.");
+  }
+  return true;
 }
 
 void Socket::Shutdown(int how) {
@@ -144,6 +174,34 @@ void Socket::Shutdown(int how) {
   if (shutdown_result != 0) {
     THROW_ERRNO("shutdown");
   }
+}
+
+void Socket::Flush() {
+  SetOptInt(IPPROTO_TCP, TCP_NODELAY, 1);
+  SetOptInt(IPPROTO_TCP, TCP_NODELAY, 0);
+}
+
+void Socket::GetOpt(int level, int optname, void* optval, socklen_t* optlen) {
+  int getsockopt_result = getsockopt(fd_, level, optname, optval, optlen);
+  if (getsockopt_result != 0) THROW_ERRNO("getsockopt");
+}
+
+int Socket::GetOptInt(int level, int optname) {
+  int optval;
+  socklen_t optlen = sizeof(optval);
+  GetOpt(level, optname, &optval, &optlen);
+  MUST_EQ(optlen, sizeof(optval));
+  return optval;
+}
+
+void Socket::SetOpt(int level, int optname, const void* optval,
+                    socklen_t optlen) {
+  int setsockopt_result = setsockopt(fd_, level, optname, optval, optlen);
+  if (setsockopt_result != 0) THROW_ERRNO("setsockopt");
+}
+
+void Socket::SetOptInt(const int level, const int optname, const int optval) {
+  SetOpt(level, optname, &optval, sizeof(optval));
 }
 
 }  // namespace network

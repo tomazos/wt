@@ -1,21 +1,25 @@
 syntax = "proto2";
 
 message LadyBugState {
-  required double left = 1;
-  required double right = 2;
+  optional double left = 1 [default = 0];
+  optional double right = 2 [default = 0];
 
-  required double sonar = 3;
+  optional double sonar = 3 [default = 0];
 
-  required double ax = 4;
-  required double ay = 5;
-  required double az = 6;
+  optional double ax = 4 [default = 0];
+  optional double ay = 5 [default = 0];
+  optional double az = 6 [default = 0];
 
-  required double gx = 7;
-  required double gy = 8;
-  required double gz = 9;
+  optional double gx = 7 [default = 0];
+  optional double gy = 8 [default = 0];
+  optional double gz = 9 [default = 0];
 
-  required double mx = 11;
-  required double my = 12;
-  required double mz = 13;
+  optional double mx = 11 [default = 0];
+  optional double my = 12 [default = 0];
+  optional double mz = 13 [default = 0];
+
+  optional bytes image = 15;
+
+  optional double direction1 = 16 [default = 0];
+  optional double direction2 = 17 [default = 0];
 };
-

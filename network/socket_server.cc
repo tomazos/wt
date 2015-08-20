@@ -11,10 +11,9 @@ void Main() {
   server.Listen(5);
   network::Socket sock = Accept(server);
 
-  for (I i = 0; i < k; i++) MUST_EQ(sock.ReceiveInteger(), i);
+  for (I i = 0; i < k; i++) MUST_EQ(sock.ReceiveInteger().value(), i);
 
-  char buf;
-  MUST_EQ(sock.TryReceive(&buf, 1), 0u);
+  MUST(!sock.ReceiveInteger());
 
   for (I i = 0; i < k; i++) sock.SendInteger(i * 2);
 

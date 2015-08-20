@@ -5,6 +5,7 @@
 
 class AccelerometerSubsystem : public Subsystem {
  public:
+  static constexpr float64 kFrequencyHertz = 100;
   AccelerometerSubsystem();
   ~AccelerometerSubsystem();
 
