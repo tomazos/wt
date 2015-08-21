@@ -7,9 +7,9 @@
 #ifndef lstring_h
 #define lstring_h
 
-#include "lgc.h"
-#include "lobject.h"
-#include "lstate.h"
+#include "lua/lgc.h"
+#include "lua/lobject.h"
+#include "lua/lstate.h"
 
 #define sizelstring(l) (sizeof(union UTString) + ((l) + 1) * sizeof(char))
 

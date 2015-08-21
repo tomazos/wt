@@ -7,9 +7,9 @@
 #ifndef ldo_h
 #define ldo_h
 
-#include "lobject.h"
-#include "lstate.h"
-#include "lzio.h"
+#include "lua/lobject.h"
+#include "lua/lstate.h"
+#include "lua/lzio.h"
 
 #define luaD_checkstack(L, n)        \
   if (L->stack_last - L->top <= (n)) \

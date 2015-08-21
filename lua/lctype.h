@@ -7,7 +7,7 @@
 #ifndef lctype_h
 #define lctype_h
 
-#include "lua.h"
+#include "lua/lua.h"
 
 /*
 ** WARNING: the functions defined here do not necessarily correspond
@@ -31,7 +31,7 @@
 
 #include <limits.h>
 
-#include "llimits.h"
+#include "lua/llimits.h"
 
 #define ALPHABIT 0
 #define DIGITBIT 1

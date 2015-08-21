@@ -7,7 +7,7 @@
 #ifndef lualib_h
 #define lualib_h
 
-#include "lua.h"
+#include "lua/lua.h"
 
 LUAMOD_API int(luaopen_base)(lua_State *L);
 

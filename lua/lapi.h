@@ -7,8 +7,8 @@
 #ifndef lapi_h
 #define lapi_h
 
-#include "llimits.h"
-#include "lstate.h"
+#include "lua/llimits.h"
+#include "lua/lstate.h"
 
 #define api_incr_top(L)                                   \
   {                                                       \

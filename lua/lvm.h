@@ -7,9 +7,9 @@
 #ifndef lvm_h
 #define lvm_h
 
-#include "ldo.h"
-#include "lobject.h"
-#include "ltm.h"
+#include "lua/ldo.h"
+#include "lua/lobject.h"
+#include "lua/ltm.h"
 
 #if !defined(LUA_NOCVTN2S)
 #define cvt2str(o) ttisnumber(o)

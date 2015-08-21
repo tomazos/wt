@@ -39,6 +39,8 @@
 */
 /* #define LUA_USE_C89 */
 
+#define LUA_USE_LINUX
+
 /*
 ** By default, Lua on Windows use (some) specific Windows features
 */
@@ -53,8 +55,8 @@
 
 #if defined(LUA_USE_LINUX)
 #define LUA_USE_POSIX
-#define LUA_USE_DLOPEN   /* needs an extra library: -ldl */
-#define LUA_USE_READLINE /* needs some extra libraries */
+// #define LUA_USE_DLOPEN /* needs an extra library: -ldl */
+// #define LUA_USE_READLINE /* needs some extra libraries */
 #endif
 
 #if defined(LUA_USE_MACOSX)
@@ -484,7 +486,6 @@
 ** use LUAI_UACINT here to avoid problems with promotions (which
 ** can turn a comparison between unsigneds into a signed comparison)
 */
-#define LUA_UNSIGNED unsigned LUAI_UACINT
 
 /* now the variable definitions */
 
@@ -506,31 +507,11 @@
 
 #elif LUA_INT_TYPE == LUA_INT_LONGLONG /* }{ long long */
 
-#if defined(LLONG_MAX) /* { */
-/* use ISO C99 stuff */
-
-#define LUA_INTEGER long long
+#define LUA_INTEGER int64
+#define LUA_UNSIGNED uint64
 #define LUA_INTEGER_FRMLEN "ll"
-
-#define LUA_MAXINTEGER LLONG_MAX
-#define LUA_MININTEGER LLONG_MIN
-
-#elif defined(LUA_USE_WINDOWS) /* }{ */
-/* in Windows, can use specific Windows types */
-
-#define LUA_INTEGER __int64
-#define LUA_INTEGER_FRMLEN "I64"
-
-#define LUA_MAXINTEGER _I64_MAX
-#define LUA_MININTEGER _I64_MIN
-
-#else /* }{ */
-
-#error \
-    "Compiler does not support 'long long'. Use option '-DLUA_32BITS' \
-  or '-DLUA_C89_NUMBERS' (see file 'luaconf.h' for details)"
-
-#endif /* } */
+constexpr auto LUA_MAXINTEGER = std::numeric_limits<LUA_INTEGER>::max();
+constexpr auto LUA_MININTEGER = std::numeric_limits<LUA_INTEGER>::min();
 
 #else /* }{ */
 

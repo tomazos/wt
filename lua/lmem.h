@@ -9,8 +9,8 @@
 
 #include <stddef.h>
 
-#include "llimits.h"
-#include "lua.h"
+#include "lua/llimits.h"
+#include "lua/lua.h"
 
 /*
 ** This macro reallocs a vector 'b' from 'on' to 'n' elements, where

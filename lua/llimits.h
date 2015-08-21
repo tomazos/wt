@@ -10,7 +10,7 @@
 #include <limits.h>
 #include <stddef.h>
 
-#include "lua.h"
+#include "lua/lua.h"
 
 /*
 ** 'lu_mem' and 'l_mem' are unsigned/signed integers big enough to count

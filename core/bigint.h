@@ -10,11 +10,13 @@ class bigint {
   bigint(int8 i) : m(i) {}
   bigint(int16 i) : m(i) {}
   bigint(int32 i) : m(i) {}
+  bigint(long i) : m(i) {}
   bigint(int64 i) : m(i) {}
 
   bigint(uint8 i) : m(i) {}
   bigint(uint16 i) : m(i) {}
   bigint(uint32 i) : m(i) {}
+  bigint(unsigned long i) : m(i) {}
   bigint(uint64 i) : m(i) {}
 
   template <typename T>

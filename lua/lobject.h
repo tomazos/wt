@@ -9,8 +9,8 @@
 
 #include <stdarg.h>
 
-#include "llimits.h"
-#include "lua.h"
+#include "lua/llimits.h"
+#include "lua/lua.h"
 
 /*
 ** Extra tags for non-values

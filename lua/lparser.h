@@ -7,9 +7,9 @@
 #ifndef lparser_h
 #define lparser_h
 
-#include "llimits.h"
-#include "lobject.h"
-#include "lzio.h"
+#include "lua/llimits.h"
+#include "lua/lobject.h"
+#include "lua/lzio.h"
 
 /*
 ** Expression descriptor

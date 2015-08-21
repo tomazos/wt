@@ -7,7 +7,7 @@
 #ifndef lopcodes_h
 #define lopcodes_h
 
-#include "llimits.h"
+#include "lua/llimits.h"
 
 /*===========================================================================
   We assume that instructions are unsigned numbers.
