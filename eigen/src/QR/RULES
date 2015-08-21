@@ -1,0 +1,8 @@
+library:
+  name = QR
+  headers:
+    FullPivHouseholderQR.h
+    ColPivHouseholderQR.h
+    ColPivHouseholderQR_MKL.h
+    HouseholderQR.h
+    HouseholderQR_MKL.h

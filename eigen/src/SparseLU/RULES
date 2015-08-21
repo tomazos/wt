@@ -1,0 +1,20 @@
+library:
+  name = SparseLU
+  headers:
+    SparseLU_panel_dfs.h
+    SparseLU_Structs.h
+    SparseLU_column_dfs.h
+    SparseLU_SupernodalMatrix.h
+    SparseLU_gemm_kernel.h
+    SparseLU_panel_bmod.h
+    SparseLU_column_bmod.h
+    SparseLU_Utils.h
+    SparseLU_heap_relax_snode.h
+    SparseLU_kernel_bmod.h
+    SparseLU_relax_snode.h
+    SparseLU_copy_to_ucol.h
+    SparseLU.h
+    SparseLU_Memory.h
+    SparseLUImpl.h
+    SparseLU_pruneL.h
+    SparseLU_pivotL.h

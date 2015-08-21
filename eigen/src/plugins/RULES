@@ -1,0 +1,10 @@
+library:
+  name = plugins
+  headers:
+    BlockMethods.h
+    ArrayCwiseBinaryOps.h
+    MatrixCwiseBinaryOps.h
+    CommonCwiseBinaryOps.h
+    CommonCwiseUnaryOps.h
+    MatrixCwiseUnaryOps.h
+    ArrayCwiseUnaryOps.h

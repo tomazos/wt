@@ -1,0 +1,4 @@
+library:
+  name = SPQRSupport
+  headers:
+    SuiteSparseQRSupport.h

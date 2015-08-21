@@ -1,0 +1,6 @@
+library:
+  name = Cholesky
+  headers:
+    LDLT.h
+    LLT_MKL.h
+    LLT.h

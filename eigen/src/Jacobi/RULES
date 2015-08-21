@@ -1,0 +1,4 @@
+library:
+  name = Jacobi
+  headers:
+    Jacobi.h

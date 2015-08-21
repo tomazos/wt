@@ -20,30 +20,30 @@
   * Please, see the documentation of the SparseLU class for more details.
   */
 
-#include "src/misc/Solve.h"
-#include "src/misc/SparseSolve.h"
+#include "eigen/src/misc/Solve.h"
+#include "eigen/src/misc/SparseSolve.h"
 
 // Ordering interface
 #include "OrderingMethods"
 
-#include "src/SparseLU/SparseLU_gemm_kernel.h"
+#include "eigen/src/SparseLU/SparseLU_gemm_kernel.h"
 
-#include "src/SparseLU/SparseLU_Structs.h"
-#include "src/SparseLU/SparseLU_SupernodalMatrix.h"
-#include "src/SparseLU/SparseLUImpl.h"
-#include "src/SparseCore/SparseColEtree.h"
-#include "src/SparseLU/SparseLU_Memory.h"
-#include "src/SparseLU/SparseLU_heap_relax_snode.h"
-#include "src/SparseLU/SparseLU_relax_snode.h"
-#include "src/SparseLU/SparseLU_pivotL.h"
-#include "src/SparseLU/SparseLU_panel_dfs.h"
-#include "src/SparseLU/SparseLU_kernel_bmod.h"
-#include "src/SparseLU/SparseLU_panel_bmod.h"
-#include "src/SparseLU/SparseLU_column_dfs.h"
-#include "src/SparseLU/SparseLU_column_bmod.h"
-#include "src/SparseLU/SparseLU_copy_to_ucol.h"
-#include "src/SparseLU/SparseLU_pruneL.h"
-#include "src/SparseLU/SparseLU_Utils.h"
-#include "src/SparseLU/SparseLU.h"
+#include "eigen/src/SparseLU/SparseLU_Structs.h"
+#include "eigen/src/SparseLU/SparseLU_SupernodalMatrix.h"
+#include "eigen/src/SparseLU/SparseLUImpl.h"
+#include "eigen/src/SparseCore/SparseColEtree.h"
+#include "eigen/src/SparseLU/SparseLU_Memory.h"
+#include "eigen/src/SparseLU/SparseLU_heap_relax_snode.h"
+#include "eigen/src/SparseLU/SparseLU_relax_snode.h"
+#include "eigen/src/SparseLU/SparseLU_pivotL.h"
+#include "eigen/src/SparseLU/SparseLU_panel_dfs.h"
+#include "eigen/src/SparseLU/SparseLU_kernel_bmod.h"
+#include "eigen/src/SparseLU/SparseLU_panel_bmod.h"
+#include "eigen/src/SparseLU/SparseLU_column_dfs.h"
+#include "eigen/src/SparseLU/SparseLU_column_bmod.h"
+#include "eigen/src/SparseLU/SparseLU_copy_to_ucol.h"
+#include "eigen/src/SparseLU/SparseLU_pruneL.h"
+#include "eigen/src/SparseLU/SparseLU_Utils.h"
+#include "eigen/src/SparseLU/SparseLU.h"
 
 #endif // EIGEN_SPARSELU_MODULE_H

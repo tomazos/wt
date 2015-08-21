@@ -3,7 +3,7 @@
 
 #include "Core"
 
-#include "src/Core/util/DisableStupidWarnings.h"
+#include "eigen/src/Core/util/DisableStupidWarnings.h"
 
 /** \defgroup Jacobi_Module Jacobi module
   * This module provides Jacobi and Givens rotations.
@@ -17,9 +17,9 @@
   *  - MatrixBase::applyOnTheRight().
   */
 
-#include "src/Jacobi/Jacobi.h"
+#include "eigen/src/Jacobi/Jacobi.h"
 
-#include "src/Core/util/ReenableStupidWarnings.h"
+#include "eigen/src/Core/util/ReenableStupidWarnings.h"
 
 #endif // EIGEN_JACOBI_MODULE_H
 /* vim: set filetype=cpp et sw=2 ts=2 ai: */

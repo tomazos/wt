@@ -19,7 +19,7 @@
 
 #else
 
-#include "src/StlSupport/StdList.h"
+#include "eigen/src/StlSupport/StdList.h"
 
 #endif
 

@@ -1,0 +1,8 @@
+library:
+  name = LU
+  headers:
+    PartialPivLU.h
+    FullPivLU.h
+    Inverse.h
+    PartialPivLU_MKL.h
+    Determinant.h
