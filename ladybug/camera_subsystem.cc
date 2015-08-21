@@ -16,7 +16,7 @@ CameraSubsystem::CameraSubsystem() {
   raspicam_.setFormat(raspicam::RASPICAM_FORMAT_RGB);
   //  raspicam_.setExposure(raspicam::RASPICAM_EXPOSURE_AUTO);
   //  raspicam_.setAWB(raspicam::RASPICAM_AWB_AUTO);
-  raspicam_.setExposure(raspicam::RASPICAM_EXPOSURE_VERYLONG);
+  raspicam_.setExposure(raspicam::RASPICAM_EXPOSURE_NIGHT);
   raspicam_.setAWB(raspicam::RASPICAM_AWB_OFF);
 
   MUST(raspicam_.open(true));
