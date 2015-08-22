@@ -1,0 +1,28 @@
+test:
+  name = allocator_test
+  sources:
+    allocator_test.cc
+  dependencies:
+    xxua
+    /testing
+
+library:
+  name = xxua
+  headers:
+    allocator.h
+    debug_allocator.h
+    state.h
+  sources:
+    debug_allocator.cc
+    state.cc
+  dependencies:
+    /core/must
+    /lua/core
+
+test:
+  name = state_test
+  sources:
+    state_test.cc
+  dependencies:
+    xxua
+    /testing

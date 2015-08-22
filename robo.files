@@ -425,7 +425,6 @@ lua/RULES
 lua/lvm.cc
 lua/ldblib.cc
 lua/ldump.cc
-lua/lua.hpp
 lua/lapi.cc
 lua/lcorolib.cc
 lua/lua.h
@@ -468,3 +467,12 @@ lua/lopcodes.h
 lua/lbaselib.cc
 lua/lgc.cc
 lua/lstring.cc
+lua/state.h
+xxua/state.h
+xxua/allocator.h
+xxua/state.cc
+xxua/RULES
+xxua/state_test.cc
+xxua/allocator_test.cc
+xxua/debug_allocator.h
+xxua/debug_allocator.cc
