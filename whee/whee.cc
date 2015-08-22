@@ -532,6 +532,8 @@ class Whee {
               last_write_time(pb_source) <= protos_last_write_time) {
             optional<Error> error;
             try {
+              std::cout << " [PROTO] " << directory_name << "/" << source_file
+                        << std::endl;
               ExecuteShellCommand(
                   GenProtoCommand(source, pb_root, include_paths, pb_stderr));
             } catch (const Error& e) {
@@ -689,6 +691,8 @@ class Whee {
                 last_write_time(object) <= source_last_write_time) {
               optional<Error> error;
               try {
+                std::cout << " [CC] " << platform.name << " " << directory_name
+                          << "/" << source_file << std::endl;
                 ExecuteShellCommand(CompileCommand(platform, source, object,
                                                    primitives_header,
                                                    include_paths));
@@ -717,6 +721,8 @@ class Whee {
             const path library = build_directory / (rule_name + ".a");
             if (!exists(library) ||
                 last_write_time(library) <= objects_last_write_time) {
+              std::cout << " [AR] " << platform.name << " " << directory_name
+                        << "/" << rule_name << std::endl;
               ExecuteShellCommand(LibraryCommand(platform, library, objects));
             }
             library_files[me] = library;
@@ -756,9 +762,13 @@ class Whee {
           }
           if (!exists(program) ||
               last_write_time(program) <= libs_last_write_time) {
+            std::cout << " [LN] " << platform.name << " " << directory_name
+                      << "/" << rule_name << std::endl;
             ExecuteShellCommand(ProgramCommand(platform, program, libs));
           }
           if (rule.kind == Rule::TEST && platform.name == "zubu") {
+            std::cout << " [TEST] " << platform.name << " " << directory_name
+                      << "/" << rule_name << std::endl;
             ExecuteShellCommand(program.string());
           }
         }

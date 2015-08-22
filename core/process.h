@@ -8,7 +8,7 @@
 template <typename... Args>
 void ExecuteShellCommand(const Args&... args) {
   const string command = EncodeAsString(args...);
-  std::cout << command << std::endl;
+  //  std::cout << command << std::endl;
   int system_result = system(command.c_str());
   const string call_desc = EncodeAsString("std::system(", command, "): ");
   if (system_result == -1) {
