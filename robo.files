@@ -476,3 +476,6 @@ xxua/state_test.cc
 xxua/allocator_test.cc
 xxua/debug_allocator.h
 xxua/debug_allocator.cc
+xxua/writer.h
+xxua/type.h
+xxua/reader.h

@@ -11,7 +11,10 @@ library:
   headers:
     allocator.h
     debug_allocator.h
+    reader.h
     state.h
+    type.h
+    writer.h
   sources:
     debug_allocator.cc
     state.cc

@@ -229,6 +229,11 @@ LUA_API int lua_type(lua_State *L, int idx) {
   return (isvalid(o) ? ttnov(o) : LUA_TNONE);
 }
 
+LUA_API uint8 xlua_type(lua_State *L, int idx) {
+  StkId o = index2addr(L, idx);
+  return (isvalid(o) ? ttype(o) : XLUA_TNONE);
+}
+
 LUA_API const char *lua_typename(lua_State *L, int t) {
   UNUSED(L);
   api_check(L, LUA_TNONE <= t && t < LUA_NUMTAGS, "invalid tag");

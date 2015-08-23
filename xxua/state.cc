@@ -1,5 +1,7 @@
 #include "xxua/state.h"
 
+#include <cstring>
+
 namespace xxua {
 
 static void* DefaultAllocate(void* ud[[gnu::unused]], void* ptr,
@@ -29,7 +31,7 @@ static Allocator::BlockPurpose TranslateBlockPurpose(size_t osize) {
 }
 
 static void* CustomAllocate(void* ud, void* ptr, size_t osize, size_t nsize) {
-  Allocator& allocator = *reinterpret_cast<Allocator*>(ud);
+  Allocator& allocator = *static_cast<Allocator*>(ud);
   if (ptr == nullptr) {
     if (nsize == 0) return nullptr;
     const auto block_purpose = TranslateBlockPurpose(osize);
@@ -57,9 +59,11 @@ State::State(lua_State* L_in) : L(L_in) {
   if (L == nullptr)
     throw std::runtime_error("Could not create a new lua state.");
   AtPanic(PanicThrow);
+  void* const extra_space = lua_getextraspace(L);
+  const void* const state_void = this;
+  STATIC_ASSERT(sizeof(void*) == LUA_EXTRASPACE);
+  std::memcpy(extra_space, &state_void, LUA_EXTRASPACE);
 }
-
-State::State(State&& other) : L(other.L) { other.L = nullptr; }
 
 void State::Close() {
   if (L) {
@@ -67,17 +71,45 @@ void State::Close() {
   }
 }
 
-void State::AtPanic(lua_CFunction panic_function) {
-  lua_atpanic(L, panic_function);
+State::CFunction State::AtPanic(CFunction panic_function) {
+  return lua_atpanic(L, panic_function);
+}
+
+static std::string LastWriterError() {
+  thread_local std::string s;
+  return s;
+}
+
+static int WriterFunction(lua_State* L, const void* p, size_t sz, void* ud) {
+  Writer& writer = *static_cast<Writer*>(ud);
+  try {
+    writer.Write(p, sz);
+    return 0;
+  } catch (std::exception e) {
+    LastWriterError() = e.what();
+    return 1;
+  }
+}
+
+void State::Save(Writer& writer, bool strip) {
+  void* ud = &writer;
+  if (lua_dump(L, WriterFunction, ud, strip) == 0)
+    return;
+  else
+    throw std::runtime_error(LastWriterError());
+}
+
+static const char* ReaderFunction(lua_State* L, void* ud, size_t* size) {
+  Reader& reader = *static_cast<Reader*>(ud);
+  Reader::Buffer buffer = reader.Read();
+  *size = buffer.size;
+  return buffer.data;
+}
+
+void State::Load(Reader& reader, const string& chunkname, const char* mode) {
+  lua_load(L, ReaderFunction, &reader, chunkname.c_str(), mode);
 }
 
 State::~State() { Close(); }
-
-State& State::operator=(State&& other) {
-  Close();
-  L = other.L;
-  other.L = nullptr;
-  return *this;
-}
 
 }  // namespace xxua

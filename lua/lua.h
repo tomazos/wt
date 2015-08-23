@@ -52,7 +52,7 @@ typedef struct lua_State lua_State;
 ** basic types
 */
 #define LUA_TNONE (-1)
-
+#define XLUA_TNONE (0x80)
 #define LUA_TNIL 0
 #define LUA_TBOOLEAN 1
 #define LUA_TLIGHTUSERDATA 2
@@ -153,6 +153,7 @@ LUA_API int(lua_iscfunction)(lua_State *L, int idx);
 LUA_API int(lua_isinteger)(lua_State *L, int idx);
 LUA_API int(lua_isuserdata)(lua_State *L, int idx);
 LUA_API int(lua_type)(lua_State *L, int idx);
+LUA_API uint8(xlua_type)(lua_State *L, int idx);
 LUA_API const char *(lua_typename)(lua_State *L, int tp);
 
 LUA_API lua_Number(lua_tonumberx)(lua_State *L, int idx, int *isnum);
