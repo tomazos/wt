@@ -6,6 +6,7 @@
 
 #include "core/error_class.h"
 #include "core/string_functions.h"
+#include "whee/source_root_sentinal.h"
 
 #define THROW_ERRNO(...)                                 \
   throw std::system_error(errno, std::system_category(), \
@@ -30,17 +31,23 @@
 #define MUST_GE(lhs, rhs, ...) \
   MustGreaterEqualImpl(lhs, rhs, #lhs, #rhs, __FILE__, __LINE__, ##__VA_ARGS__)
 
+template <typename... Args>
+string EncodeSourceMessage(const char* file, int64 line, Args&&... args) {
+  return EncodeAsString(ReplaceSourceRootSentinal(file), ":", line, ":", 1,
+                        ": ", std::forward<Args>(args)...);
+}
+
 template <typename Expr>
 void DumpExprImpl(const char* file, int64 line, const char* expr_string,
                   Expr&& expr) {
-  std::cout << EncodeAsString(file, ":", line, ":", 1, ": ", expr_string, " = ",
-                              std::forward<Expr>(expr)) << std::endl;
+  std::cout << EncodeSourceMessage(file, line, expr_string, " = ",
+                                   std::forward<Expr>(expr)) << std::endl;
 }
 
 template <typename... Args>
 [[noreturn]] void ThrowError(const char* file, int64 line, Args&&... args) {
-  throw Error(EncodeAsString(file, ":", line, ":", 1, ": error: ",
-                             std::forward<Args>(args)...));
+  throw Error(
+      EncodeSourceMessage(file, line, "error: ", std::forward<Args>(args)...));
 }
 
 template <typename... Args>

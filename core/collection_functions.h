@@ -27,6 +27,14 @@ bool Contains(const Collection& collection, const Value& value) {
          std::end(collection);
 }
 
+inline bool Contains(const string& subject, const string& object) {
+  return subject.find(object) != string::npos;
+}
+
+inline bool Contains(const string& subject, const char* object) {
+  return subject.find(object) != string::npos;
+}
+
 template <typename Collection, typename Key = typename Collection::key_type>
 bool ContainsKey(const Collection& collection, const Key& key) {
   return collection.find(key) != collection.end();

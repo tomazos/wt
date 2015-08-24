@@ -1014,12 +1014,10 @@ LUA_API int lua_gc(lua_State *L, int what, int data) {
 ** miscellaneous functions
 */
 
-LUA_API int lua_error(lua_State *L) {
+[[noreturn]] LUA_API int lua_error(lua_State *L) {
   lua_lock(L);
   api_checknelems(L, 1);
   luaG_errormsg(L);
-  /* code unreachable; will unlock when control actually leaves the kernel */
-  return 0; /* to avoid warnings */
 }
 
 LUA_API int lua_next(lua_State *L, int idx) {

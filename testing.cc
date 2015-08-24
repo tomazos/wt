@@ -6,6 +6,6 @@ int main() {
   try {
     TestMain();
   } catch (const Error& error) {
-    std::cerr << "TEST FAILED: " << error.what() << std::endl;
+    std::cerr << error.what() << std::endl;
   }
 }

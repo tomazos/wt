@@ -28,6 +28,10 @@ class State {
   inline int StackSize();
   inline bool CheckStack(int n);
 
+  // pseudo-indexes
+  static constexpr Index REGISTRY = LUA_REGISTRYINDEX;
+  inline static Index UPVALUE(int i);
+
   // stack mutate
   inline void ResizeStack(Index n);
   inline void Insert(Index index);
@@ -43,6 +47,7 @@ class State {
   inline bool ToBoolean(Index index);
   inline Integer ToInteger(Index index);
   inline Float ToFloat(Index index);
+  inline static optional<Integer> FloatToInteger(Float n);
   inline string ToString(Index index);
   inline CFunction ToCFunction(Index index);
   inline void* ToUserdata(Index index);
@@ -121,14 +126,11 @@ class State {
   // tables
   inline void PopField(Index table, bool raw = false);
   inline void PushField(Index table, bool raw = false);
-  [[gnu::warn_unused_result]]inline bool Next(Index table);
+  [[gnu::warn_unused_result]] inline bool Next(Index table);
 
   // metatable
   inline void PopMetatable(Index index);
   [[gnu::warn_unused_result]] inline bool PushMetatable(Index index);
-
-  inline static optional<Integer> FloatToInteger(Float n);
-  inline static Index UpvalueIndex(int i);
 
  private:
   CFunction AtPanic(CFunction panic_function);
@@ -350,7 +352,9 @@ inline void State::LoadFromString(const string& s, const string& chunkname,
   LoadFromStream(iss, chunkname, format);
 }
 
-[[gnu::warn_unused_result]] inline bool State::Next(Index index) { return lua_next(L, index); }
+[[gnu::warn_unused_result]] inline bool State::Next(Index index) {
+  return lua_next(L, index);
+}
 
 inline optional<State::Integer> State::FloatToInteger(Float n) {
   Integer i;
@@ -406,6 +410,6 @@ inline const void* State::ToPointer(Index index) {
 
 inline void* State::ToUserdata(Index index) { return lua_touserdata(L, index); }
 
-inline State::Index State::UpvalueIndex(int i) { return lua_upvalueindex(i); }
+inline State::Index State::UPVALUE(int i) { return lua_upvalueindex(i); }
 
 }  // namespace xxua

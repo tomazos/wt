@@ -2,31 +2,31 @@
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <map>
-#include <regex>
 #include <set>
-#include <sstream>
 #include <vector>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "main/args.h"
+#include "core/bigint.h"
 #include "core/file_functions.h"
 #include "core/must.h"
 #include "core/process.h"
+#include "whee/source_root_sentinal.h"
 #include "whee/token_tree.h"
 
 using namespace boost::filesystem;
 using boost::filesystem::path;
 using boost::algorithm::split;
 
-const string source_root_sentinal = "FynmfH4Tn6CA";
+const string source_root_sentinal = GetSourceRootSentinal();
 
-string ReplaceSourceRootSentinal(const string& input) {
-  static const std::regex re("\\.whee\\/.*\\/" + source_root_sentinal + "\\/");
-  std::vector<string> lines_in, lines_out;
-  std::ostringstream oss;
-  split(lines_in, input, boost::is_any_of("\n"));
-  for (const string& line_in : lines_in)
-    oss << std::regex_replace(line_in, re, "") << std::endl;
-  return oss.str();
+bigint LastModificationTime(const path& p) {
+  struct stat s;
+  int stat_result = stat(p.string().c_str(), &s);
+  if (stat_result != 0) THROW_ERRNO("stat(", p, ")");
+  return bigint(s.st_mtim.tv_sec) * 1'000'000'000 + s.st_mtim.tv_nsec;
 }
 
 class Whee {
@@ -268,7 +268,7 @@ class Whee {
         //        const string filename = source_path.filename().string();
         //        MUST(Insert(source_tree[directory].files, filename,
         //                    SourceFile{filename,
-        //                    last_write_time(source_path)}),
+        //                    LastModificationTime(source_path)}),
         //             "duplicate filename ", filename);
       } else {
         auto rules_sequence = token_tree::ParseSequenceFile(source_path);
@@ -505,7 +505,7 @@ class Whee {
                                  source_root_sentinal;
 
         std::vector<path> include_paths;
-        std::time_t protos_last_write_time = 0;
+        bigint protos_last_write_time = 0;
 
         for (const RuleRef& dep : ruledeps.at(me)) {
           include_paths.push_back(protos_superroot / dep.directory / dep.name /
@@ -513,8 +513,8 @@ class Whee {
           const SourceDirectory& dep_directory = source_tree.at(dep.directory);
           const Rule& dep_rule = dep_directory.rules.at(dep.name);
           for (const string& proto_name : dep_rule.raw_sources) {
-            std::time_t proto_last_write_time =
-                last_write_time(GetSourceRoot() / dep.directory / proto_name);
+            bigint proto_last_write_time = LastModificationTime(
+                GetSourceRoot() / dep.directory / proto_name);
             if (proto_last_write_time > protos_last_write_time)
               protos_last_write_time = proto_last_write_time;
           }
@@ -528,8 +528,8 @@ class Whee {
               pb_directory / (source.stem().string() + ".pb.stderr");
 
           if (!exists(pb_header) || !exists(pb_source) ||
-              last_write_time(pb_header) <= protos_last_write_time ||
-              last_write_time(pb_source) <= protos_last_write_time) {
+              LastModificationTime(pb_header) <= protos_last_write_time ||
+              LastModificationTime(pb_source) <= protos_last_write_time) {
             optional<Error> error;
             try {
               std::cout << " [PROTO] " << directory_name << "/" << source_file
@@ -658,11 +658,11 @@ class Whee {
                                   source_root_sentinal;
 
           std::vector<path> include_paths;
-          std::time_t source_last_write_time = 0;
+          bigint source_last_write_time = 0;
 
           for (const string& unit_name : rule.cc_sources()) {
-            std::time_t unit_last_write_time =
-                last_write_time(units_root / directory_name / unit_name);
+            bigint unit_last_write_time =
+                LastModificationTime(units_root / directory_name / unit_name);
             if (unit_last_write_time > source_last_write_time)
               source_last_write_time = unit_last_write_time;
           }
@@ -675,7 +675,7 @@ class Whee {
                 source_tree.at(dep.directory);
             const Rule& dep_rule = dep_directory.rules.at(dep.name);
             for (const string& header_name : dep_rule.cc_headers()) {
-              std::time_t header_last_write_time = last_write_time(
+              bigint header_last_write_time = LastModificationTime(
                   dep_headers_root / dep.directory / header_name);
               if (header_last_write_time > source_last_write_time)
                 source_last_write_time = header_last_write_time;
@@ -688,7 +688,7 @@ class Whee {
             const path object =
                 build_directory / (source.stem().string() + ".o");
             if (!exists(object) ||
-                last_write_time(object) <= source_last_write_time) {
+                LastModificationTime(object) <= source_last_write_time) {
               optional<Error> error;
               try {
                 std::cout << " [CC] " << platform.name << " " << directory_name
@@ -711,16 +711,16 @@ class Whee {
           }
 
           if (!objects.empty()) {
-            std::time_t objects_last_write_time = 0;
+            bigint objects_last_write_time = 0;
             for (const path& object : objects) {
-              std::time_t object_last_write_time = last_write_time(object);
+              bigint object_last_write_time = LastModificationTime(object);
               if (object_last_write_time > objects_last_write_time) {
                 objects_last_write_time = object_last_write_time;
               }
             }
             const path library = build_directory / (rule_name + ".a");
             if (!exists(library) ||
-                last_write_time(library) <= objects_last_write_time) {
+                LastModificationTime(library) <= objects_last_write_time) {
               std::cout << " [AR] " << platform.name << " " << directory_name
                         << "/" << rule_name << std::endl;
               ExecuteShellCommand(LibraryCommand(platform, library, objects));
@@ -753,15 +753,15 @@ class Whee {
             if (p) libs.insert(*p);
           }
 
-          std::time_t libs_last_write_time = 0;
+          bigint libs_last_write_time = 0;
           for (const path& lib : libs) {
-            std::time_t lib_last_write_time = last_write_time(lib);
+            bigint lib_last_write_time = LastModificationTime(lib);
             if (lib_last_write_time > libs_last_write_time) {
               libs_last_write_time = lib_last_write_time;
             }
           }
           if (!exists(program) ||
-              last_write_time(program) <= libs_last_write_time) {
+              LastModificationTime(program) <= libs_last_write_time) {
             std::cout << " [LN] " << platform.name << " " << directory_name
                       << "/" << rule_name << std::endl;
             ExecuteShellCommand(ProgramCommand(platform, program, libs));

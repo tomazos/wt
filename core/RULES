@@ -63,6 +63,7 @@ library:
   dependencies:
     error_class
     string_functions
+    /whee/source_root_sentinal
 
 test:
   name = must_test

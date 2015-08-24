@@ -12,7 +12,16 @@ program:
   sources:
     whee.cc
   dependencies:
+    token_tree
+    source_root_sentinal
+    /core/bigint
     /core/process
     /core/file_functions
-    token_tree
     /main/args
+
+library:
+  name = source_root_sentinal
+  headers:
+    source_root_sentinal.h
+  sources:
+    source_root_sentinal.cc

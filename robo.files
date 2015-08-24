@@ -479,3 +479,5 @@ xxua/debug_allocator.cc
 xxua/writer.h
 xxua/type.h
 xxua/reader.h
+whee/source_root_sentinal.h
+whee/source_root_sentinal.cc
