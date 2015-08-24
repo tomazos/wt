@@ -28,4 +28,4 @@ test:
     state_test.cc
   dependencies:
     xxua
-    /testing
+    /main/gtest

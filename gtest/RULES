@@ -1,0 +1,27 @@
+library:
+  name = gtest
+  headers:
+    gtest_pred_impl.h
+    gtest_prod.h
+    gtest-message.h
+    gtest-typed-test.h
+    gtest-internal-inl.h
+    gtest-test-part.h
+    gtest.h
+    gtest-printers.h
+    gtest-param-test.h
+    gtest-death-test.h
+    gtest-spi.h
+  sources:
+    gtest.cc
+    gtest-death-test.cc
+    gtest-filepath.cc
+    gtest-port.cc
+    gtest-printers.cc
+    gtest-test-part.cc
+    gtest-typed-test.cc
+  dependencies:
+    /gtest/internal/internal
+    /gtest/internal/custom/custom
+    /whee/source_root_sentinal
+

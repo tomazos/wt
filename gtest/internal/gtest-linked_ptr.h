@@ -1,34 +1,3 @@
-// Copyright 2003 Google Inc.
-// All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are
-// met:
-//
-//     * Redistributions of source code must retain the above copyright
-// notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above
-// copyright notice, this list of conditions and the following disclaimer
-// in the documentation and/or other materials provided with the
-// distribution.
-//     * Neither the name of Google Inc. nor the names of its
-// contributors may be used to endorse or promote products derived from
-// this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-// Authors: Dan Egnor (egnor@google.com)
-//
 // A "smart" pointer type with reference tracking.  Every pointer to a
 // particular object is kept on a circular linked list.  When the last pointer
 // to an object is destroyed or reassigned, the object is deleted.
@@ -89,9 +58,7 @@ GTEST_API_ GTEST_DECLARE_STATIC_MUTEX_(g_linked_ptr_mutex);
 class linked_ptr_internal {
  public:
   // Create a new circle that includes only this instance.
-  void join_new() {
-    next_ = this;
-  }
+  void join_new() { next_ = this; }
 
   // Many linked_ptr operations may change p.link_ for some linked_ptr
   // variable p in the same circle as this object.  Therefore we need
@@ -122,8 +89,7 @@ class linked_ptr_internal {
 
   // Leave whatever circle we're part of.  Returns true if we were the
   // last member of the circle.  Once this is done, you can join() another.
-  bool depart()
-      GTEST_LOCK_EXCLUDED_(g_linked_ptr_mutex) {
+  bool depart() GTEST_LOCK_EXCLUDED_(g_linked_ptr_mutex) {
     MutexLock lock(&g_linked_ptr_mutex);
 
     if (next_ == this) return true;
@@ -153,14 +119,18 @@ class linked_ptr {
   ~linked_ptr() { depart(); }
 
   // Copy an existing linked_ptr<>, adding ourselves to the list of references.
-  template <typename U> linked_ptr(linked_ptr<U> const& ptr) { copy(&ptr); }
+  template <typename U>
+  linked_ptr(linked_ptr<U> const& ptr) {
+    copy(&ptr);
+  }
   linked_ptr(linked_ptr const& ptr) {  // NOLINT
     assert(&ptr != this);
     copy(&ptr);
   }
 
   // Assignment releases the old value and acquires the new.
-  template <typename U> linked_ptr& operator=(linked_ptr<U> const& ptr) {
+  template <typename U>
+  linked_ptr& operator=(linked_ptr<U> const& ptr) {
     depart();
     copy(&ptr);
     return *this;
@@ -210,7 +180,8 @@ class linked_ptr {
     link_.join_new();
   }
 
-  template <typename U> void copy(linked_ptr<U> const* ptr) {
+  template <typename U>
+  void copy(linked_ptr<U> const* ptr) {
     value_ = ptr->get();
     if (value_)
       link_.join(&ptr->link_);
@@ -219,13 +190,13 @@ class linked_ptr {
   }
 };
 
-template<typename T> inline
-bool operator==(T* ptr, const linked_ptr<T>& x) {
+template <typename T>
+inline bool operator==(T* ptr, const linked_ptr<T>& x) {
   return ptr == x.get();
 }
 
-template<typename T> inline
-bool operator!=(T* ptr, const linked_ptr<T>& x) {
+template <typename T>
+inline bool operator!=(T* ptr, const linked_ptr<T>& x) {
   return ptr != x.get();
 }
 

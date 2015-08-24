@@ -395,9 +395,9 @@ class Whee {
       library_strings.push_back(library.string());
     return EncodeAsString(
         platform.tool_prefix, "g++ -std=gnu++14 -g -O3 -static -o ",
-        program.string(), " -Wl,--start-group ",
+        program.string(), " -Wl,--start-group -Wl,--whole-archive ",
         boost::algorithm::join(library_strings, " "),
-        " -lboost_filesystem -lboost_system -lprotobuf "
+        " -Wl,--no-whole-archive -lboost_filesystem -lboost_system -lprotobuf "
         "-Wl,--whole-archive -lpthread -Wl,--no-whole-archive -lmmal "
         "-lmmal_core -lmmal_util -lmmal_components -lvcos "
         "-Wl,--whole-archive -lmmal_vc_client -Wl,--no-whole-archive "

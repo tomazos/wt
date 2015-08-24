@@ -1,34 +1,3 @@
-// Copyright 2008, Google Inc.
-// All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are
-// met:
-//
-//     * Redistributions of source code must retain the above copyright
-// notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above
-// copyright notice, this list of conditions and the following disclaimer
-// in the documentation and/or other materials provided with the
-// distribution.
-//     * Neither the name of Google Inc. nor the names of its
-// contributors may be used to endorse or promote products derived from
-// this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-// Author: wan@google.com (Zhanyong Wan)
-
 #include "gtest/internal/gtest-port.h"
 
 #include <limits.h>
@@ -37,25 +6,27 @@
 #include <string.h>
 #include <fstream>
 
+#include "whee/source_root_sentinal.h"
+
 #if GTEST_OS_WINDOWS
-# include <windows.h>
-# include <io.h>
-# include <sys/stat.h>
-# include <map>  // Used in ThreadLocal.
+#include <windows.h>
+#include <io.h>
+#include <sys/stat.h>
+#include <map>  // Used in ThreadLocal.
 #else
-# include <unistd.h>
+#include <unistd.h>
 #endif  // GTEST_OS_WINDOWS
 
 #if GTEST_OS_MAC
-# include <mach/mach_init.h>
-# include <mach/task.h>
-# include <mach/vm_map.h>
+#include <mach/mach_init.h>
+#include <mach/task.h>
+#include <mach/vm_map.h>
 #endif  // GTEST_OS_MAC
 
 #if GTEST_OS_QNX
-# include <devctl.h>
-# include <fcntl.h>
-# include <sys/procfs.h>
+#include <devctl.h>
+#include <fcntl.h>
+#include <sys/procfs.h>
 #endif  // GTEST_OS_QNX
 
 #include "gtest/gtest-spi.h"
@@ -69,7 +40,7 @@
 // prevent the accidental inclusion of gtest-internal-inl.h in the
 // user's code.
 #define GTEST_IMPLEMENTATION_ 1
-#include "src/gtest-internal-inl.h"
+#include "gtest/gtest-internal-inl.h"
 #undef GTEST_IMPLEMENTATION_
 
 namespace testing {
@@ -117,8 +88,7 @@ size_t GetThreadCount() {
   if (status == KERN_SUCCESS) {
     // task_threads allocates resources in thread_list and we need to free them
     // to avoid leaks.
-    vm_deallocate(task,
-                  reinterpret_cast<vm_address_t>(thread_list),
+    vm_deallocate(task, reinterpret_cast<vm_address_t>(thread_list),
                   sizeof(thread_t) * thread_count);
     return static_cast<size_t>(thread_count);
   } else {
@@ -158,27 +128,17 @@ size_t GetThreadCount() {
 
 #if GTEST_IS_THREADSAFE && GTEST_OS_WINDOWS
 
-void SleepMilliseconds(int n) {
-  ::Sleep(n);
-}
+void SleepMilliseconds(int n) { ::Sleep(n); }
 
-AutoHandle::AutoHandle()
-    : handle_(INVALID_HANDLE_VALUE) {}
+AutoHandle::AutoHandle() : handle_(INVALID_HANDLE_VALUE) {}
 
-AutoHandle::AutoHandle(Handle handle)
-    : handle_(handle) {}
+AutoHandle::AutoHandle(Handle handle) : handle_(handle) {}
 
-AutoHandle::~AutoHandle() {
-  Reset();
-}
+AutoHandle::~AutoHandle() { Reset(); }
 
-AutoHandle::Handle AutoHandle::Get() const {
-  return handle_;
-}
+AutoHandle::Handle AutoHandle::Get() const { return handle_; }
 
-void AutoHandle::Reset() {
-  Reset(INVALID_HANDLE_VALUE);
-}
+void AutoHandle::Reset() { Reset(INVALID_HANDLE_VALUE); }
 
 void AutoHandle::Reset(HANDLE handle) {
   // Resetting with the same handle we already own is invalid.
@@ -190,7 +150,7 @@ void AutoHandle::Reset(HANDLE handle) {
   } else {
     GTEST_CHECK_(!IsCloseable())
         << "Resetting a valid handle to itself is likely a programmer error "
-            "and thus not allowed.";
+           "and thus not allowed.";
   }
 }
 
@@ -201,20 +161,17 @@ bool AutoHandle::IsCloseable() const {
 }
 
 Notification::Notification()
-    : event_(::CreateEvent(NULL,   // Default security attributes.
-                           TRUE,   // Do not reset automatically.
-                           FALSE,  // Initially unset.
+    : event_(::CreateEvent(NULL,     // Default security attributes.
+                           TRUE,     // Do not reset automatically.
+                           FALSE,    // Initially unset.
                            NULL)) {  // Anonymous event.
   GTEST_CHECK_(event_.Get() != NULL);
 }
 
-void Notification::Notify() {
-  GTEST_CHECK_(::SetEvent(event_.Get()) != FALSE);
-}
+void Notification::Notify() { GTEST_CHECK_(::SetEvent(event_.Get()) != FALSE); }
 
 void Notification::WaitForNotification() {
-  GTEST_CHECK_(
-      ::WaitForSingleObject(event_.Get(), INFINITE) == WAIT_OBJECT_0);
+  GTEST_CHECK_(::WaitForSingleObject(event_.Get(), INFINITE) == WAIT_OBJECT_0);
 }
 
 Mutex::Mutex()
@@ -275,15 +232,13 @@ void Mutex::ThreadSafeLazyInit() {
         ::InitializeCriticalSection(critical_section_);
         // Updates the critical_section_init_phase_ to 2 to signal
         // initialization complete.
-        GTEST_CHECK_(::InterlockedCompareExchange(
-                          &critical_section_init_phase_, 2L, 1L) ==
-                      1L);
+        GTEST_CHECK_(::InterlockedCompareExchange(&critical_section_init_phase_,
+                                                  2L, 1L) == 1L);
         break;
       case 1:
         // Somebody else is already initializing the mutex; spin until they
         // are done.
-        while (::InterlockedCompareExchange(&critical_section_init_phase_,
-                                            2L,
+        while (::InterlockedCompareExchange(&critical_section_init_phase_, 2L,
                                             2L) != 2L) {
           // Possibly yields the rest of the thread's time slice to other
           // threads.
@@ -312,11 +267,11 @@ class ThreadWithParamSupport : public ThreadWithParamBase {
     DWORD thread_id;
     // TODO(yukawa): Consider to use _beginthreadex instead.
     HANDLE thread_handle = ::CreateThread(
-        NULL,    // Default security.
-        0,       // Default stack size.
+        NULL,  // Default security.
+        0,     // Default stack size.
         &ThreadWithParamSupport::ThreadMain,
-        param,   // Parameter to ThreadMainStatic
-        0x0,     // Default creation flags.
+        param,        // Parameter to ThreadMainStatic
+        0x0,          // Default creation flags.
         &thread_id);  // Need a valid pointer for the call to work under Win98.
     GTEST_CHECK_(thread_handle != NULL) << "CreateThread failed with error "
                                         << ::GetLastError() << ".";
@@ -329,9 +284,7 @@ class ThreadWithParamSupport : public ThreadWithParamBase {
  private:
   struct ThreadMainParam {
     ThreadMainParam(Runnable* runnable, Notification* thread_can_start)
-        : runnable_(runnable),
-          thread_can_start_(thread_can_start) {
-    }
+        : runnable_(runnable), thread_can_start_(thread_can_start) {}
     scoped_ptr<Runnable> runnable_;
     // Does not own.
     Notification* thread_can_start_;
@@ -354,15 +307,12 @@ class ThreadWithParamSupport : public ThreadWithParamBase {
 
 }  // namespace
 
-ThreadWithParamBase::ThreadWithParamBase(Runnable *runnable,
+ThreadWithParamBase::ThreadWithParamBase(Runnable* runnable,
                                          Notification* thread_can_start)
-      : thread_(ThreadWithParamSupport::CreateThread(runnable,
-                                                     thread_can_start)) {
-}
+    : thread_(
+          ThreadWithParamSupport::CreateThread(runnable, thread_can_start)) {}
 
-ThreadWithParamBase::~ThreadWithParamBase() {
-  Join();
-}
+ThreadWithParamBase::~ThreadWithParamBase() { Join(); }
 
 void ThreadWithParamBase::Join() {
   GTEST_CHECK_(::WaitForSingleObject(thread_.Get(), INFINITE) == WAIT_OBJECT_0)
@@ -386,8 +336,10 @@ class ThreadLocalRegistryImpl {
     ThreadIdToThreadLocals::iterator thread_local_pos =
         thread_to_thread_locals->find(current_thread);
     if (thread_local_pos == thread_to_thread_locals->end()) {
-      thread_local_pos = thread_to_thread_locals->insert(
-          std::make_pair(current_thread, ThreadLocalValues())).first;
+      thread_local_pos =
+          thread_to_thread_locals->insert(std::make_pair(current_thread,
+                                                         ThreadLocalValues()))
+              .first;
       StartWatcherThreadFor(current_thread);
     }
     ThreadLocalValues& thread_local_values = thread_local_pos->second;
@@ -415,9 +367,8 @@ class ThreadLocalRegistryImpl {
       ThreadIdToThreadLocals* const thread_to_thread_locals =
           GetThreadLocalsMapLocked();
       for (ThreadIdToThreadLocals::iterator it =
-          thread_to_thread_locals->begin();
-          it != thread_to_thread_locals->end();
-          ++it) {
+               thread_to_thread_locals->begin();
+           it != thread_to_thread_locals->end(); ++it) {
         ThreadLocalValues& thread_local_values = it->second;
         ThreadLocalValues::iterator value_pos =
             thread_local_values.find(thread_local_instance);
@@ -447,9 +398,8 @@ class ThreadLocalRegistryImpl {
       if (thread_local_pos != thread_to_thread_locals->end()) {
         ThreadLocalValues& thread_local_values = thread_local_pos->second;
         for (ThreadLocalValues::iterator value_pos =
-            thread_local_values.begin();
-            value_pos != thread_local_values.end();
-            ++value_pos) {
+                 thread_local_values.begin();
+             value_pos != thread_local_values.end(); ++value_pos) {
           value_holders.push_back(value_pos->second);
         }
         thread_to_thread_locals->erase(thread_local_pos);
@@ -474,20 +424,18 @@ class ThreadLocalRegistryImpl {
   static void StartWatcherThreadFor(DWORD thread_id) {
     // The returned handle will be kept in thread_map and closed by
     // watcher_thread in WatcherThreadFunc.
-    HANDLE thread = ::OpenThread(SYNCHRONIZE | THREAD_QUERY_INFORMATION,
-                                 FALSE,
-                                 thread_id);
+    HANDLE thread =
+        ::OpenThread(SYNCHRONIZE | THREAD_QUERY_INFORMATION, FALSE, thread_id);
     GTEST_CHECK_(thread != NULL);
     // We need to to pass a valid thread ID pointer into CreateThread for it
     // to work correctly under Win98.
     DWORD watcher_thread_id;
     HANDLE watcher_thread = ::CreateThread(
-        NULL,   // Default security.
-        0,      // Default stack size
+        NULL,  // Default security.
+        0,     // Default stack size
         &ThreadLocalRegistryImpl::WatcherThreadFunc,
         reinterpret_cast<LPVOID>(new ThreadIdAndHandle(thread_id, thread)),
-        CREATE_SUSPENDED,
-        &watcher_thread_id);
+        CREATE_SUSPENDED, &watcher_thread_id);
     GTEST_CHECK_(watcher_thread != NULL);
     // Give the watcher thread the same priority as ours to avoid being
     // blocked by it.
@@ -502,8 +450,7 @@ class ThreadLocalRegistryImpl {
   static DWORD WINAPI WatcherThreadFunc(LPVOID param) {
     const ThreadIdAndHandle* tah =
         reinterpret_cast<const ThreadIdAndHandle*>(param);
-    GTEST_CHECK_(
-        ::WaitForSingleObject(tah->second, INFINITE) == WAIT_OBJECT_0);
+    GTEST_CHECK_(::WaitForSingleObject(tah->second, INFINITE) == WAIT_OBJECT_0);
     OnThreadExit(tah->first);
     ::CloseHandle(tah->second);
     delete tah;
@@ -527,13 +474,13 @@ Mutex ThreadLocalRegistryImpl::mutex_(Mutex::kStaticMutex);
 Mutex ThreadLocalRegistryImpl::thread_map_mutex_(Mutex::kStaticMutex);
 
 ThreadLocalValueHolderBase* ThreadLocalRegistry::GetValueOnCurrentThread(
-      const ThreadLocalBase* thread_local_instance) {
+    const ThreadLocalBase* thread_local_instance) {
   return ThreadLocalRegistryImpl::GetValueOnCurrentThread(
       thread_local_instance);
 }
 
 void ThreadLocalRegistry::OnThreadLocalDestroyed(
-      const ThreadLocalBase* thread_local_instance) {
+    const ThreadLocalBase* thread_local_instance) {
   ThreadLocalRegistryImpl::OnThreadLocalDestroyed(thread_local_instance);
 }
 
@@ -621,7 +568,7 @@ bool IsRepeat(char ch) { return IsInSet(ch, "?*+"); }
 bool IsAsciiWhiteSpace(char ch) { return IsInSet(ch, " \f\n\r\t\v"); }
 bool IsAsciiWordChar(char ch) {
   return ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') ||
-      ('0' <= ch && ch <= '9') || ch == '_';
+         ('0' <= ch && ch <= '9') || ch == '_';
 }
 
 // Returns true iff "\\c" is a supported escape sequence.
@@ -634,17 +581,28 @@ bool IsValidEscape(char c) {
 bool AtomMatchesChar(bool escaped, char pattern_char, char ch) {
   if (escaped) {  // "\\p" where p is pattern_char.
     switch (pattern_char) {
-      case 'd': return IsAsciiDigit(ch);
-      case 'D': return !IsAsciiDigit(ch);
-      case 'f': return ch == '\f';
-      case 'n': return ch == '\n';
-      case 'r': return ch == '\r';
-      case 's': return IsAsciiWhiteSpace(ch);
-      case 'S': return !IsAsciiWhiteSpace(ch);
-      case 't': return ch == '\t';
-      case 'v': return ch == '\v';
-      case 'w': return IsAsciiWordChar(ch);
-      case 'W': return !IsAsciiWordChar(ch);
+      case 'd':
+        return IsAsciiDigit(ch);
+      case 'D':
+        return !IsAsciiDigit(ch);
+      case 'f':
+        return ch == '\f';
+      case 'n':
+        return ch == '\n';
+      case 'r':
+        return ch == '\r';
+      case 's':
+        return IsAsciiWhiteSpace(ch);
+      case 'S':
+        return !IsAsciiWhiteSpace(ch);
+      case 't':
+        return ch == '\t';
+      case 'v':
+        return ch == '\v';
+      case 'w':
+        return IsAsciiWordChar(ch);
+      case 'W':
+        return !IsAsciiWordChar(ch);
     }
     return IsAsciiPunct(pattern_char) && pattern_char == ch;
   }
@@ -655,7 +613,8 @@ bool AtomMatchesChar(bool escaped, char pattern_char, char ch) {
 // Helper function used by ValidateRegex() to format error messages.
 std::string FormatRegexSyntaxError(const char* regex, int index) {
   return (Message() << "Syntax error at index " << index
-          << " in simple regular expression \"" << regex << "\": ").GetString();
+                    << " in simple regular expression \"" << regex
+                    << "\": ").GetString();
 }
 
 // Generates non-fatal failures and returns false if regex is invalid;
@@ -700,12 +659,12 @@ bool ValidateRegex(const char* regex) {
                       << "'$' can only appear at the end.";
         is_valid = false;
       } else if (IsInSet(ch, "()[]{}|")) {
-        ADD_FAILURE() << FormatRegexSyntaxError(regex, i)
-                      << "'" << ch << "' is unsupported.";
+        ADD_FAILURE() << FormatRegexSyntaxError(regex, i) << "'" << ch
+                      << "' is unsupported.";
         is_valid = false;
       } else if (IsRepeat(ch) && !prev_repeatable) {
-        ADD_FAILURE() << FormatRegexSyntaxError(regex, i)
-                      << "'" << ch << "' can only follow a repeatable token.";
+        ADD_FAILURE() << FormatRegexSyntaxError(regex, i) << "'" << ch
+                      << "' can only follow a repeatable token.";
         is_valid = false;
       }
 
@@ -723,12 +682,10 @@ bool ValidateRegex(const char* regex) {
 // characters to be indexable by size_t, in which case the test will
 // probably time out anyway.  We are fine with this limitation as
 // std::string has it too.
-bool MatchRepetitionAndRegexAtHead(
-    bool escaped, char c, char repeat, const char* regex,
-    const char* str) {
+bool MatchRepetitionAndRegexAtHead(bool escaped, char c, char repeat,
+                                   const char* regex, const char* str) {
   const size_t min_count = (repeat == '+') ? 1 : 0;
-  const size_t max_count = (repeat == '?') ? 1 :
-      static_cast<size_t>(-1) - 1;
+  const size_t max_count = (repeat == '?') ? 1 : static_cast<size_t>(-1) - 1;
   // We cannot call numeric_limits::max() as it conflicts with the
   // max() macro on Windows.
 
@@ -741,8 +698,7 @@ bool MatchRepetitionAndRegexAtHead(
       // greedy match.
       return true;
     }
-    if (str[i] == '\0' || !AtomMatchesChar(escaped, c, str[i]))
-      return false;
+    if (str[i] == '\0' || !AtomMatchesChar(escaped, c, str[i])) return false;
   }
   return false;
 }
@@ -756,25 +712,23 @@ bool MatchRegexAtHead(const char* regex, const char* str) {
 
   // "$" only matches the end of a string.  Note that regex being
   // valid guarantees that there's nothing after "$" in it.
-  if (*regex == '$')
-    return *str == '\0';
+  if (*regex == '$') return *str == '\0';
 
   // Is the first thing in regex an escape sequence?
   const bool escaped = *regex == '\\';
-  if (escaped)
-    ++regex;
+  if (escaped) ++regex;
   if (IsRepeat(regex[1])) {
     // MatchRepetitionAndRegexAtHead() calls MatchRegexAtHead(), so
     // here's an indirect recursion.  It terminates as the regex gets
     // shorter in each recursion.
-    return MatchRepetitionAndRegexAtHead(
-        escaped, regex[0], regex[1], regex + 2, str);
+    return MatchRepetitionAndRegexAtHead(escaped, regex[0], regex[1], regex + 2,
+                                         str);
   } else {
     // regex isn't empty, isn't "$", and doesn't start with a
     // repetition.  We match the first atom of regex with the first
     // character of str and recurse.
     return (*str != '\0') && AtomMatchesChar(escaped, *regex, *str) &&
-        MatchRegexAtHead(regex + 1, str + 1);
+           MatchRegexAtHead(regex + 1, str + 1);
   }
 }
 
@@ -787,16 +741,13 @@ bool MatchRegexAtHead(const char* regex, const char* str) {
 // exponential with respect to the regex length + the string length,
 // but usually it's must faster (often close to linear).
 bool MatchRegexAnywhere(const char* regex, const char* str) {
-  if (regex == NULL || str == NULL)
-    return false;
+  if (regex == NULL || str == NULL) return false;
 
-  if (*regex == '^')
-    return MatchRegexAtHead(regex + 1, str);
+  if (*regex == '^') return MatchRegexAtHead(regex + 1, str);
 
   // A successful match can be anywhere in str.
   do {
-    if (MatchRegexAtHead(regex, str))
-      return true;
+    if (MatchRegexAtHead(regex, str)) return true;
   } while (*str++ != '\0');
   return false;
 }
@@ -859,8 +810,9 @@ const char kUnknownFile[] = "unknown file";
 
 // Formats a source file path and a line number as they would appear
 // in an error message from the compiler used to compile this code.
-GTEST_API_ ::std::string FormatFileLocation(const char* file, int line) {
-  const std::string file_name(file == NULL ? kUnknownFile : file);
+GTEST_API_::std::string FormatFileLocation(const char* file, int line) {
+  std::string file_name(file == NULL ? kUnknownFile : file);
+  file_name = ReplaceSourceRootSentinal(file_name);
 
   if (line < 0) {
     return file_name + ":";
@@ -877,8 +829,8 @@ GTEST_API_ ::std::string FormatFileLocation(const char* file, int line) {
 // FormatFileLocation in order to contrast the two functions.
 // Note that FormatCompilerIndependentFileLocation() does NOT append colon
 // to the file location it produces, unlike FormatFileLocation().
-GTEST_API_ ::std::string FormatCompilerIndependentFileLocation(
-    const char* file, int line) {
+GTEST_API_::std::string FormatCompilerIndependentFileLocation(const char* file,
+                                                              int line) {
   const std::string file_name(file == NULL ? kUnknownFile : file);
 
   if (line < 0)
@@ -890,11 +842,14 @@ GTEST_API_ ::std::string FormatCompilerIndependentFileLocation(
 GTestLog::GTestLog(GTestLogSeverity severity, const char* file, int line)
     : severity_(severity) {
   const char* const marker =
-      severity == GTEST_INFO ?    "[  INFO ]" :
-      severity == GTEST_WARNING ? "[WARNING]" :
-      severity == GTEST_ERROR ?   "[ ERROR ]" : "[ FATAL ]";
-  GetStream() << ::std::endl << marker << " "
-              << FormatFileLocation(file, line).c_str() << ": ";
+      severity == GTEST_INFO ? "[  INFO ]" : severity == GTEST_WARNING
+                                                 ? "[WARNING]"
+                                                 : severity == GTEST_ERROR
+                                                       ? "[ ERROR ]"
+                                                       : "[ FATAL ]";
+  GetStream() << ::std::endl
+              << marker << " " << FormatFileLocation(file, line).c_str()
+              << ": ";
 }
 
 // Flushes the buffers and, if severity is GTEST_FATAL, aborts the program.
@@ -916,27 +871,26 @@ class CapturedStream {
  public:
   // The ctor redirects the stream to a temporary file.
   explicit CapturedStream(int fd) : fd_(fd), uncaptured_fd_(dup(fd)) {
-# if GTEST_OS_WINDOWS
-    char temp_dir_path[MAX_PATH + 1] = { '\0' };  // NOLINT
-    char temp_file_path[MAX_PATH + 1] = { '\0' };  // NOLINT
+#if GTEST_OS_WINDOWS
+    char temp_dir_path[MAX_PATH + 1] = {'\0'};   // NOLINT
+    char temp_file_path[MAX_PATH + 1] = {'\0'};  // NOLINT
 
     ::GetTempPathA(sizeof(temp_dir_path), temp_dir_path);
-    const UINT success = ::GetTempFileNameA(temp_dir_path,
-                                            "gtest_redir",
+    const UINT success = ::GetTempFileNameA(temp_dir_path, "gtest_redir",
                                             0,  // Generate unique file name.
                                             temp_file_path);
-    GTEST_CHECK_(success != 0)
-        << "Unable to create a temporary file in " << temp_dir_path;
+    GTEST_CHECK_(success != 0) << "Unable to create a temporary file in "
+                               << temp_dir_path;
     const int captured_fd = creat(temp_file_path, _S_IREAD | _S_IWRITE);
     GTEST_CHECK_(captured_fd != -1) << "Unable to open temporary file "
                                     << temp_file_path;
     filename_ = temp_file_path;
-# else
-    // There's no guarantee that a test has write access to the current
-    // directory, so we create the temporary file in the /tmp directory
-    // instead. We use /tmp on most systems, and /sdcard on Android.
-    // That's because Android doesn't have /tmp.
-#  if GTEST_OS_LINUX_ANDROID
+#else
+// There's no guarantee that a test has write access to the current
+// directory, so we create the temporary file in the /tmp directory
+// instead. We use /tmp on most systems, and /sdcard on Android.
+// That's because Android doesn't have /tmp.
+#if GTEST_OS_LINUX_ANDROID
     // Note: Android applications are expected to call the framework's
     // Context.getExternalStorageDirectory() method through JNI to get
     // the location of the world-writable SD Card directory. However,
@@ -952,20 +906,18 @@ class CapturedStream {
     // other OEM-customized locations. Never rely on these, and always
     // use /sdcard.
     char name_template[] = "/sdcard/gtest_captured_stream.XXXXXX";
-#  else
+#else
     char name_template[] = "/tmp/captured_stream.XXXXXX";
-#  endif  // GTEST_OS_LINUX_ANDROID
+#endif  // GTEST_OS_LINUX_ANDROID
     const int captured_fd = mkstemp(name_template);
     filename_ = name_template;
-# endif  // GTEST_OS_WINDOWS
+#endif  // GTEST_OS_WINDOWS
     fflush(NULL);
     dup2(captured_fd, fd_);
     close(captured_fd);
   }
 
-  ~CapturedStream() {
-    remove(filename_.c_str());
-  }
+  ~CapturedStream() { remove(filename_.c_str()); }
 
   std::string GetCapturedString() {
     if (uncaptured_fd_ != -1) {
@@ -1072,7 +1024,8 @@ std::string ReadEntireFile(FILE* file) {
   // Keeps reading the file until we cannot read further or the
   // pre-determined file size is reached.
   do {
-    bytes_last_read = fread(buffer+bytes_read, 1, file_size-bytes_read, file);
+    bytes_last_read =
+        fread(buffer + bytes_read, 1, file_size - bytes_read, file);
     bytes_read += bytes_last_read;
   } while (bytes_last_read > 0 && bytes_read < file_size);
 
@@ -1085,11 +1038,10 @@ std::string ReadEntireFile(FILE* file) {
 #if GTEST_HAS_DEATH_TEST
 
 static const ::std::vector<testing::internal::string>* g_injected_test_argvs =
-                                        NULL;  // Owned.
+    NULL;  // Owned.
 
 void SetInjectableArgvs(const ::std::vector<testing::internal::string>* argvs) {
-  if (g_injected_test_argvs != argvs)
-    delete g_injected_test_argvs;
+  if (g_injected_test_argvs != argvs) delete g_injected_test_argvs;
   g_injected_test_argvs = argvs;
 }
 
@@ -1176,8 +1128,7 @@ bool BoolFromGTestEnv(const char* flag, bool default_value) {
 #endif  // defined(GTEST_GET_BOOL_FROM_ENV_)
   const std::string env_var = FlagToEnvVar(flag);
   const char* const string_value = posix::GetEnv(env_var.c_str());
-  return string_value == NULL ?
-      default_value : strcmp(string_value, "0") != 0;
+  return string_value == NULL ? default_value : strcmp(string_value, "0") != 0;
 }
 
 // Reads and returns a 32-bit integer stored in the environment
@@ -1195,8 +1146,8 @@ Int32 Int32FromGTestEnv(const char* flag, Int32 default_value) {
   }
 
   Int32 result = default_value;
-  if (!ParseInt32(Message() << "Environment variable " << env_var,
-                  string_value, &result)) {
+  if (!ParseInt32(Message() << "Environment variable " << env_var, string_value,
+                  &result)) {
     printf("The default value %s is used.\n",
            (Message() << default_value).GetString().c_str());
     fflush(stdout);
