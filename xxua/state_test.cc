@@ -12,6 +12,7 @@ namespace {
 class StateTest : public testing::Test {
  public:
   StateTest() : state(allocator) {}
+  ~StateTest() { EXPECT_EQ(state.StackSize(), 0); }
 
   DebugAllocator allocator;
   xxua::State state;
@@ -56,6 +57,7 @@ TEST_F(StateTest, StackQuery) {
   EXPECT_EQ(state.AbsIndex(State::UPVALUE(1)), State::UPVALUE(1));
   EXPECT_EQ(state.AbsIndex(State::UPVALUE(2)), State::UPVALUE(2));
   EXPECT_EQ(state.AbsIndex(State::UPVALUE(3)), State::UPVALUE(3));
+  state.Pop(3);
 }
 
 TEST_F(StateTest, ResizeStack) {
@@ -104,6 +106,72 @@ TEST_F(StateTest, Rotate) {
   EXPECT_EQ(state.ToInteger(3), 4);
   EXPECT_EQ(state.ToInteger(4), 5);
   EXPECT_EQ(state.ToInteger(5), 2);
+  state.Rotate(3, -1);
+  EXPECT_EQ(state.ToInteger(1), 1);
+  EXPECT_EQ(state.ToInteger(2), 3);
+  EXPECT_EQ(state.ToInteger(3), 5);
+  EXPECT_EQ(state.ToInteger(4), 2);
+  EXPECT_EQ(state.ToInteger(5), 4);
+  state.Pop(5);
+}
+
+TEST_F(StateTest, Copy) {
+  state.PushInteger(1);
+  state.PushInteger(2);
+  state.PushInteger(3);
+  state.PushInteger(4);
+  state.PushInteger(5);
+  state.Copy(2, 4);
+  EXPECT_EQ(state.ToInteger(1), 1);
+  EXPECT_EQ(state.ToInteger(2), 2);
+  EXPECT_EQ(state.ToInteger(3), 3);
+  EXPECT_EQ(state.ToInteger(4), 2);
+  EXPECT_EQ(state.ToInteger(5), 5);
+  state.Pop(5);
+}
+
+TEST_F(StateTest, PushCopy) {
+  state.PushInteger(1);
+  state.PushInteger(2);
+  state.PushInteger(3);
+  state.PushInteger(4);
+  state.PushInteger(5);
+  state.PushCopy(2);
+  EXPECT_EQ(state.ToInteger(1), 1);
+  EXPECT_EQ(state.ToInteger(2), 2);
+  EXPECT_EQ(state.ToInteger(3), 3);
+  EXPECT_EQ(state.ToInteger(4), 4);
+  EXPECT_EQ(state.ToInteger(5), 5);
+  EXPECT_EQ(state.ToInteger(6), 2);
+  state.Pop(6);
+}
+
+TEST_F(StateTest, Remove) {
+  state.PushInteger(1);
+  state.PushInteger(2);
+  state.PushInteger(3);
+  state.PushInteger(4);
+  state.PushInteger(5);
+  state.Remove(3);
+  EXPECT_EQ(state.ToInteger(1), 1);
+  EXPECT_EQ(state.ToInteger(2), 2);
+  EXPECT_EQ(state.ToInteger(3), 4);
+  EXPECT_EQ(state.ToInteger(4), 5);
+  EXPECT_TRUE(state.GetType(5) == Type::NONE);
+  state.Pop(4);
+}
+
+TEST_F(StateTest, Replace) {
+  state.PushInteger(1);
+  state.PushInteger(2);
+  state.PushInteger(3);
+  state.PushInteger(4);
+  state.PushInteger(5);
+  state.Replace(3);
+  EXPECT_EQ(state.ToInteger(1), 1);
+  EXPECT_EQ(state.ToInteger(2), 2);
+  EXPECT_EQ(state.ToInteger(3), 5);
+  EXPECT_EQ(state.ToInteger(4), 4);
   state.Pop(4);
 }
 
@@ -213,6 +281,91 @@ TEST_F(StateTest, ElementQueryCreation) {
   EXPECT_TRUE(state.GetType(1) == Type::INTEGER);
   EXPECT_EQ(state.ToInteger(1), 43);
   state.Pop(1);
+}
+
+TEST_F(StateTest, Arithmetic) {
+  state.PushInteger(2);
+  state.PushInteger(3);
+  state.ADD();
+  EXPECT_TRUE(state.GetType(1) == Type::INTEGER);
+  EXPECT_EQ(state.ToInteger(1), 5);
+  state.Pop();
+
+  state.PushInteger(5);
+  state.PushInteger(3);
+  state.SUB();
+  EXPECT_TRUE(state.GetType(1) == Type::INTEGER);
+  EXPECT_EQ(state.ToInteger(1), 2);
+  state.Pop();
+
+  state.PushInteger(5);
+  state.PushInteger(3);
+  state.MUL();
+  EXPECT_TRUE(state.GetType(1) == Type::INTEGER);
+  EXPECT_EQ(state.ToInteger(1), 15);
+  state.Pop();
+
+  state.PushInteger(9);
+  state.PushInteger(4);
+  state.DIV();
+  EXPECT_TRUE(state.GetType(1) == Type::FLOAT);
+  EXPECT_EQ(state.ToFloat(1), 2.25);
+  state.Pop();
+
+  state.PushInteger(9);
+  state.PushInteger(4);
+  state.IDIV();
+  EXPECT_TRUE(state.GetType(1) == Type::INTEGER);
+  EXPECT_EQ(state.ToInteger(1), 2);
+  state.Pop();
+
+  state.PushInteger(9);
+  state.PushInteger(4);
+  state.MOD();
+  EXPECT_TRUE(state.GetType(1) == Type::INTEGER);
+  EXPECT_EQ(state.ToInteger(1), 1);
+  state.Pop();
+
+  state.PushFloat(9.75);
+  state.PushFloat(3.75);
+  state.MOD();
+  EXPECT_TRUE(state.GetType(1) == Type::FLOAT);
+  EXPECT_EQ(state.ToFloat(1), 2.25);
+  state.Pop();
+
+  state.PushInteger(2);
+  state.PushInteger(10);
+  state.POW();
+  EXPECT_TRUE(state.GetType(1) == Type::FLOAT);
+  EXPECT_EQ(state.ToFloat(1), 1024);
+  state.Pop();
+
+  state.PushInteger(10);
+  state.NEG();
+  EXPECT_TRUE(state.GetType(1) == Type::INTEGER);
+  EXPECT_EQ(state.ToInteger(1), -10);
+  state.Pop();
+
+  const int64 xforneg = 0xF8A8'C2D1'924F'01AC;
+  state.PushInteger(xforneg);
+  state.BNOT();
+  EXPECT_TRUE(state.GetType(1) == Type::INTEGER);
+  EXPECT_EQ(state.ToInteger(1), ~xforneg);
+  state.Pop();
+
+  state.PushInteger(0b1010'0011);
+  state.PushInteger(0b0010'1010);
+  state.BAND();
+  EXPECT_TRUE(state.GetType(1) == Type::INTEGER);
+  EXPECT_EQ(state.ToInteger(1), 0b0010'0010);
+  state.Pop();
+
+  state.PushInteger(0b1010'0011);
+  state.PushInteger(0b0010'1010);
+  state.BOR();
+  EXPECT_TRUE(state.GetType(1) == Type::INTEGER);
+  EXPECT_EQ(state.ToInteger(1), 0b1010'1011);
+  state.Pop();
 }
 
 }  // namespace
