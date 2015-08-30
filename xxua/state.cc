@@ -47,7 +47,9 @@ static void* CustomAllocate(void* ud, void* ptr, size_t osize, size_t nsize) {
 }
 
 [[noreturn]] static int PanicThrow(lua_State* L) {
-  throw std::runtime_error(lua_tostring(L, -1));
+  std::runtime_error error(lua_tostring(L, -1));
+  lua_pop(L, 1);
+  throw error;
 }
 
 State::State() : State(lua_newstate(DefaultAllocate, nullptr)) {}

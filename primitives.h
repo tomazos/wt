@@ -3,6 +3,7 @@
 #include <chrono>
 #include <cstdint>
 #include <experimental/optional>
+#include <experimental/string_view>
 #include <mutex>
 #include <string>
 #include <type_traits>
@@ -11,6 +12,7 @@
 #define STATIC_ASSERT(cond) static_assert(cond, #cond);
 
 using std::string;
+using std::experimental::string_view;
 
 using Mutex = std::mutex;
 using LockGuard = std::lock_guard<std::mutex>;

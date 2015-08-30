@@ -522,3 +522,10 @@ gtest/gtest-spi.h
 gtest/RULES
 main/gtest.cc
 main/gtest_test.cc
+xxua/GRAMMAR
+xxua/context.h
+xxua/pointer.h
+xxua/reference.h
+xxua/context_test.cc
+xxua/stack.h
+xxua/stack_test.cc

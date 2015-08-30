@@ -366,6 +366,185 @@ TEST_F(StateTest, Arithmetic) {
   EXPECT_TRUE(state.GetType(1) == Type::INTEGER);
   EXPECT_EQ(state.ToInteger(1), 0b1010'1011);
   state.Pop();
+
+  state.PushInteger(0b1010'0011);
+  state.PushInteger(0b0010'1010);
+  state.XOR();
+  EXPECT_TRUE(state.GetType(1) == Type::INTEGER);
+  EXPECT_EQ(state.ToInteger(1), 0b1000'1001);
+  state.Pop();
+
+  state.PushInteger(0b1010'0011);
+  state.PushInteger(2);
+  state.SHL();
+  EXPECT_TRUE(state.GetType(1) == Type::INTEGER);
+  EXPECT_EQ(state.ToInteger(1), 0b1010'0011'00);
+  state.Pop();
+
+  state.PushInteger(0b1010'0011);
+  state.PushInteger(2);
+  state.SHR();
+  EXPECT_TRUE(state.GetType(1) == Type::INTEGER);
+  EXPECT_EQ(state.ToInteger(1), 0b1010'00);
+  state.Pop();
+}
+
+TEST_F(StateTest, Comparison) {
+  state.PushInteger(3);
+  state.PushInteger(3);
+  state.PushInteger(4);
+  state.PushInteger(2);
+
+  EXPECT_TRUE(state.EQ(1, 2));
+  EXPECT_FALSE(state.EQ(1, 3));
+  EXPECT_FALSE(state.NE(1, 2));
+  EXPECT_TRUE(state.NE(1, 3));
+  EXPECT_TRUE(state.LT(2, 3));
+  EXPECT_FALSE(state.LT(1, 2));
+  EXPECT_FALSE(state.LT(1, 4));
+  EXPECT_TRUE(state.GT(1, 4));
+  EXPECT_FALSE(state.GT(1, 2));
+  EXPECT_FALSE(state.GT(1, 3));
+  EXPECT_TRUE(state.GE(1, 4));
+  EXPECT_TRUE(state.GE(1, 2));
+  EXPECT_FALSE(state.GE(1, 3));
+  EXPECT_TRUE(state.LE(2, 3));
+  EXPECT_TRUE(state.LE(1, 2));
+  EXPECT_FALSE(state.LE(1, 4));
+
+  state.Pop(4);
+}
+
+TEST_F(StateTest, Strings) {
+  state.PushString("foo");
+  state.PushString("barr");
+  state.LEN(1);
+  state.LEN(2);
+
+  EXPECT_EQ(state.ToInteger(3), 3);
+  EXPECT_EQ(state.ToInteger(4), 4);
+  state.Pop(2);
+
+  state.PushString("baz");
+  state.Concat(3);
+  EXPECT_EQ(state.ToString(1), "foobarrbaz");
+
+  state.Pop(1);
+}
+
+[[noreturn]] int protected_test_function(lua_State* L) {
+  lua_pushlstring(L, "fail", 4);
+  lua_error(L);
+}
+
+TEST_F(StateTest, Calls) {
+  state.LoadFromString("x,y = ...; return x + y", "test");
+  state.PushInteger(2);
+  state.PushInteger(3);
+  state.Call(2, 1);
+  EXPECT_EQ(state.ToInteger(1), 5);
+  state.Pop();
+
+  state.LoadFromString("return ...", "test");
+  state.PushInteger(1);
+  state.PushInteger(2);
+  state.PushInteger(3);
+  state.CallMultret(3);
+  EXPECT_EQ(state.ToInteger(1), 1);
+  EXPECT_EQ(state.ToInteger(2), 2);
+  EXPECT_EQ(state.ToInteger(3), 3);
+  state.Pop(3);
+
+  state.PushCFunction(protected_test_function);
+  EXPECT_ANY_THROW(state.CallProtected(0, 0));
+}
+
+TEST_F(StateTest, LoadSave) {
+  state.LoadFromString("x,y = ...; return x + y", "test",
+                       State::ChunkFormat::TEXT);
+  string saved = state.SaveToString();
+  state.Pop();
+  EXPECT_EQ(state.StackSize(), 0);
+  state.LoadFromString(saved, "test", State::ChunkFormat::BINARY);
+  state.PushInteger(2);
+  state.PushInteger(3);
+  state.Call(2, 1);
+  EXPECT_EQ(state.ToInteger(1), 5);
+  state.Pop();
+}
+
+TEST_F(StateTest, GCSmoke) {
+  state.GCStop();
+  state.GCRestart();
+  state.GCCollect();
+  state.PushNewUserdata(10'000);
+  EXPECT_GE(state.GCCount(), 10'000);
+  state.Pop();
+  state.GCCollect();
+  EXPECT_LT(state.GCCount(), 10'000);
+  state.GCSetPause(true);
+  state.GCSetPause(false);
+  state.GCSetStepMultiplier(10);
+  EXPECT_TRUE(state.GCIsRunning());
+  state.GCStop();
+  EXPECT_FALSE(state.GCIsRunning());
+}
+
+TEST_F(StateTest, Tables) {
+  state.LoadFromString("y = 2 * x");
+  EXPECT_EQ(state.StackSize(), 1);
+  state.PushGlobalTable();
+  EXPECT_EQ(state.StackSize(), 2);
+  state.PushString("x");
+  EXPECT_EQ(state.StackSize(), 3);
+  state.PushInteger(21);
+  EXPECT_EQ(state.StackSize(), 4);
+  state.PopField(2);
+  EXPECT_EQ(state.StackSize(), 2);
+  state.Pop();
+  EXPECT_EQ(state.StackSize(), 1);
+  state.Call(0, 0);
+  EXPECT_EQ(state.StackSize(), 0);
+  state.PushGlobalTable();
+  EXPECT_EQ(state.StackSize(), 1);
+  state.PushString("y");
+  EXPECT_EQ(state.StackSize(), 2);
+  state.PushField(1);
+  EXPECT_EQ(state.StackSize(), 2);
+  EXPECT_EQ(state.ToInteger(2), 42);
+  state.Pop(2);
+}
+
+TEST_F(StateTest, Uservalue) {
+  state.PushNewUserdata(1);
+  state.PushInteger(42);
+  state.PopUservalue(1);
+  EXPECT_EQ(state.StackSize(), 1);
+  state.PushUservalue(1);
+  EXPECT_EQ(state.ToInteger(2), 42);
+  state.Pop(2);
+}
+
+TEST_F(StateTest, Metatable) {
+  state.PushString("foo");  // 1
+  EXPECT_FALSE(state.PushMetatable(1));
+  state.PushNewTable();  // 2
+  state.PushString("__index");
+  state.PushNewTable();  // 4
+  state.PushString("bar");
+  state.LoadFromString("self = ...; baz = self");
+  state.PopField(4);
+  state.PopField(2);
+  state.PopMetatable(1);
+  state.Pop();
+
+  state.LoadFromString("local s = 'qux'; return s:bar()");
+  state.Call(0, 0);
+  state.PushGlobalTable();
+  state.PushString("baz");
+  state.PushField(1);
+  EXPECT_EQ(state.ToString(2), "qux");
+  state.Pop(2);
 }
 
 }  // namespace

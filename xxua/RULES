@@ -6,12 +6,24 @@ test:
     xxua
     /testing
 
+test:
+  name = context_test
+  sources:
+    context_test.cc
+  dependencies:
+    xxua
+    /main/gtest
+
 library:
   name = xxua
   headers:
     allocator.h
+    context.h
     debug_allocator.h
+    pointer.h
     reader.h
+    reference.h
+    stack.h
     state.h
     type.h
     writer.h
@@ -21,6 +33,14 @@ library:
   dependencies:
     /core/must
     /lua/core
+
+test:
+  name = stack_test
+  sources:
+    stack_test.cc
+  dependencies:
+    xxua
+    /main/gtest
 
 test:
   name = state_test

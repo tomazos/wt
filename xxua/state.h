@@ -21,6 +21,7 @@ class State {
   ~State();
 
   [[noreturn]] inline void Error();
+  [[noreturn]] inline void Error(const string& error_message);
 
   // stack query
   inline Index AbsIndex(Index idx);
@@ -48,7 +49,7 @@ class State {
   inline Integer ToInteger(Index index);
   inline Float ToFloat(Index index);
   inline static optional<Integer> FloatToInteger(Float n);
-  inline string ToString(Index index);
+  inline string_view ToString(Index index);
   inline CFunction ToCFunction(Index index);
   inline void* ToUserdata(Index index);
   inline const void* ToPointer(Index index);
@@ -58,7 +59,7 @@ class State {
   inline void PushBoolean(bool b);
   inline void PushInteger(Integer i);
   inline void PushFloat(Float n);
-  inline void PushString(const string& s);
+  inline void PushString(string_view s);
   inline void PushLightUserdata(void* p);
   inline void PushNewTable(int narr = 0, int nrec = 0);
   inline void* PushNewUserdata(size_t size);
@@ -80,6 +81,7 @@ class State {
   inline void SHL();
   inline void SHR();
   inline bool EQ(Index index1, Index index2, bool raw = false);
+  inline bool NE(Index index1, Index index2, bool raw = false);
   inline bool LT(Index index1, Index index2);
   inline bool GT(Index index1, Index index2);
   inline bool LE(Index index1, Index index2);
@@ -95,11 +97,11 @@ class State {
   // chunk loading/saving
   enum class ChunkFormat { EITHER, BINARY, TEXT };
 
-  inline void Load(Reader& reader, const string& chunkname,
+  inline void Load(Reader& reader, const string& chunkname = "",
                    ChunkFormat format = ChunkFormat::EITHER);
-  inline void LoadFromStream(std::istream& is, const string& chunkname,
+  inline void LoadFromStream(std::istream& is, const string& chunkname = "",
                              ChunkFormat format = ChunkFormat::EITHER);
-  inline void LoadFromString(const string& s, const string& chunkname,
+  inline void LoadFromString(const string& s, const string& chunkname = "",
                              ChunkFormat format = ChunkFormat::EITHER);
 
   void Save(Writer& writer, bool strip = false);
@@ -148,6 +150,13 @@ class State {
   State& operator=(State&& other) = delete;
 };
 
+[[noreturn]] inline void State::Error() { lua_error(L); }
+
+[[noreturn]] inline void State::Error(const string& error_message) {
+  PushString(error_message);
+  Error();
+}
+
 inline State::Index State::AbsIndex(Index idx) { return lua_absindex(L, idx); }
 
 inline void State::ADD() { lua_arith(L, LUA_OPADD); }
@@ -169,6 +178,10 @@ inline bool State::EQ(Index index1, Index index2, bool raw) {
     return lua_rawequal(L, index1, index2);
   else
     return lua_compare(L, index1, index2, LUA_OPEQ);
+}
+
+inline bool State::NE(Index index1, Index index2, bool raw) {
+  return !EQ(index1, index2, raw);
 }
 
 inline bool State::LT(Index index1, Index index2) {
@@ -204,7 +217,7 @@ inline void State::CallProtected(int nargs, int nresults, Index msgh) {
   if (lua_pcall(L, nargs, nresults, msgh) == LUA_OK)
     return;
   else {
-    std::string error_message = ToString(-1);
+    std::string error_message = ToString(-1).to_string();
     Pop();
     throw std::runtime_error(error_message);
   }
@@ -228,8 +241,6 @@ inline string State::SaveToString(bool strip) {
   SaveToStream(oss, strip);
   return oss.str();
 }
-
-[[noreturn]] inline void State::Error() { lua_error(L); }
 
 inline void State::GCStop() { lua_gc(L, LUA_GCSTOP, 0); }
 
@@ -261,7 +272,7 @@ inline void State::PushBoolean(bool b) { lua_pushboolean(L, b); }
 inline void State::PushInteger(Integer i) { lua_pushinteger(L, i); }
 inline void State::PushFloat(Float n) { lua_pushnumber(L, n); }
 inline void State::PushLightUserdata(void* p) { lua_pushlightuserdata(L, p); }
-inline void State::PushString(const string& s) {
+inline void State::PushString(string_view s) {
   lua_pushlstring(L, s.data(), s.size());
 }
 inline void State::PushNewTable(int narr, int nrec) {
@@ -368,40 +379,35 @@ inline void State::Pop(int n) { lua_pop(L, n); }
 
 inline void State::ResizeStack(Index n) { lua_settop(L, n); }
 
-inline bool State::ToBoolean(Index index) { return lua_toboolean(L, index); }
+inline bool State::ToBoolean(Index index) {
+  if (GetType(index) != Type::BOOLEAN) Error("boolean expected");
+
+  return lua_toboolean(L, index);
+}
 
 inline State::Integer State::ToInteger(Index index) {
+  if (GetType(index) != Type::INTEGER) Error("integer expected");
+
   return lua_tointeger(L, index);
 }
 
 inline State::Float State::ToFloat(Index index) {
+  if (GetType(index) != Type::FLOAT) Error("float expected");
   return lua_tonumber(L, index);
 }
 
 inline State::CFunction State::ToCFunction(Index index) {
+  if (GetType(index) != Type::CFUNCTION) Error("C function expected");
+
   return lua_tocfunction(L, index);
 }
 
-inline string State::ToString(Index index) {
-  switch (GetType(index)) {
-    case Type::STRING: {
-      size_t len;
-      const char* data = lua_tolstring(L, index, &len);
-      return string(data, len);
-    }
-    case Type::FLOAT:
-      return EncodeAsString(ToFloat(index));
-    case Type::INTEGER:
-      return EncodeAsString(ToInteger(index));
-    case Type::BOOLEAN:
-      return ToBoolean(index) ? "1" : "0";
-    case Type::NIL:
-      return "";
-    case Type::NONE:
-      return "";
-    default:
-      return EncodeAsString(ToPointer(index));
-  }
+inline string_view State::ToString(Index index) {
+  if (GetType(index) != Type::STRING) Error("string expected");
+
+  size_t len;
+  const char* data = lua_tolstring(L, index, &len);
+  return {data, len};
 }
 
 inline const void* State::ToPointer(Index index) {
