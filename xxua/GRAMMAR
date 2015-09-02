@@ -1,0 +1,58 @@
+chunk ::= block
+
+block ::= {stat}
+
+stat ::= ‘;’ |
+         varlist assignop explist `;` |
+         functioncall `;` |
+         break |
+         `{` block `}` |
+         if `(` exp `)` stat [ else stat ] |
+         while `(` exp `)` stat |
+         do stat while `(` exp `)` `;` |
+         for `(` identifier `=` exp `,` exp [`,` exp] `)` stat |
+         for `(` namelist in explist `)` stat |
+         function funcname funcbody |
+         local function identifier funcbody |
+         local namelist [`=` explist] |
+         return [explist] `;`
+
+funcname ::= identifier {`.` identifier} [`:` identifier]
+
+varlist ::= var {`,` var}
+
+var ::=  identifier | prefixexp `[` exp `]` | prefixexp `.` identifier
+
+namelist ::= identifier {`,` identifier}
+
+explist ::= exp {`,` exp}
+
+exp ::=  literal | `...` | functiondef |
+   prefixexp | tableconstructor | exp binop exp | unop exp
+
+prefixexp ::= var | functioncall | `(` exp `)`
+
+functioncall ::=  prefixexp args | prefixexp `:` identifier args
+
+args ::=  `(` [explist] `)`
+
+functiondef ::= function funcbody
+
+funcbody ::= `(` [parlist] `)` `{` block `}`
+
+parlist ::= namelist [‘,’ ‘...’] | ‘...’
+
+tableconstructor ::= `{` [fieldlist] `}`
+
+fieldlist ::= field {`,` field} [`,`]
+
+field ::= `[` exp `]` `=` exp | identifier `=` exp | exp
+
+binop ::=  `+` | `-` | `*` | `/` | `%` |
+           `&` | `|` | `^` | `>>` | `<<` |
+           `==` | `!=` | `<` | `<=` | `>` | `>=` |
+           `&&` | `||`
+
+unop ::= `-` | `!` | ‘~’
+
+assignop ::= `=` | `+=` | `-=` | `*=` | `/=` | `%=` | `&=` | `^=` | `|=`

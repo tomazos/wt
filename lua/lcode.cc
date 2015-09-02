@@ -713,7 +713,6 @@ static int validop(int op, TValue *v1, TValue *v2) {
       return (tointeger(v1, &i) && tointeger(v2, &i));
     }
     case LUA_OPDIV:
-    case LUA_OPIDIV:
     case LUA_OPMOD: /* division by 0 */
       return (nvalue(v2) != 0);
     default:
@@ -756,11 +755,11 @@ static void codeexpval(FuncState *fs, OpCode op, expdesc *e1, expdesc *e2,
   else {
     int o1, o2;
     /* move operands to registers (if needed) */
-    if (op == OP_UNM || op == OP_BNOT || op == OP_LEN) { /* unary op? */
-      o2 = 0;                       /* no second expression */
-      o1 = luaK_exp2anyreg(fs, e1); /* cannot operate on constants */
-    } else {                        /* regular case (binary operators) */
-      o2 = luaK_exp2RK(fs, e2);     /* both operands are "RK" */
+    if (op == OP_UNM || op == OP_BNOT) { /* unary op? */
+      o2 = 0;                            /* no second expression */
+      o1 = luaK_exp2anyreg(fs, e1);      /* cannot operate on constants */
+    } else {                             /* regular case (binary operators) */
+      o2 = luaK_exp2RK(fs, e2);          /* both operands are "RK" */
       o1 = luaK_exp2RK(fs, e1);
     }
     if (o1 > o2) { /* free registers in proper order */
@@ -800,8 +799,7 @@ void luaK_prefix(FuncState *fs, UnOpr op, expdesc *e, int line) {
   e2.u.ival = 0;
   switch (op) {
     case OPR_MINUS:
-    case OPR_BNOT:
-    case OPR_LEN: {
+    case OPR_BNOT: {
       codeexpval(fs, cast(OpCode, (op - OPR_MINUS) + OP_UNM), e, &e2, line);
       break;
     }
@@ -823,17 +821,11 @@ void luaK_infix(FuncState *fs, BinOpr op, expdesc *v) {
       luaK_goiffalse(fs, v);
       break;
     }
-    case OPR_CONCAT: {
-      luaK_exp2nextreg(fs, v); /* operand must be on the 'stack' */
-      break;
-    }
     case OPR_ADD:
     case OPR_SUB:
     case OPR_MUL:
     case OPR_DIV:
-    case OPR_IDIV:
     case OPR_MOD:
-    case OPR_POW:
     case OPR_BAND:
     case OPR_BOR:
     case OPR_BXOR:
@@ -865,27 +857,11 @@ void luaK_posfix(FuncState *fs, BinOpr op, expdesc *e1, expdesc *e2, int line) {
       *e1 = *e2;
       break;
     }
-    case OPR_CONCAT: {
-      luaK_exp2val(fs, e2);
-      if (e2->k == VRELOCABLE && GET_OPCODE(getcode(fs, e2)) == OP_CONCAT) {
-        lua_assert(e1->u.info == GETARG_B(getcode(fs, e2)) - 1);
-        freeexp(fs, e1);
-        SETARG_B(getcode(fs, e2), e1->u.info);
-        e1->k = VRELOCABLE;
-        e1->u.info = e2->u.info;
-      } else {
-        luaK_exp2nextreg(fs, e2); /* operand must be on the 'stack' */
-        codeexpval(fs, OP_CONCAT, e1, e2, line);
-      }
-      break;
-    }
     case OPR_ADD:
     case OPR_SUB:
     case OPR_MUL:
     case OPR_DIV:
-    case OPR_IDIV:
     case OPR_MOD:
-    case OPR_POW:
     case OPR_BAND:
     case OPR_BOR:
     case OPR_BXOR:

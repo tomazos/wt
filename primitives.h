@@ -34,6 +34,11 @@ using std::experimental::make_optional;
 namespace google {}
 using namespace google;
 
+namespace boost {
+namespace filesystem {}
+};
+namespace filesystem = boost::filesystem;
+
 using int8 = std::int8_t;
 using int16 = std::int16_t;
 using int32 = std::int32_t;

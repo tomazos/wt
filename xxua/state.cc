@@ -77,7 +77,7 @@ State::CFunction State::AtPanic(CFunction panic_function) {
   return lua_atpanic(L, panic_function);
 }
 
-static std::string LastWriterError() {
+static std::string LastWriterThrow() {
   thread_local std::string s;
   return s;
 }
@@ -88,7 +88,7 @@ static int WriterFunction(lua_State* L, const void* p, size_t sz, void* ud) {
     writer.Write(p, sz);
     return 0;
   } catch (std::exception e) {
-    LastWriterError() = e.what();
+    LastWriterThrow() = e.what();
     return 1;
   }
 }
@@ -98,7 +98,7 @@ void State::Save(Writer& writer, bool strip) {
   if (lua_dump(L, WriterFunction, ud, strip) == 0)
     return;
   else
-    throw std::runtime_error(LastWriterError());
+    throw std::runtime_error(LastWriterThrow());
 }
 
 static const char* ReaderFunction(lua_State* L, void* ud, size_t* size) {
@@ -109,7 +109,18 @@ static const char* ReaderFunction(lua_State* L, void* ud, size_t* size) {
 }
 
 void State::Load(Reader& reader, const string& chunkname, const char* mode) {
-  lua_load(L, ReaderFunction, &reader, chunkname.c_str(), mode);
+  switch (lua_load(L, ReaderFunction, &reader, chunkname.c_str(), mode)) {
+    case LUA_OK:
+      return;
+    case LUA_ERRSYNTAX:
+      Throw();
+    case LUA_ERRMEM:
+      Throw("memory error on load");
+    case LUA_ERRGCMM:
+      Throw("gc error on load");
+    default:
+      Throw("unknown error on load");
+  }
 }
 
 State::~State() { Close(); }

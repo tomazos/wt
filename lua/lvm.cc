@@ -512,10 +512,7 @@ lua_Integer luaV_div(lua_State *L, lua_Integer m, lua_Integer n) {
     if (n == 0) luaG_runerror(L, "attempt to divide by zero");
     return intop(-, 0, m); /* n==-1; avoid overflow with 0x80000...//-1 */
   } else {
-    lua_Integer q = m / n;         /* perform C division */
-    if ((m ^ n) < 0 && m % n != 0) /* 'm/n' would be negative non-integer? */
-      q -= 1;                      /* correct result for different rounding */
-    return q;
+    return m / n;
   }
 }
 
@@ -615,14 +612,12 @@ void luaV_finishOp(lua_State *L) {
     case OP_SUB:
     case OP_MUL:
     case OP_DIV:
-    case OP_IDIV:
     case OP_BAND:
     case OP_BOR:
     case OP_BXOR:
     case OP_SHL:
     case OP_SHR:
     case OP_MOD:
-    case OP_POW:
     case OP_UNM:
     case OP_BNOT:
     case OP_LEN:
@@ -884,12 +879,16 @@ newframe: /* reentry point when frame changes (call/return) */
         }
         vmbreak;
       }
-      vmcase(OP_DIV) { /* float division (always with floats) */
+      vmcase(OP_DIV) { /* division */
         TValue *rb = RKB(i);
         TValue *rc = RKC(i);
         lua_Number nb;
         lua_Number nc;
-        if (tonumber(rb, &nb) && tonumber(rc, &nc)) {
+        if (ttisinteger(rb) && ttisinteger(rc)) {
+          lua_Integer ib = ivalue(rb);
+          lua_Integer ic = ivalue(rc);
+          setivalue(ra, luaV_div(L, ib, ic));
+        } else if (tonumber(rb, &nb) && tonumber(rc, &nc)) {
           setfltvalue(ra, luai_numdiv(L, nb, nc));
         } else {
           Protect(luaT_trybinTM(L, rb, rc, ra, TM_DIV));
@@ -971,34 +970,6 @@ newframe: /* reentry point when frame changes (call/return) */
           setfltvalue(ra, m);
         } else {
           Protect(luaT_trybinTM(L, rb, rc, ra, TM_MOD));
-        }
-        vmbreak;
-      }
-      vmcase(OP_IDIV) { /* floor division */
-        TValue *rb = RKB(i);
-        TValue *rc = RKC(i);
-        lua_Number nb;
-        lua_Number nc;
-        if (ttisinteger(rb) && ttisinteger(rc)) {
-          lua_Integer ib = ivalue(rb);
-          lua_Integer ic = ivalue(rc);
-          setivalue(ra, luaV_div(L, ib, ic));
-        } else if (tonumber(rb, &nb) && tonumber(rc, &nc)) {
-          setfltvalue(ra, luai_numidiv(L, nb, nc));
-        } else {
-          Protect(luaT_trybinTM(L, rb, rc, ra, TM_IDIV));
-        }
-        vmbreak;
-      }
-      vmcase(OP_POW) {
-        TValue *rb = RKB(i);
-        TValue *rc = RKC(i);
-        lua_Number nb;
-        lua_Number nc;
-        if (tonumber(rb, &nb) && tonumber(rc, &nc)) {
-          setfltvalue(ra, luai_numpow(L, nb, nc));
-        } else {
-          Protect(luaT_trybinTM(L, rb, rc, ra, TM_POW));
         }
         vmbreak;
       }

@@ -54,7 +54,22 @@ library:
   sources:
     file_functions.cc
   dependencies:
+    bigint
     must
+
+test:
+  name = file_functions_test
+  sources:
+    file_functions_test.cc
+  dependencies:
+    file_functions
+    file_functions_test_proto
+    /main/gtest
+
+proto:
+  name = file_functions_test_proto
+  sources:
+    file_functions_test.proto
 
 library:
   name = must

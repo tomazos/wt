@@ -1,0 +1,5 @@
+syntax = "proto2";
+
+message TestFileAttributes {
+  optional int32 x = 1;
+}

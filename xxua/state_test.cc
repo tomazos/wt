@@ -20,14 +20,14 @@ class StateTest : public testing::Test {
 
 TEST_F(StateTest, Smoke) {}
 
-TEST_F(StateTest, Error) {
+TEST_F(StateTest, Throw) {
   DebugAllocator allocator;
   xxua::State state(allocator);
 
   bool threw = false;
   try {
     state.PushString("foo");
-    state.Error();
+    state.Throw();
   } catch (const std::exception& e) {
     threw = true;
     string error_message = e.what();
@@ -308,15 +308,15 @@ TEST_F(StateTest, Arithmetic) {
   state.PushInteger(9);
   state.PushInteger(4);
   state.DIV();
-  EXPECT_TRUE(state.GetType(1) == Type::FLOAT);
-  EXPECT_EQ(state.ToFloat(1), 2.25);
-  state.Pop();
-
-  state.PushInteger(9);
-  state.PushInteger(4);
-  state.IDIV();
   EXPECT_TRUE(state.GetType(1) == Type::INTEGER);
   EXPECT_EQ(state.ToInteger(1), 2);
+  state.Pop();
+
+  state.PushFloat(9);
+  state.PushFloat(4);
+  state.DIV();
+  EXPECT_TRUE(state.GetType(1) == Type::FLOAT);
+  EXPECT_EQ(state.ToFloat(1), 2.25);
   state.Pop();
 
   state.PushInteger(9);
@@ -331,13 +331,6 @@ TEST_F(StateTest, Arithmetic) {
   state.MOD();
   EXPECT_TRUE(state.GetType(1) == Type::FLOAT);
   EXPECT_EQ(state.ToFloat(1), 2.25);
-  state.Pop();
-
-  state.PushInteger(2);
-  state.PushInteger(10);
-  state.POW();
-  EXPECT_TRUE(state.GetType(1) == Type::FLOAT);
-  EXPECT_EQ(state.ToFloat(1), 1024);
   state.Pop();
 
   state.PushInteger(10);
@@ -438,14 +431,14 @@ TEST_F(StateTest, Strings) {
 }
 
 TEST_F(StateTest, Calls) {
-  state.LoadFromString("x,y = ...; return x + y", "test");
+  state.LoadFromString("x,y = ...; return x + y;", "test");
   state.PushInteger(2);
   state.PushInteger(3);
   state.Call(2, 1);
   EXPECT_EQ(state.ToInteger(1), 5);
   state.Pop();
 
-  state.LoadFromString("return ...", "test");
+  state.LoadFromString("return ...;", "test");
   state.PushInteger(1);
   state.PushInteger(2);
   state.PushInteger(3);
@@ -460,7 +453,7 @@ TEST_F(StateTest, Calls) {
 }
 
 TEST_F(StateTest, LoadSave) {
-  state.LoadFromString("x,y = ...; return x + y", "test",
+  state.LoadFromString("x,y = ...; return x + y;", "test",
                        State::ChunkFormat::TEXT);
   string saved = state.SaveToString();
   state.Pop();
@@ -491,7 +484,7 @@ TEST_F(StateTest, GCSmoke) {
 }
 
 TEST_F(StateTest, Tables) {
-  state.LoadFromString("y = 2 * x");
+  state.LoadFromString("y = 2 * x;");
   EXPECT_EQ(state.StackSize(), 1);
   state.PushGlobalTable();
   EXPECT_EQ(state.StackSize(), 2);
@@ -532,13 +525,13 @@ TEST_F(StateTest, Metatable) {
   state.PushString("__index");
   state.PushNewTable();  // 4
   state.PushString("bar");
-  state.LoadFromString("self = ...; baz = self");
+  state.LoadFromString("self = ...; baz = self;");
   state.PopField(4);
   state.PopField(2);
   state.PopMetatable(1);
   state.Pop();
 
-  state.LoadFromString("local s = 'qux'; return s:bar()");
+  state.LoadFromString("local s = 'qux'; return s:bar();");
   state.Call(0, 0);
   state.PushGlobalTable();
   state.PushString("baz");

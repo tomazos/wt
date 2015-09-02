@@ -22,7 +22,10 @@ using CFunction = State::CFunction;
 using Index = State::Index;
 using ChunkFormat = State::ChunkFormat;
 
-[[noreturn]] inline void Error();
+inline Index UPVALUE(int i);
+
+[[noreturn]] inline void Throw();
+[[noreturn]] inline void Throw(string_view error_message);
 
 // stack query
 inline Index AbsIndex(Index idx);
@@ -66,9 +69,7 @@ inline void ADD();
 inline void SUB();
 inline void MUL();
 inline void DIV();
-inline void IDIV();
 inline void MOD();
-inline void POW();
 inline void NEG();
 inline void BNOT();
 inline void BAND();
@@ -97,7 +98,7 @@ inline void LoadFromStream(std::istream& is, const string& chunkname = "",
 inline void LoadFromString(const string& s, const string& chunkname = "",
                            ChunkFormat format = ChunkFormat::EITHER);
 
-void Save(Writer& writer, bool strip = false);
+inline void Save(Writer& writer, bool strip = false);
 inline void SaveToStream(std::ostream& os, bool strip = false);
 inline string SaveToString(bool strip = false);
 
@@ -138,7 +139,12 @@ inline Context::Context(State& state) : previous_(Current()) {
 
 inline Context::~Context() { Current() = previous_; }
 
-[[noreturn]] inline void Error() { Context::Current()->Error(); }
+inline Index UPVALUE(int i) { return State::UPVALUE(i); }
+
+[[noreturn]] inline void Throw() { Context::Current()->Throw(); }
+[[noreturn]] inline void Throw(string_view error_message) {
+  Context::Current()->Throw(error_message);
+}
 
 // stack query
 inline Index AbsIndex(Index idx) { return Context::Current()->AbsIndex(idx); }
@@ -211,9 +217,7 @@ inline void ADD() { Context::Current()->ADD(); }
 inline void SUB() { Context::Current()->SUB(); }
 inline void MUL() { Context::Current()->MUL(); }
 inline void DIV() { Context::Current()->DIV(); }
-inline void IDIV() { Context::Current()->IDIV(); }
 inline void MOD() { Context::Current()->MOD(); }
-inline void POW() { Context::Current()->POW(); }
 inline void NEG() { Context::Current()->NEG(); }
 inline void BNOT() { Context::Current()->BNOT(); }
 inline void BAND() { Context::Current()->BAND(); }
@@ -265,7 +269,7 @@ inline void LoadFromString(const string& s, const string& chunkname,
   Context::Current()->LoadFromString(s, chunkname, format);
 }
 
-void Save(Writer& writer, bool strip) {
+inline void Save(Writer& writer, bool strip) {
   Context::Current()->Save(writer, strip);
 }
 inline void SaveToStream(std::ostream& os, bool strip) {

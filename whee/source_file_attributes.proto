@@ -1,0 +1,6 @@
+syntax = "proto2";
+
+message SourceFileAttributes {
+  optional int64 last_tidy = 1;
+  optional int64 last_tested = 2;
+}

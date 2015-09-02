@@ -9,10 +9,10 @@
 #include <unistd.h>
 
 #include "main/args.h"
-#include "core/bigint.h"
 #include "core/file_functions.h"
 #include "core/must.h"
 #include "core/process.h"
+#include "whee/source_file_attributes.pb.h"
 #include "whee/source_root_sentinal.h"
 #include "whee/token_tree.h"
 
@@ -21,13 +21,6 @@ using boost::filesystem::path;
 using boost::algorithm::split;
 
 const string source_root_sentinal = GetSourceRootSentinal();
-
-bigint LastModificationTime(const path& p) {
-  struct stat s;
-  int stat_result = stat(p.string().c_str(), &s);
-  if (stat_result != 0) THROW_ERRNO("stat(", p, ")");
-  return bigint(s.st_mtim.tv_sec) * 1'000'000'000 + s.st_mtim.tv_nsec;
-}
 
 class Whee {
  public:
@@ -142,7 +135,14 @@ class Whee {
   }
 
   void TidyFile(const path& p) {
-    ExecuteShellCommand("clang-format-3.6 -style=Google -i ", p);
+    int64 mod_time = LastModificationTime(p);
+    SourceFileAttributes attributes;
+    GetFileAttribute(p, "user.srcfile", attributes);
+    if (attributes.last_tidy() != mod_time) {
+      ExecuteShellCommand("clang-format-3.6 -style=Google -i ", p);
+      attributes.set_last_tidy(LastModificationTime(p));
+      SetFileAttribute(p, "user.srcfile", attributes);
+    }
   }
 
   void ForEachSourcePath(
@@ -350,6 +350,7 @@ class Whee {
     string name;
     string tool_prefix;
     string lib_path;
+    string flags;
   };
 
   string GenProtoCommand(const path& source, const path& pb_root,
@@ -374,8 +375,8 @@ class Whee {
 
     return EncodeAsString(
         platform.tool_prefix, "g++ -c -g -std=gnu++14 -Wall -Werror -O3 ",
-        boost::algorithm::join(include_paths_strings, " "), " -include ",
-        primitives_header.string(), " -o ", object.string(), " ",
+        platform.flags, " ", boost::algorithm::join(include_paths_strings, " "),
+        " -include ", primitives_header.string(), " -o ", object.string(), " ",
         source.string(), " 2> ", object.string(), ".stderr");
   }
 
@@ -394,8 +395,9 @@ class Whee {
     for (const path& library : libraries)
       library_strings.push_back(library.string());
     return EncodeAsString(
-        platform.tool_prefix, "g++ -std=gnu++14 -g -O3 -static -o ",
-        program.string(), " -Wl,--start-group -Wl,--whole-archive ",
+        platform.tool_prefix, "g++ -std=gnu++14 -g -O3 ", platform.flags,
+        " -static -o ", program.string(),
+        " -Wl,--start-group -Wl,--whole-archive ",
         boost::algorithm::join(library_strings, " "),
         " -Wl,--no-whole-archive -lboost_filesystem -lboost_system -lprotobuf "
         "-Wl,--whole-archive -lpthread -Wl,--no-whole-archive -lmmal "
@@ -505,7 +507,7 @@ class Whee {
                                  source_root_sentinal;
 
         std::vector<path> include_paths;
-        bigint protos_last_write_time = 0;
+        int64 protos_last_write_time = 0;
 
         for (const RuleRef& dep : ruledeps.at(me)) {
           include_paths.push_back(protos_superroot / dep.directory / dep.name /
@@ -513,7 +515,7 @@ class Whee {
           const SourceDirectory& dep_directory = source_tree.at(dep.directory);
           const Rule& dep_rule = dep_directory.rules.at(dep.name);
           for (const string& proto_name : dep_rule.raw_sources) {
-            bigint proto_last_write_time = LastModificationTime(
+            int64 proto_last_write_time = LastModificationTime(
                 GetSourceRoot() / dep.directory / proto_name);
             if (proto_last_write_time > protos_last_write_time)
               protos_last_write_time = proto_last_write_time;
@@ -607,12 +609,14 @@ class Whee {
   }
 
   void Build(const std::vector<string>& args) {
-    struct Platform native = {"native", "", "-L/usr/local/lib"};
+    struct Platform native = {"native", "", "-L/usr/local/lib", ""};
+    struct Platform coverage = {"coverage", "", "-L/usr/local/lib",
+                                "--coverage"};
     struct Platform zubu = {"zubu", "x86_64-zubu-linux-gnu-", ""};
-    struct Platform zipi = {"zipi", "arm-zipi-linux-gnueabihf-", ""};
+    //    struct Platform zipi = {"zipi", "arm-zipi-linux-gnueabihf-", ""};
     struct Platform zapi = {"zapi", "arm-zapi-linux-gnueabihf-", ""};
 
-    static std::vector<Platform> platforms = {native, zubu, zipi, zapi};
+    static std::vector<Platform> platforms = {native, coverage, zubu, zapi};
     const SourceTree source_tree = GetSourceTree();
 
     std::map<RuleRef, std::set<RuleRef>> ruledeps =
@@ -658,10 +662,10 @@ class Whee {
                                   source_root_sentinal;
 
           std::vector<path> include_paths;
-          bigint source_last_write_time = 0;
+          int64 source_last_write_time = 0;
 
           for (const string& unit_name : rule.cc_sources()) {
-            bigint unit_last_write_time =
+            int64 unit_last_write_time =
                 LastModificationTime(units_root / directory_name / unit_name);
             if (unit_last_write_time > source_last_write_time)
               source_last_write_time = unit_last_write_time;
@@ -675,7 +679,7 @@ class Whee {
                 source_tree.at(dep.directory);
             const Rule& dep_rule = dep_directory.rules.at(dep.name);
             for (const string& header_name : dep_rule.cc_headers()) {
-              bigint header_last_write_time = LastModificationTime(
+              int64 header_last_write_time = LastModificationTime(
                   dep_headers_root / dep.directory / header_name);
               if (header_last_write_time > source_last_write_time)
                 source_last_write_time = header_last_write_time;
@@ -711,9 +715,9 @@ class Whee {
           }
 
           if (!objects.empty()) {
-            bigint objects_last_write_time = 0;
+            int64 objects_last_write_time = 0;
             for (const path& object : objects) {
-              bigint object_last_write_time = LastModificationTime(object);
+              int64 object_last_write_time = LastModificationTime(object);
               if (object_last_write_time > objects_last_write_time) {
                 objects_last_write_time = object_last_write_time;
               }
@@ -753,9 +757,9 @@ class Whee {
             if (p) libs.insert(*p);
           }
 
-          bigint libs_last_write_time = 0;
+          int64 libs_last_write_time = 0;
           for (const path& lib : libs) {
-            bigint lib_last_write_time = LastModificationTime(lib);
+            int64 lib_last_write_time = LastModificationTime(lib);
             if (lib_last_write_time > libs_last_write_time) {
               libs_last_write_time = lib_last_write_time;
             }
@@ -766,14 +770,22 @@ class Whee {
                       << "/" << rule_name << std::endl;
             ExecuteShellCommand(ProgramCommand(platform, program, libs));
           }
-          if (rule.kind == Rule::TEST && platform.name == "zubu") {
-            std::cout << " [TEST] " << platform.name << " " << directory_name
-                      << "/" << rule_name << std::endl;
-            ExecuteShellCommand(program.string());
+          if (rule.kind == Rule::TEST && platform.name == "coverage") {
+            int64 program_last_mod = LastModificationTime(program);
+            SourceFileAttributes attributes;
+            GetFileAttribute(program, "user.srcfile", attributes);
+            if (attributes.last_tested() != program_last_mod) {
+              std::cout << " [TEST] " << platform.name << " " << directory_name
+                        << "/" << rule_name << std::endl;
+              ExecuteShellCommand(program.string());
+              attributes.set_last_tested(program_last_mod);
+              SetFileAttribute(program, "user.srcfile", attributes);
+            }
           }
         }
       }
     }
+    std::cerr << "/:1:1: Build complete." << std::endl;
   }
 };
 

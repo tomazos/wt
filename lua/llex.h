@@ -22,8 +22,7 @@
 */
 enum RESERVED {
   /* terminal symbols denoted by reserved words */
-  TK_AND = FIRST_RESERVED,
-  TK_BREAK,
+  TK_BREAK = FIRST_RESERVED,
   TK_DO,
   TK_ELSE,
   TK_ELSEIF,
@@ -35,9 +34,7 @@ enum RESERVED {
   TK_IF,
   TK_IN,
   TK_LOCAL,
-  TK_NIL,
-  TK_NOT,
-  TK_OR,
+  TK_NULL,
   TK_REPEAT,
   TK_RETURN,
   TK_THEN,
@@ -45,12 +42,12 @@ enum RESERVED {
   TK_UNTIL,
   TK_WHILE,
   /* other terminal symbols */
-  TK_IDIV,
-  TK_CONCAT,
+  TK_AND,
   TK_DOTS,
   TK_EQ,
   TK_GE,
   TK_LE,
+  TK_OR,
   TK_NE,
   TK_SHL,
   TK_SHR,
@@ -92,7 +89,6 @@ typedef struct LexState {
   struct Dyndata *dyd; /* dynamic structures used by the parser */
   TString *source;     /* current source name */
   TString *envn;       /* environment variable name */
-  char decpoint;       /* locale decimal point */
 } LexState;
 
 LUAI_FUNC void luaX_init(lua_State *L);

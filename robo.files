@@ -529,3 +529,12 @@ xxua/reference.h
 xxua/context_test.cc
 xxua/stack.h
 xxua/stack_test.cc
+xxua/value.h
+xxua/lang_test.cc
+xxua/api.h
+xxua/api.cc
+xxua/api_test.cc
+xxua/lex_test.cc
+core/file_functions_test.cc
+core/file_functions_test.proto
+whee/source_file_attributes.proto

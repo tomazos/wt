@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
   startTimer(50);
 }
 
-void MainWindow::timerEvent(QTimerEvent* event) {
+void MainWindow::timerEvent(QTimerEvent* event [[gnu::unused]]) {
   state = client.GetState();
   UpdateView();
 }

@@ -1,4 +1,12 @@
 test:
+  name = api_test
+  sources:
+    api_test.cc
+  dependencies:
+    xxua
+    /main/gtest
+
+test:
   name = allocator_test
   sources:
     allocator_test.cc
@@ -14,10 +22,27 @@ test:
     xxua
     /main/gtest
 
+test:
+  name = lang_test
+  sources:
+    lang_test.cc
+  dependencies:
+    xxua
+    /main/gtest
+
+test:
+  name = lex_test
+  sources:
+    lex_test.cc
+  dependencies:
+    xxua
+    /main/gtest
+
 library:
   name = xxua
   headers:
     allocator.h
+    api.h
     context.h
     debug_allocator.h
     pointer.h
@@ -28,6 +53,7 @@ library:
     type.h
     writer.h
   sources:
+    api.cc
     debug_allocator.cc
     state.cc
   dependencies:

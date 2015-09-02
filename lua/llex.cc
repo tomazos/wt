@@ -11,6 +11,7 @@
 
 #include <locale.h>
 #include <string.h>
+#include <iostream>
 
 #include "lua/lua.h"
 
@@ -32,12 +33,11 @@
 
 /* ORDER RESERVED */
 static const char *const luaX_tokens[] = {
-    "and",    "break",    "do",     "else",   "elseif", "end",      "false",
-    "for",    "function", "goto",   "if",     "in",     "local",    "nil",
-    "not",    "or",       "repeat", "return", "then",   "true",     "until",
-    "while",  "//",       "..",     "...",    "==",     ">=",       "<=",
-    "~=",     "<<",       ">>",     "::",     "<eof>",  "<number>", "<integer>",
-    "<name>", "<string>"};
+    "break",    "do",    "else",     "elseif",    "end",    "false",   "for",
+    "function", "goto",  "if",       "in",        "local",  "null",    "repeat",
+    "return",   "then",  "true",     "until",     "while",  "&&",      "...",
+    "==",       ">=",    "<=",       "||",        "!=",     "<<",      ">>",
+    "::",       "<eof>", "<number>", "<integer>", "<name>", "<string>"};
 
 #define save_and_next(ls) (save(ls, ls->current), next(ls))
 
@@ -141,7 +141,6 @@ static void inclinenumber(LexState *ls) {
 void luaX_setinput(lua_State *L, LexState *ls, ZIO *z, TString *source,
                    int firstchar) {
   ls->t.token = 0;
-  ls->decpoint = '.';
   ls->L = L;
   ls->current = firstchar;
   ls->lookahead.token = TK_EOS; /* no look-ahead token */
@@ -181,34 +180,7 @@ static int check_next2(LexState *ls, const char *set) {
     return 0;
 }
 
-/*
-** change all characters 'from' in buffer to 'to'
-*/
-static void buffreplace(LexState *ls, char from, char to) {
-  if (from != to) {
-    size_t n = luaZ_bufflen(ls->buff);
-    char *p = luaZ_buffer(ls->buff);
-    while (n--)
-      if (p[n] == from) p[n] = to;
-  }
-}
-
 #define buff2num(b, o) (luaO_str2num(luaZ_buffer(b), o) != 0)
-
-/*
-** in case of format error, try to change decimal point separator to
-** the one defined in the current locale and check again
-*/
-static void trydecpoint(LexState *ls, TValue *o) {
-  char old = ls->decpoint;
-  ls->decpoint = lua_getlocaledecpoint();
-  buffreplace(ls, old, ls->decpoint); /* try new decimal separator */
-  if (!buff2num(ls->buff, o)) {
-    /* format error with correct decimal point: no more options */
-    buffreplace(ls, ls->decpoint, '.'); /* undo change (for error message) */
-    lexerror(ls, "malformed number", TK_FLT);
-  }
-}
 
 /* LUA_NUMBER */
 /*
@@ -217,16 +189,18 @@ static void trydecpoint(LexState *ls, TValue *o) {
 */
 static int read_numeral(LexState *ls, SemInfo *seminfo) {
   TValue obj;
-  const char *expo = "Ee";
-  int first = ls->current;
   lua_assert(lisdigit(ls->current));
   save_and_next(ls);
-  if (first == '0' && check_next2(ls, "xX")) /* hexadecimal? */
-    expo = "Pp";
   for (;;) {
-    if (check_next2(ls, expo)) /* exponent part? */
-      check_next2(ls, "-+");   /* optional exponent sign */
-    if (lisxdigit(ls->current))
+    if (ls->current == '\'') { /* digit separator */
+      save_and_next(ls);
+      if (lisxdigit(ls->current))
+        save_and_next(ls);
+      else
+        lexerror(ls, "expected alphanum after digit separator", 0);
+    } else if (check_next2(ls, "eE")) /* exponent part? */
+      check_next2(ls, "-+");          /* optional exponent sign */
+    else if (lislalnum(ls->current))
       save_and_next(ls);
     else if (ls->current == '.')
       save_and_next(ls);
@@ -234,9 +208,8 @@ static int read_numeral(LexState *ls, SemInfo *seminfo) {
       break;
   }
   save(ls, '\0');
-  buffreplace(ls, '.', ls->decpoint); /* follow locale for decimal point */
-  if (!buff2num(ls->buff, &obj))      /* format error? */
-    trydecpoint(ls, &obj); /* try to update decimal point separator */
+  if (!buff2num(ls->buff, &obj))
+    lexerror(ls, "numeric literal format error", 0);
   if (ttisinteger(&obj)) {
     seminfo->i = ivalue(&obj);
     return TK_INT;
@@ -469,25 +442,6 @@ static int llex(LexState *ls, SemInfo *seminfo) {
         next(ls);
         break;
       }
-      case '-': { /* '-' or '--' (comment) */
-        next(ls);
-        if (ls->current != '-') return '-';
-        /* else is a comment */
-        next(ls);
-        if (ls->current == '[') { /* long comment? */
-          int sep = skip_sep(ls);
-          luaZ_resetbuffer(ls->buff); /* 'skip_sep' may dirty the buffer */
-          if (sep >= 0) {
-            read_long_string(ls, NULL, sep); /* skip long comment */
-            luaZ_resetbuffer(ls->buff); /* previous call may dirty the buff. */
-            break;
-          }
-        }
-        /* else short comment */
-        while (!currIsNewline(ls) && ls->current != EOZ)
-          next(ls); /* skip until end of line (or end of file) */
-        break;
-      }
       case '[': { /* long string or simply '[' */
         int sep = skip_sep(ls);
         if (sep >= 0) {
@@ -497,12 +451,33 @@ static int llex(LexState *ls, SemInfo *seminfo) {
           lexerror(ls, "invalid long string delimiter", TK_STRING);
         return '[';
       }
+      case '!': {
+        next(ls);
+        if (check_next1(ls, '='))
+          return TK_NE;
+        else
+          return '!';
+      }
       case '=': {
         next(ls);
         if (check_next1(ls, '='))
           return TK_EQ;
         else
           return '=';
+      }
+      case '&': {
+        next(ls);
+        if (check_next1(ls, '&'))
+          return TK_AND;
+        else
+          return '&';
+      }
+      case '|': {
+        next(ls);
+        if (check_next1(ls, '|'))
+          return TK_OR;
+        else
+          return '|';
       }
       case '<': {
         next(ls);
@@ -524,10 +499,28 @@ static int llex(LexState *ls, SemInfo *seminfo) {
       }
       case '/': {
         next(ls);
-        if (check_next1(ls, '/'))
-          return TK_IDIV;
-        else
-          return '/';
+        /* short comment */
+        if (check_next1(ls, '/')) {
+          while (!currIsNewline(ls) && ls->current != EOZ)
+            next(ls); /* skip until end of line (or end of file) */
+          break;
+        }
+        /* long comment */
+        if (check_next1(ls, '*')) {
+          do {
+            while (ls->current != '*') {
+              if (ls->current == EOZ)
+                lexerror(ls, "unterminated comment", TK_EOS);
+              next(ls);
+            }
+            while (ls->current == '*') {
+              next(ls);
+            }
+          } while (ls->current != '/');
+          next(ls);
+          break;
+        }
+        return '/';
       }
       case '~': {
         next(ls);
@@ -554,7 +547,7 @@ static int llex(LexState *ls, SemInfo *seminfo) {
           if (check_next1(ls, '.'))
             return TK_DOTS; /* '...' */
           else
-            return TK_CONCAT; /* '..' */
+            lexerror(ls, "unexpected ..", 0);
         } else if (!lisdigit(ls->current))
           return '.';
         else

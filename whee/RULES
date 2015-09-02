@@ -12,12 +12,18 @@ program:
   sources:
     whee.cc
   dependencies:
-    token_tree
+    source_file_attributes
     source_root_sentinal
+    token_tree
     /core/bigint
     /core/process
     /core/file_functions
     /main/args
+
+proto:
+  name = source_file_attributes
+  sources:
+    source_file_attributes.proto
 
 library:
   name = source_root_sentinal

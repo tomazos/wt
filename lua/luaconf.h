@@ -533,9 +533,9 @@ constexpr auto LUA_MININTEGER = std::numeric_limits<LUA_INTEGER>::min();
 ** leave 'lua_strx2number' undefined and Lua will provide its own
 ** implementation.
 */
-#if !defined(LUA_USE_C89)
-#define lua_strx2number(s, p) lua_str2number(s, p)
-#endif
+//#if !defined(LUA_USE_C89)
+//#define lua_strx2number(s, p) lua_str2number(s, p)
+//#endif
 
 /*
 @@ lua_number2strx converts a float to an hexadecimal numeric string.

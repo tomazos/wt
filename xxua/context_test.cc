@@ -21,11 +21,11 @@ class ContextTest : public testing::Test {
 
 TEST_F(ContextTest, Smoke) {}
 
-TEST_F(ContextTest, Error) {
+TEST_F(ContextTest, Throw) {
   bool threw = false;
   try {
     PushString("foo");
-    Error();
+    Throw();
   } catch (const std::exception& e) {
     threw = true;
     string error_message = e.what();
@@ -309,15 +309,15 @@ TEST_F(ContextTest, Arithmetic) {
   PushInteger(9);
   PushInteger(4);
   DIV();
-  EXPECT_TRUE(GetType(1) == Type::FLOAT);
-  EXPECT_EQ(ToFloat(1), 2.25);
-  Pop();
-
-  PushInteger(9);
-  PushInteger(4);
-  IDIV();
   EXPECT_TRUE(GetType(1) == Type::INTEGER);
   EXPECT_EQ(ToInteger(1), 2);
+  Pop();
+
+  PushFloat(9);
+  PushFloat(4);
+  DIV();
+  EXPECT_TRUE(GetType(1) == Type::FLOAT);
+  EXPECT_EQ(ToFloat(1), 2.25);
   Pop();
 
   PushInteger(9);
@@ -332,13 +332,6 @@ TEST_F(ContextTest, Arithmetic) {
   MOD();
   EXPECT_TRUE(GetType(1) == Type::FLOAT);
   EXPECT_EQ(ToFloat(1), 2.25);
-  Pop();
-
-  PushInteger(2);
-  PushInteger(10);
-  POW();
-  EXPECT_TRUE(GetType(1) == Type::FLOAT);
-  EXPECT_EQ(ToFloat(1), 1024);
   Pop();
 
   PushInteger(10);
@@ -439,14 +432,14 @@ TEST_F(ContextTest, Strings) {
 }
 
 TEST_F(ContextTest, Calls) {
-  LoadFromString("x,y = ...; return x + y", "test");
+  LoadFromString("x,y = ...; return x + y;", "test");
   PushInteger(2);
   PushInteger(3);
   Call(2, 1);
   EXPECT_EQ(ToInteger(1), 5);
   Pop();
 
-  LoadFromString("return ...", "test");
+  LoadFromString("return ...;", "test");
   PushInteger(1);
   PushInteger(2);
   PushInteger(3);
@@ -461,7 +454,7 @@ TEST_F(ContextTest, Calls) {
 }
 
 TEST_F(ContextTest, LoadSave) {
-  LoadFromString("x,y = ...; return x + y", "test", State::ChunkFormat::TEXT);
+  LoadFromString("x,y = ...; return x + y;", "test", State::ChunkFormat::TEXT);
   string saved = SaveToString();
   Pop();
   EXPECT_EQ(StackSize(), 0);
@@ -491,7 +484,7 @@ TEST_F(ContextTest, GCSmoke) {
 }
 
 TEST_F(ContextTest, Tables) {
-  LoadFromString("y = 2 * x");
+  LoadFromString("y = 2 * x;");
   EXPECT_EQ(StackSize(), 1);
   PushGlobalTable();
   EXPECT_EQ(StackSize(), 2);
@@ -532,13 +525,13 @@ TEST_F(ContextTest, Metatable) {
   PushString("__index");
   PushNewTable();  // 4
   PushString("bar");
-  LoadFromString("self = ...; baz = self");
+  LoadFromString("self = ...; baz = self;");
   PopField(4);
   PopField(2);
   PopMetatable(1);
   Pop();
 
-  LoadFromString("local s = 'qux'; return s:bar()");
+  LoadFromString("local s = 'qux'; return s:bar();");
   Call(0, 0);
   PushGlobalTable();
   PushString("baz");

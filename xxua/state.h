@@ -20,8 +20,8 @@ class State {
   explicit State(Allocator& allocator);
   ~State();
 
-  [[noreturn]] inline void Error();
-  [[noreturn]] inline void Error(const string& error_message);
+  [[noreturn]] inline void Throw();
+  [[noreturn]] inline void Throw(string_view error_message);
 
   // stack query
   inline Index AbsIndex(Index idx);
@@ -70,9 +70,7 @@ class State {
   inline void SUB();
   inline void MUL();
   inline void DIV();
-  inline void IDIV();
   inline void MOD();
-  inline void POW();
   inline void NEG();
   inline void BNOT();
   inline void BAND();
@@ -150,11 +148,11 @@ class State {
   State& operator=(State&& other) = delete;
 };
 
-[[noreturn]] inline void State::Error() { lua_error(L); }
+[[noreturn]] inline void State::Throw() { lua_error(L); }
 
-[[noreturn]] inline void State::Error(const string& error_message) {
+[[noreturn]] inline void State::Throw(string_view error_message) {
   PushString(error_message);
-  Error();
+  Throw();
 }
 
 inline State::Index State::AbsIndex(Index idx) { return lua_absindex(L, idx); }
@@ -163,9 +161,7 @@ inline void State::ADD() { lua_arith(L, LUA_OPADD); }
 inline void State::SUB() { lua_arith(L, LUA_OPSUB); }
 inline void State::MUL() { lua_arith(L, LUA_OPMUL); }
 inline void State::DIV() { lua_arith(L, LUA_OPDIV); }
-inline void State::IDIV() { lua_arith(L, LUA_OPIDIV); }
 inline void State::MOD() { lua_arith(L, LUA_OPMOD); }
-inline void State::POW() { lua_arith(L, LUA_OPPOW); }
 inline void State::NEG() { lua_arith(L, LUA_OPUNM); }
 inline void State::BNOT() { lua_arith(L, LUA_OPBNOT); }
 inline void State::BAND() { lua_arith(L, LUA_OPBAND); }
@@ -380,30 +376,30 @@ inline void State::Pop(int n) { lua_pop(L, n); }
 inline void State::ResizeStack(Index n) { lua_settop(L, n); }
 
 inline bool State::ToBoolean(Index index) {
-  if (GetType(index) != Type::BOOLEAN) Error("boolean expected");
+  if (GetType(index) != Type::BOOLEAN) Throw("boolean expected");
 
   return lua_toboolean(L, index);
 }
 
 inline State::Integer State::ToInteger(Index index) {
-  if (GetType(index) != Type::INTEGER) Error("integer expected");
+  if (GetType(index) != Type::INTEGER) Throw("integer expected");
 
   return lua_tointeger(L, index);
 }
 
 inline State::Float State::ToFloat(Index index) {
-  if (GetType(index) != Type::FLOAT) Error("float expected");
+  if (GetType(index) != Type::FLOAT) Throw("float expected");
   return lua_tonumber(L, index);
 }
 
 inline State::CFunction State::ToCFunction(Index index) {
-  if (GetType(index) != Type::CFUNCTION) Error("C function expected");
+  if (GetType(index) != Type::CFUNCTION) Throw("C function expected");
 
   return lua_tocfunction(L, index);
 }
 
 inline string_view State::ToString(Index index) {
-  if (GetType(index) != Type::STRING) Error("string expected");
+  if (GetType(index) != Type::STRING) Throw("string expected");
 
   size_t len;
   const char* data = lua_tolstring(L, index, &len);
