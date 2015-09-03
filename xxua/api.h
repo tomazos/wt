@@ -97,8 +97,8 @@ T& ToObject(Index index) {
 
 int DispatchFunction(lua_State* L);
 
-inline void PushFunction(std::function<void()> f) {
-  EmplaceObject<std::function<void()>>(std::move(f));
+inline void PushFunction(std::function<int()> f) {
+  EmplaceObject<std::function<int()>>(std::move(f));
   PushCFunction(DispatchFunction, 1);
 }
 

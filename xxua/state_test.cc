@@ -531,7 +531,7 @@ TEST_F(StateTest, Metatable) {
   state.PopMetatable(1);
   state.Pop();
 
-  state.LoadFromString("local s = 'qux'; return s:bar();");
+  state.LoadFromString("local s = \"qux\"; return s:bar();");
   state.Call(0, 0);
   state.PushGlobalTable();
   state.PushString("baz");

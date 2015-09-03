@@ -3,7 +3,7 @@ chunk ::= block
 block ::= {stat}
 
 stat ::= ‘;’ |
-         varlist assignop explist `;` |
+         varlist = explist `;` |
          functioncall `;` |
          break |
          `{` block `}` |
@@ -11,7 +11,7 @@ stat ::= ‘;’ |
          while `(` exp `)` stat |
          do stat while `(` exp `)` `;` |
          for `(` identifier `=` exp `,` exp [`,` exp] `)` stat |
-         for `(` namelist in explist `)` stat |
+         for `(` namelist `in` explist `)` stat |
          function funcname funcbody |
          local function identifier funcbody |
          local namelist [`=` explist] |
@@ -54,5 +54,3 @@ binop ::=  `+` | `-` | `*` | `/` | `%` |
            `&&` | `||`
 
 unop ::= `-` | `!` | ‘~’
-
-assignop ::= `=` | `+=` | `-=` | `*=` | `/=` | `%=` | `&=` | `^=` | `|=`

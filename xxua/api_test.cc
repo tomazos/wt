@@ -42,7 +42,10 @@ TEST_F(ApiTest, EmplaceObject) {
 
 TEST_F(ApiTest, PushFunction) {
   int total = 0;
-  PushFunction([&] { total++; });
+  PushFunction([&] {
+    total++;
+    return 0;
+  });
   for (int i = 0; i < 1000; i++) {
     PushCopy(1);
     Call(0, 0);

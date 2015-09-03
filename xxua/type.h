@@ -20,4 +20,6 @@ enum class Type : uint8 {
   USERDATA = LUA_TUSERDATA
 };
 
+string_view TypeToString(Type t);
+
 }  // namespace xxua

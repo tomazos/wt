@@ -1,5 +1,6 @@
 #include "core/file_functions.h"
 
+#include <sys/file.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/xattr.h>
@@ -94,4 +95,18 @@ int64 LastModificationTime(const filesystem::path& p) {
   int stat_result = stat(p.string().c_str(), &s);
   if (stat_result != 0) THROW_ERRNO("stat(", p, ")");
   return int64(s.st_mtim.tv_sec) * 1'000'000'000 + s.st_mtim.tv_nsec;
+}
+
+FileLock::FileLock(const filesystem::path& path)
+    : path_(path), fd_(open(path.string().c_str(), O_RDONLY)) {
+  if (fd_ == -1) THROW_ERRNO("open(", path_, ")");
+  int flock_result = flock(fd_, LOCK_EX | LOCK_NB);
+  if (flock_result != 0) THROW_ERRNO("flock(", path_, ")");
+}
+
+FileLock::~FileLock() {
+  int flock_result = flock(fd_, LOCK_UN);
+  if (flock_result != 0) THROW_ERRNO("flock(", path_, ")");
+  int close_result = close(fd_);
+  if (close_result != 0) THROW_ERRNO("close(", path_, ")");
 }

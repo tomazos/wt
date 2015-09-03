@@ -531,7 +531,7 @@ TEST_F(ContextTest, Metatable) {
   PopMetatable(1);
   Pop();
 
-  LoadFromString("local s = 'qux'; return s:bar();");
+  LoadFromString("local s = \"qux\"; return s:bar();");
   Call(0, 0);
   PushGlobalTable();
   PushString("baz");

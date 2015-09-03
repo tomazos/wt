@@ -3,6 +3,7 @@
 #include "xxua/api.h"
 #include "xxua/context.h"
 #include "xxua/debug_allocator.h"
+#include "xxua/library.h"
 #include "xxua/state.h"
 
 #include <boost/any.hpp>
@@ -17,7 +18,7 @@ TEST(LangTest, All) {
 
   function assert(condition) {
     if (!condition)
-      error("assertion failed");
+      throw("assertion failed");
   }
 
   assert(1 == 1.00000);
@@ -142,23 +143,70 @@ TEST(LangTest, All) {
   } while (t < 5);
   assert(t == 5);
 
-  x = {1,2,3};
+  x = {2,4,6};
+
+  for (i = 1, 3)
+    assert(x[i] == 2*i);
+
+  local tab = {foo = "bar", baz = "qux", [42] = "quux"};
+
+  for (key, val in keyvals(tab))
+    if (key == 42)
+      assert(val == "quux");
+    else if (key == "foo")
+      assert(val == "bar");
+    else if (key == "baz")
+      assert(val == "qux");
+
+  local s = "foo";
+
+  assert(strlen(s) == 3);
+
+  assert(string(s) == "foo");
+  assert(string(42) == "42");
+  assert(string(true) == "1");
+  assert(string(false) == "0");
+
+  assert(cat(s,42,true) == "foo421");
+  assert(cat() == "");
+
+  assert(join(" ", s,42,true) == "foo 42 1");
+  assert(join("\000",s,42,true) == "foo\00042\0001");
+  assert(join("\000",s,42,true) != "foo\00042\0002");
+
+  assert(join("",s,42,true) == cat(s,42,true));
+
+  assert(join("xx", split("foo bar  baz", " ")) == "fooxxbarxxxxbaz");
+
+  assert(s:size() == 3);
+
+  s = "foobar";
+  assert(s:find("baz") == null);
+  assert(s:find("bar") == 4);
+  assert(s:find("o") == 2);
+  assert(s:find("o", 3) == 3);
+
+  assert(s:at(1) == 'f');
+  assert(s:at(2) == 'o');
+  assert(s:at(3) == 'o');
+  assert(s:at(4) == 'b');
+  assert(s:at(5) == 'a');
+  assert(s:at(6) == 'r');
+
+  assert(s:substr(4) == "bar");
+  assert(s:substr(2,3) == "oob");
+
+  es = "";
+  assert(!s:empty());
+  assert(es:empty());
+
 )";
 
   DebugAllocator allocator;
   State state(allocator);
   Context context(state);
+  InstallStandardLibrary();
   LoadFromString(code);
-  PushGlobalTable();
-
-  PushString("error");
-  PushFunction([] {
-    Concat(StackSize());
-    Throw();
-  });
-  PopField(-3);
-
-  Pop();
   Call(0, 0);
 
   PushGlobalTable();

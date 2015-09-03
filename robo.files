@@ -538,3 +538,6 @@ xxua/lex_test.cc
 core/file_functions_test.cc
 core/file_functions_test.proto
 whee/source_file_attributes.proto
+xxua/library.cc
+xxua/library.h
+xxua/type.cc

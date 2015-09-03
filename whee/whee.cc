@@ -132,6 +132,7 @@ class Whee {
     MUST(!exists(whee_dir), whee_dir,
          " already exists.  Delete it first to re-initialize.");
     create_directory(whee_dir);
+    SetFileContents(whee_dir / "lock", "");
   }
 
   void TidyFile(const path& p) {
@@ -161,6 +162,7 @@ class Whee {
   }
 
   void Tidy(const std::vector<string>& args) {
+    FileLock l(GetWheeDir() / "lock");
     MUST(args.empty());
 
     ForEachSourcePath([&](const path& source_path) {
@@ -609,6 +611,8 @@ class Whee {
   }
 
   void Build(const std::vector<string>& args) {
+    FileLock l(GetWheeDir() / "lock");
+
     struct Platform native = {"native", "", "-L/usr/local/lib", ""};
     struct Platform coverage = {"coverage", "", "-L/usr/local/lib",
                                 "--coverage"};

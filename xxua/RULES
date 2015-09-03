@@ -27,6 +27,7 @@ test:
   sources:
     lang_test.cc
   dependencies:
+    library
     xxua
     /main/gtest
 
@@ -37,6 +38,15 @@ test:
   dependencies:
     xxua
     /main/gtest
+
+library:
+  name = library
+  headers:
+    library.h
+  sources:
+    library.cc
+  dependencies:
+    xxua
 
 library:
   name = xxua
@@ -56,6 +66,7 @@ library:
     api.cc
     debug_allocator.cc
     state.cc
+    type.cc
   dependencies:
     /core/must
     /lua/core

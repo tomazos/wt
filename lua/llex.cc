@@ -336,6 +336,65 @@ static int readdecesc(LexState *ls) {
   return r;
 }
 
+static void read_charlit(LexState *ls, SemInfo *seminfo) {
+  next(ls);
+  lua_Integer c;
+  switch (ls->current) {
+    case EOZ:
+      lexerror(ls, "bad char literal", TK_EOS);
+      break; /* to avoid warnings */
+    case '\n':
+    case '\r':
+      lexerror(ls, "bad char literal", TK_STRING);
+      break;     /* to avoid warnings */
+    case '\\': { /* escape sequences */
+      next(ls);
+      switch (ls->current) {
+        case 'a':
+          c = '\a';
+          break;
+        case 'b':
+          c = '\b';
+          break;
+        case 'f':
+          c = '\f';
+          break;
+        case 'n':
+          c = '\n';
+          break;
+        case 'r':
+          c = '\r';
+          break;
+        case 't':
+          c = '\t';
+          break;
+        case 'v':
+          c = '\v';
+          break;
+        case '\\':
+        case '\"':
+        case '\'':
+          c = ls->current;
+          break;
+        case EOZ:
+          lexerror(ls, "bad char literal", TK_STRING);
+        default:
+          lexerror(ls, "bad char literal", TK_STRING);
+      }
+      next(ls);
+      break;
+    }
+    default:
+      c = ls->current;
+      next(ls);
+  }
+  if (!check_next1(ls, '\'')) lexerror(ls, "expected '", 0);
+
+  TValue obj;
+  setivalue(&obj, c);
+  seminfo->i = ivalue(&obj);
+}
+
 static void read_string(LexState *ls, int del, SemInfo *seminfo) {
   save_and_next(ls); /* keep delimiter (for error messages) */
   while (ls->current != del) {
@@ -537,10 +596,8 @@ static int llex(LexState *ls, SemInfo *seminfo) {
           return ':';
       }
       case '"':
-      case '\'': { /* short literal strings */
         read_string(ls, ls->current, seminfo);
         return TK_STRING;
-      }
       case '.': { /* '.', '..', '...', or number */
         save_and_next(ls);
         if (check_next1(ls, '.')) {
@@ -553,6 +610,11 @@ static int llex(LexState *ls, SemInfo *seminfo) {
         else
           return read_numeral(ls, seminfo);
       }
+      case '\'': {
+        read_charlit(ls, seminfo);
+        return TK_INT;
+      }
+
       case '0':
       case '1':
       case '2':

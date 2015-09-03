@@ -14,8 +14,7 @@ int DispatchFunction(lua_State* L) {
   }
   State& state = *static_cast<State*>(state_void);
   Context context(state);
-  ToObject<std::function<void()>>(UPVALUE(1))();
-  return 0;
+  return ToObject<std::function<int()>>(UPVALUE(1))();
 }
 
 }  // namespace xxua
