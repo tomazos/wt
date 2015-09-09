@@ -1,5 +1,10 @@
 syntax = "proto2";
 
+message LadyBugCommand {
+  optional double left_power = 1;
+  optional double right_power = 2;
+};
+
 message LadyBugState {
   optional double left = 1 [default = 0];
   optional double right = 2 [default = 0];

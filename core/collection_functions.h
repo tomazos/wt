@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <sstream>
 
 template <typename Collection, typename OutputIterator>
 OutputIterator CopyCollection(Collection& collection,
@@ -18,6 +19,19 @@ const Value* FindOrNull(const Collection& collection, const Key& key) {
     return &it->second;
   } else {
     return nullptr;
+  }
+}
+
+template <typename Collection, typename Key = typename Collection::key_type,
+          typename Value = typename Collection::mapped_type>
+const Value& FindOrThrow(const Collection& collection, const Key& key) {
+  const auto it = collection.find(key);
+  if (it != collection.end()) {
+    return it->second;
+  } else {
+    std::ostringstream oss;
+    oss << "key not found: " << key;
+    throw std::logic_error(oss.str());
   }
 }
 

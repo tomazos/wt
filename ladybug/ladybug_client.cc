@@ -3,7 +3,6 @@
 #include <atomic>
 
 #include "core/must.h"
-#include "ladybug/ladybug_network.h"
 #include "ladybug/ladybug_state.pb.h"
 #include "main/args.h"
 
@@ -11,8 +10,8 @@ LadyBugClient::LadyBugClient(const string& address) {
   sock_.Connect(address, "35358");
 }
 
-LadyBugState LadyBugClient::GetState() {
-  sock_.SendInteger(kGetState);
+LadyBugState LadyBugClient::SendCommand(const LadyBugCommand& command) {
+  sock_.SendMessage(command);
   sock_.Flush();
   LadyBugState state;
   MUST(sock_.ReceiveMessage(state));

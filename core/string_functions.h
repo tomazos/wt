@@ -8,6 +8,19 @@
 
 inline bool IsSpace(char c) { return std::isspace(c); }
 
+inline void Scan(string_view input, string_view delimiter,
+                 std::function<void(string_view)> on_substring) {
+  size_t pos = 0;
+  while (true) {
+    size_t next = input.find(delimiter, pos);
+    on_substring(input.substr(pos, next - pos));
+
+    if (next == string::npos) return;
+
+    pos = next + delimiter.size();
+  }
+}
+
 inline string EncodeAsString(string str);
 inline string EncodeAsString(const char* str);
 inline string EncodeAsString(int8 i);

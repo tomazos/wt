@@ -1,0 +1,42 @@
+library:
+  name = proof_of_work
+  headers:
+    proof_of_work.h
+  dependencies:
+    /core/sha3
+
+proto:
+  name = pow
+  sources:
+    pow.proto
+
+program:
+  name = pow_server
+  sources:
+    pow_server.cc
+  dependencies:
+    proof_of_work
+    pow
+    /core/hex
+    /core/must
+    /network/socket
+    /main/noargs
+
+program:
+  name = pow_worker
+  sources:
+    pow_worker.cc
+  dependencies:
+    proof_of_work
+    pow
+    /core/must
+    /network/socket
+    /main/noargs
+
+test:
+  name = proof_of_work_test
+  sources:
+    proof_of_work_test.cc
+  dependencies:
+    proof_of_work
+    /main/gtest

@@ -64,7 +64,6 @@ library:
   sources:
     ladybug_client.cc
   dependencies:
-    ladybug_network
     ladybug_state
     /core/must
     /main/args
@@ -84,18 +83,12 @@ proto:
   sources:
     ladybug_state.proto
 
-library:
-  name = ladybug_network
-  headers:
-    ladybug_network.h
-
 program:
   name = ladybug_server
   sources:
     ladybug_server.cc
   dependencies:
     ladybug
-    ladybug_network
     /main/noargs
     /network/socket
 

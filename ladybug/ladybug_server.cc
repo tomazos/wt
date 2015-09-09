@@ -1,6 +1,5 @@
 #include "core/must.h"
 #include "ladybug/ladybug.h"
-#include "ladybug/ladybug_network.h"
 #include "main/noargs.h"
 #include "network/socket.h"
 
@@ -13,16 +12,19 @@ void Main() {
   network::Socket sock = Accept(server);
 
   while (true) {
-    optional<bigint> command = sock.ReceiveInteger();
-
-    if (command == nullopt) {
+    LadyBugCommand command;
+    bool message_received = sock.ReceiveMessage(command);
+    if (!message_received) {
       break;
-    } else if (*command == kGetState) {
+    } else {
+      if (command.has_left_power())
+        ladybug.SetLeftWheelPower(command.left_power());
+      if (command.has_right_power())
+        ladybug.SetRightWheelPower(command.right_power());
+
       const LadyBugState state = ladybug.GetState();
       sock.SendMessage(state);
       sock.Flush();
-    } else {
-      FAIL("Unknown command: ", *command);
     }
   }
   sock.Shutdown(SHUT_WR);

@@ -21,9 +21,14 @@ class MainWindow : public QMainWindow {
 
  protected:
   void timerEvent(QTimerEvent *event);
+  void keyPressEvent(QKeyEvent *event) override;
+  void keyReleaseEvent(QKeyEvent *event) override;
 
  private:
   void UpdateView();
+
+  bool forward_pressed = false, backward_pressed = false, left_pressed = false,
+       right_pressed = false;
 
   LadyBugClient client;
   LadyBugState state;
@@ -34,7 +39,7 @@ class MainWindow : public QMainWindow {
 
   QGraphicsScene *scene;
   QGraphicsPixmapItem *pixmap;
-  QImage image;
+  QImage image, resized;
 };
 
 #endif  // MAINWINDOW_H

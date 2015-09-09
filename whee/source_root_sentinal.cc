@@ -4,7 +4,7 @@
 #include <regex>
 #include <sstream>
 
-using boost::algorithm::split;
+using algorithm::split;
 
 const string& GetSourceRootSentinal() {
   static const string source_root_sentinal = "FynmfH4Tn6CA";

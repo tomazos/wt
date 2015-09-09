@@ -8,7 +8,7 @@ class LadyBugClient {
   LadyBugClient(const string& address);
   ~LadyBugClient();
 
-  LadyBugState GetState();
+  LadyBugState SendCommand(const LadyBugCommand& command);
 
  private:
   network::Socket sock_;

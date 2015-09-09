@@ -35,8 +35,10 @@ namespace google {}
 using namespace google;
 
 namespace boost {
+namespace algorithm {}
 namespace filesystem {}
 };
+namespace algorithm = boost::algorithm;
 namespace filesystem = boost::filesystem;
 
 using int8 = std::int8_t;

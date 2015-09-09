@@ -9,16 +9,21 @@ library:
 
 program:
   name = whee
+  headers:
+    paths.h
+    whee.h
   sources:
     whee.cc
+    paths.cc
   dependencies:
     source_file_attributes
     source_root_sentinal
     token_tree
-    /core/bigint
+    /core/env
     /core/process
     /core/file_functions
     /main/args
+    /xxua/xxua
 
 proto:
   name = source_file_attributes

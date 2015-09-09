@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+message WorkRequest {
+  required bytes subject = 1;
+  required int32 len = 2;
+  required bytes init_suffix = 3;
+  required int32 width = 4;
+};
+
+message ProofOfWorkProto {
+  required bytes subject = 1;
+  required bytes suffix = 2;
+  required int32 len = 3;
+};
+
+message WorkResponse {
+  optional ProofOfWorkProto proof_of_work = 1;
+};

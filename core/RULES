@@ -24,6 +24,7 @@ test:
     collection_functions_test.cc
   dependencies:
     collection_functions
+    must
     /testing
 
 test:
@@ -33,6 +34,23 @@ test:
   dependencies:
     must
     /testing
+
+library:
+  name = env
+  headers:
+    env.h
+  sources:
+    env.cc
+  dependencies:
+    must
+
+test:
+  name = env_test
+  sources:
+    env_test.cc
+  dependencies:
+    env
+    /main/gtest
 
 library:
   name = error_class
@@ -70,6 +88,21 @@ proto:
   name = file_functions_test_proto
   sources:
     file_functions_test.proto
+
+library:
+  name = hex
+  headers:
+    hex.h
+  dependencies:
+    must
+
+test:
+  name = hex_test
+  sources:
+    hex_test.cc
+  dependencies:
+    hex
+    /main/gtest
 
 library:
   name = must
@@ -135,3 +168,20 @@ test:
   dependencies:
     bigint
     string_functions
+
+library:
+  name = sha3
+  headers:
+    sha3.h
+
+test:
+  name = sha3_test
+  sources:
+    sha3_test.cc
+  dependencies:
+    hex
+    sha3
+    /core/env
+    /core/file_functions
+    /main/gtest
+
