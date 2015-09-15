@@ -7,9 +7,7 @@ use File::Basename;
 
 my $dir = $ARGV[0];
 
-
 my $rulename = basename($dir);
-
 
 opendir(DIR, $dir) or die $!;
 

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <boost/multiprecision/cpp_int.hpp>
+#include <string>
+#include <vector>
 
 #include "core/string_functions.h"
 
@@ -107,3 +109,18 @@ DEFINE_BIGINT_RELOP(< )
 DEFINE_BIGINT_RELOP(> )
 DEFINE_BIGINT_RELOP(<= )
 DEFINE_BIGINT_RELOP(>= )
+
+std::string pack_bigint(bigint n);
+template <typename GetCharFunction>
+optional<bigint> unpack_bigint(GetCharFunction get_next_char) {
+  optional<uint8> first_char = get_next_char();
+  if (!first_char) return nullopt;
+  uint8 m(*first_char & 0b1111'1111);
+  bigint result = (m & 0b0111'1111);
+  while (m & 0b1000'0000) {
+    m = get_next_char().value();
+    result <<= 7;
+    result |= (m & 0b0111'1111);
+  }
+  return result;
+}

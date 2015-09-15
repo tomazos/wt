@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+package audio;
+
+message Subtitle {
+  required int64 begin_ms = 2;
+  required int64 end_ms = 3;
+  required bytes text = 4;
+};
+
+message SrtProtoFile {
+  repeated Subtitle subtitles = 1;
+};
+
+message SpeechText {
+  required bytes wave = 1;
+  required bytes text = 2;
+};

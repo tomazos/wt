@@ -5,6 +5,8 @@
 
 #include "core/bigint.h"
 
+enum FileWriteMode { OVERWRITE, APPEND };
+
 string GetFileContents(const filesystem::path& path);
 
 void SetFileContents(const filesystem::path& path, const string& content);

@@ -2,6 +2,8 @@ library:
   name = bigint
   headers:
     bigint.h
+  sources:
+    bigint.cc
   dependencies:
     string_functions
 
@@ -11,7 +13,7 @@ test:
     bigint_test.cc
   dependencies:
     bigint
-    /testing
+    /main/gtest
 
 library:
   name = collection_functions
@@ -153,6 +155,29 @@ program:
   dependencies:
     random
     /main/noargs
+
+library:
+  name = sequence_file
+  headers:
+    sequence_file.h
+  sources:
+    sequence_file.cc
+  dependencies:
+    file_functions
+
+test:
+  name = sequence_file_test
+  sources:
+    sequence_file_test.cc
+  dependencies:
+    sequence_file
+    sequence_file_test_proto
+    /main/gtest
+
+proto:
+  name = sequence_file_test_proto
+  sources:
+    sequence_file_test.proto
 
 library:
   name = string_functions

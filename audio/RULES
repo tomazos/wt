@@ -1,0 +1,78 @@
+library:
+  name = audio_functions
+  headers:
+    audio_functions.h
+  sources:
+    audio_functions.cc
+  dependencies:
+    wave_file
+    /core/must
+    /core/process
+
+program:
+  name = dump_srtproto
+  sources:
+    dump_srtproto.cc
+  dependencies:
+    srtproto_file
+    /core/file_functions
+    /core/must
+    /main/args
+
+program:
+  name = extract_speechtext
+  sources:
+    extract_speechtext.cc
+  dependencies:
+    srtproto_file
+    wave_file
+    /core/file_functions
+    /core/must
+    /core/sequence_file
+    /main/args
+
+program:
+  name = search_speechtext
+  sources:
+    search_speechtext.cc
+  dependencies:
+    audio_functions
+    srtproto_file
+    wave_file
+    /core/file_functions
+    /core/must
+    /core/sequence_file
+    /main/args
+
+proto:
+  name = srtproto_file
+  sources:
+    srtproto_file.proto
+
+test:
+  name = srtproto_test
+  sources:
+    srtproto_test.cc
+  dependencies:
+    srtproto_file
+    /core/env
+    /core/file_functions
+    /main/gtest
+
+library:
+  name = wave_file
+  headers:
+    wave_file.h
+  sources:
+    wave_file.cc
+  dependencies:
+    /core/file_functions
+
+test:
+  name = wave_file_test
+  sources:
+    wave_file_test.cc
+  dependencies:
+    wave_file
+    /core/env
+    /main/gtest
