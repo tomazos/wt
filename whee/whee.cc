@@ -97,9 +97,12 @@ void Whee::Init(const std::vector<string>& args) {
 void Whee::TidyFile(const path& p) {
   int64 mod_time = LastModificationTime(p);
   SourceFileAttributes attributes;
+
   GetFileAttribute(p, "user.srcfile", attributes);
   if (attributes.last_tidy() != mod_time) {
-    ExecuteShellCommand("clang-format-3.6 -style=Google -i ", p);
+    if (file_size(p) < 500'000) {
+      ExecuteShellCommand("clang-format-3.6 -style=Google -i ", p);
+    }
     attributes.set_last_tidy(LastModificationTime(p));
     SetFileAttribute(p, "user.srcfile", attributes);
   }

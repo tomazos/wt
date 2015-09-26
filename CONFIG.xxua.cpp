@@ -1,23 +1,23 @@
 add_platform{
   name = "native",
-  lib_path = "-L/usr/local/lib",
+  lib_path = "-L/usr/local/lib -lsqlite3 -lpcre2-8",
   flags = "",
 };
 
 add_platform{
   name = "coverage",
-  lib_path = "-L/usr/local/lib",
+  lib_path = "-L/usr/local/lib -lsqlite3 -lpcre2-8",
   flags = "--coverage",
 };
 
 add_platform{
   name="zubu",
   tool_prefix="x86_64-zubu-linux-gnu-",
-  lib_path = ""
+  lib_path = "-lsqlite3 -lpcre2-8"
 };
 
 add_platform{
   name="zapi",
   tool_prefix="arm-zapi-linux-gnueabihf-",
-       lib_path = ""
+  lib_path = "-lsqlite3 -lpcre2-8"
 };

@@ -19,7 +19,9 @@ void Main(const std::vector<string>& args) {
 
   for (const audio::Subtitle& subtitle : srtproto.subtitles()) {
     int64 begin_sample = subtitle.begin_ms() * audio::kSampleRate / 1000;
+    begin_sample -= 6000;
     int64 end_sample = subtitle.end_ms() * audio::kSampleRate / 1000;
+    end_sample += 6000;
     const string& text = subtitle.text();
 
     if (begin_sample >= end_sample || begin_sample < 0 ||

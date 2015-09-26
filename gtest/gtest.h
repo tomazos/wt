@@ -1949,7 +1949,7 @@ class TestWithParam : public Test, public WithParamInterface<T> {};
 // FloatingPoint template class in gtest-internal.h if you are
 // interested in the implementation details.
 
-#define EXPECT_FLOAT_EQ(expected, actual)                                   \
+#define EXPECT_FLOAT_EQ(actual, expected)                                   \
   EXPECT_PRED_FORMAT2(::testing::internal::CmpHelperFloatingPointEQ<float>, \
                       expected, actual)
 

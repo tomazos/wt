@@ -1,0 +1,15 @@
+library:
+  name = feed_forward
+  headers:
+    feed_forward.h
+  dependencies:
+    /core/must
+    /eigen/eigen
+
+test:
+  name = feed_forward_test
+  sources:
+    feed_forward_test.cc
+  dependencies:
+    feed_forward
+    /main/gtest

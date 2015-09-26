@@ -1,32 +1,36 @@
 #include "main/args.h"
 
+#include <sqlite3.h>
+
 #include "audio/audio_functions.h"
-#include "audio/srtproto_file.pb.h"
-#include "audio/wave_file.h"
 #include "core/must.h"
-#include "core/sequence_file.h"
+#include "database/connection.h"
+#include "database/statement.h"
 
 void Main(const std::vector<string>& args) {
-  if (args.size() < 2) FAIL("usage: search_speechtext <query> <speechtext>");
-  string query = args[0];
-  filesystem::path speechtext_path = args[1];
-  SequenceReader reader(speechtext_path);
+  if (args.size() < 1) FAIL("usage: search_speechtext <query>");
+  std::string query = "select id, written, spoken from speechtext";
 
-  size_t count = 1;
-  while (true) {
-    audio::SpeechText speechtext;
-    if (!reader.ReadMessage(speechtext)) break;
+  for (const string& arg : args) {
+    query += " " + arg;
+  }
+  std::cout << query << std::endl;
 
-    const string& text = speechtext.text();
-    const string& wave_bytes = speechtext.wave();
+  database::Connection db("/data/speechtext.db", SQLITE_OPEN_READONLY);
 
-    MUST_EQ(wave_bytes.size() % 2, 0u);
-    const int16* begin_wave = (const int16*)wave_bytes.data();
-    const int16* end_wave = begin_wave + wave_bytes.size() / 2;
+  database::Statement select = db.Prepare(query);
 
-    if (text.find(query) != string::npos) {
-      std::cout << count++ << ". " << text << std::endl;
-      audio::PlaySound(begin_wave, end_wave);
-    }
+  while (select.Step()) {
+    int64 id = select.ColumnInteger(0);
+    string written = select.ColumnText(1).to_string();
+    string spoken = select.ColumnBlob(2).to_string();
+
+    MUST_EQ(spoken.size() % 2, 0u);
+    const int16* begin_wave = (const int16*)spoken.data();
+    const int16* end_wave = begin_wave + spoken.size() / 2;
+    if (begin_wave > end_wave) continue;
+
+    std::cout << id << ". " << written << std::endl;
+    audio::PlaySound(begin_wave, end_wave);
   }
 }

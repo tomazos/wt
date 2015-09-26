@@ -157,6 +157,24 @@ program:
     /main/noargs
 
 library:
+  name = regex
+  headers:
+    regex.h
+  sources:
+    regex.cc
+  dependencies:
+    must
+
+test:
+  name = regex_test
+  sources:
+    regex_test.cc
+  dependencies:
+    regex
+    /main/gtest
+
+
+library:
   name = sequence_file
   headers:
     sequence_file.h

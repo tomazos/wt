@@ -23,7 +23,8 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=-1
+current_page=0
+FILE_NAME_0=0;C++;0;EUTF-8;0;1;0;%2Fhome%2Fzos%2F.cache%2F.fr-xekIva%2Fkiss_fft130%2Ftest%2Ftestcpp.cc;0;2
 
 [VTE]
 last_dir=/home/zos/robo
@@ -41,4 +42,3 @@ NF_02_WD=
 EX_00_LB=
 EX_00_CM="./%e"
 EX_00_WD=
-filetypes=C++;None;C;

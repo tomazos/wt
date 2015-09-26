@@ -49,9 +49,6 @@ void WaveFile::SetupFormat() {
   while (subchunk < data_.size()) {
     string_view tag = string_view(data_).substr(subchunk, 4);
     size_t length = Read<uint32>(subchunk + 4);
-    DUMPEXPR(tag);
-    DUMPEXPR(subchunk);
-    DUMPEXPR(length);
     if (tag == "fmt ") {
       const size_t fmt = subchunk + 8;
       const uint16 audio_format = Read<uint16>(fmt);
