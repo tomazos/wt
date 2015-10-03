@@ -1,85 +1,47 @@
 library:
   name = core
   headers:
-    lapi.h
-    lcode.h
-    lctype.h
-    ldebug.h
-    ldo.h
-    lfunc.h
-    lgc.h
-    llex.h
-    lmem.h
-    lobject.h
-    lopcodes.h
-    lparser.h
-    lprefix.h
-    llimits.h
-    lstate.h
-    lstring.h
-    ltable.h
-    ltm.h
+    api.h
+    code.h
+    ctype.h
+    debug.h
+    do.h
+    func.h
+    gc.h
+    lex.h
+    mem.h
+    object.h
+    opcodes.h
+    parser.h
+    prefix.h
+    limits.h
+    state.h
+    string.h
+    table.h
+    tm.h
     lua.h
     luaconf.h
-    lundump.h
-    lvm.h
-    lzio.h
+    undump.h
+    vm.h
+    zio.h
   sources:
-    lapi.cc
-    lcode.cc
-    lctype.cc
-    ldebug.cc
-    ldo.cc
-    ldump.cc
-    lfunc.cc
-    lgc.cc
-    llex.cc
-    lmem.cc
-    lobject.cc
-    lopcodes.cc
-    lparser.cc
-    lstate.cc
-    lstring.cc
-    ltable.cc
-    ltm.cc
-    lundump.cc
-    lvm.cc
-    lzio.cc
-
-library:
-  name = lib
-  headers:
-    lauxlib.h
-    lualib.h
-  sources:
-    lauxlib.cc
-    lbaselib.cc
-    lbitlib.cc
-    lcorolib.cc
-    ldblib.cc
-    liolib.cc
-    lmathlib.cc
-    loslib.cc
-    lstrlib.cc
-    ltablib.cc
-    lutf8lib.cc
-    loadlib.cc
-    linit.cc
-  dependencies:
-    core
-
-program:
-  name = luac
-  sources:
-    luac.cc
-  dependencies:
-    core
-    lib
-
-program:
-  name = lua
-  sources:
-    lua.cc
-  dependencies:
-    core
-    lib
+    api.cc
+    code.cc
+    ctype.cc
+    debug.cc
+    do.cc
+    dump.cc
+    func.cc
+    gc.cc
+    lex.cc
+    mem.cc
+    object.cc
+    opcodes.cc
+    parser.cc
+    state.cc
+    string.cc
+    table.cc
+    tm.cc
+    undump.cc
+    vm.cc
+    zio.cc

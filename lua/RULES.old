@@ -1,0 +1,38 @@
+
+library:
+  name = lib
+  headers:
+    lauxlib.h
+    lualib.h
+  sources:
+    lauxlib.cc
+    lbaselib.cc
+    lbitlib.cc
+    lcorolib.cc
+    ldblib.cc
+    liolib.cc
+    lmathlib.cc
+    loslib.cc
+    lstrlib.cc
+    ltablib.cc
+    lutf8lib.cc
+    loadlib.cc
+    linit.cc
+  dependencies:
+    core
+
+program:
+  name = luac
+  sources:
+    luac.cc
+  dependencies:
+    core
+    lib
+
+program:
+  name = lua
+  sources:
+    lua.cc
+  dependencies:
+    core
+    lib
