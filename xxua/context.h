@@ -95,7 +95,7 @@ inline void Load(Reader& reader, const string& chunkname = "",
                  ChunkFormat format = ChunkFormat::EITHER);
 inline void LoadFromStream(std::istream& is, const string& chunkname = "",
                            ChunkFormat format = ChunkFormat::EITHER);
-inline void LoadFromString(const string& s, const string& chunkname = "",
+inline void LoadFromString(string_view s, const string& chunkname = "",
                            ChunkFormat format = ChunkFormat::EITHER);
 
 inline void Save(Writer& writer, bool strip = false);
@@ -264,7 +264,7 @@ inline void LoadFromStream(std::istream& is, const string& chunkname,
                            ChunkFormat format) {
   Context::Current()->LoadFromStream(is, chunkname, format);
 }
-inline void LoadFromString(const string& s, const string& chunkname,
+inline void LoadFromString(string_view s, const string& chunkname,
                            ChunkFormat format) {
   Context::Current()->LoadFromString(s, chunkname, format);
 }

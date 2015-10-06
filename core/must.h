@@ -12,7 +12,8 @@
   throw std::system_error(errno, std::system_category(), \
                           EncodeAsString(__VA_ARGS__, " (", errno, ")"))
 
-#define DUMPEXPR(expr) DumpExprImpl(__FILE__, __LINE__, #expr, (expr));
+#define LOG(...) LogImpl(__FILE__, __LINE__, ##__VA_ARGS__)
+#define LOGEXPR(expr) DumpExprImpl(__FILE__, __LINE__, #expr, (expr))
 #define FAIL(...) FailImpl(__FILE__, __LINE__, ##__VA_ARGS__)
 #define MUST(condition, ...) \
   MustImpl(bool(condition), #condition, __FILE__, __LINE__, ##__VA_ARGS__)
@@ -37,11 +38,16 @@ string EncodeSourceMessage(const char* file, int64 line, Args&&... args) {
                         ": ", std::forward<Args>(args)...);
 }
 
+template <typename... Args>
+void LogImpl(const char* file, int64 line, Args&&... args) {
+  std::cout << EncodeSourceMessage(file, line, std::forward<Args>(args)...)
+            << std::endl;
+}
+
 template <typename Expr>
 void DumpExprImpl(const char* file, int64 line, const char* expr_string,
                   Expr&& expr) {
-  std::cout << EncodeSourceMessage(file, line, expr_string, " = ",
-                                   std::forward<Expr>(expr)) << std::endl;
+  LogImpl(file, line, expr_string, " = ", std::forward<Expr>(expr));
 }
 
 template <typename... Args>

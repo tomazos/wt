@@ -18,10 +18,10 @@ void Main() {
     Sleep(10ms);
     LockGuard l(mutex);
 
-    DUMPEXPR(nupdates);
+    LOGEXPR(nupdates);
     nupdates = 0;
-    DUMPEXPR(mx);
-    DUMPEXPR(my);
-    DUMPEXPR(mz);
+    LOGEXPR(mx);
+    LOGEXPR(my);
+    LOGEXPR(mz);
   }
 }

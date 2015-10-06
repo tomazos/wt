@@ -34,7 +34,7 @@ void Main() {
   LadyBug& ladybug = LadyBug::Instance();
   std::atomic<bool> shutdown(false);
   float64 test = Angle(1, 2);
-  DUMPEXPR(test);
+  LOGEXPR(test);
   std::thread t([&] {
     Sleep(200ms);
     auto state = ladybug.GetState();
@@ -47,12 +47,12 @@ void Main() {
 
     while (!shutdown) {
       state = ladybug.GetState();
-      DUMPEXPR(state.gz());
-      DUMPEXPR(state.left());
-      DUMPEXPR(state.right());
+      LOGEXPR(state.gz());
+      LOGEXPR(state.left());
+      LOGEXPR(state.right());
       float64 angle_diff =
           AngleDiff(start_angle, Angle(state.mx(), state.my()));
-      DUMPEXPR(angle_diff);
+      LOGEXPR(angle_diff);
 
       if (state.sonar() != 0 && state.sonar() < 0.3) {
         forward = false;

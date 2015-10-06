@@ -8,6 +8,25 @@
 
 #include "core/must.h"
 
+string GetStandardInput() {
+  constexpr size_t maxbuf = 4096;
+  constexpr int standard_input = 0;
+
+  std::vector<char> input(maxbuf);
+
+  while (true) {
+    char* buf = input.data() + input.size() - maxbuf;
+    ssize_t read_result = read(standard_input, buf, maxbuf);
+    if (read_result == -1) THROW_ERRNO("read(stdin)");
+    if (read_result == 0) {
+      return {input.begin(), input.end() - maxbuf};
+    }
+    MUST_GT(read_result, 0);
+    const size_t bytes_read = size_t(read_result);
+    input.resize(input.size() + bytes_read);
+  }
+}
+
 string GetFileContents(const filesystem::path& path) {
   const uintmax_t file_size_result = file_size(path);
   MUST_NE(static_cast<uintmax_t>(-1), file_size_result, "file_size (", path,

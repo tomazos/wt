@@ -99,7 +99,7 @@ class State {
                    ChunkFormat format = ChunkFormat::EITHER);
   inline void LoadFromStream(std::istream& is, const string& chunkname = "",
                              ChunkFormat format = ChunkFormat::EITHER);
-  inline void LoadFromString(const string& s, const string& chunkname = "",
+  inline void LoadFromString(string_view s, const string& chunkname = "",
                              ChunkFormat format = ChunkFormat::EITHER);
 
   void Save(Writer& writer, bool strip = false);
@@ -353,9 +353,9 @@ inline void State::LoadFromStream(std::istream& is, const string& chunkname,
   Load(reader, chunkname, format);
 }
 
-inline void State::LoadFromString(const string& s, const string& chunkname,
+inline void State::LoadFromString(string_view s, const string& chunkname,
                                   ChunkFormat format) {
-  std::istringstream iss(s);
+  std::istringstream iss(s.to_string());
   LoadFromStream(iss, chunkname, format);
 }
 

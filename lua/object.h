@@ -73,7 +73,7 @@ struct GCObject {
 /*
 ** Union of all Lua values
 */
-typedef union Value Value;
+typedef union ValueUnion ValueUnion;
 
 /*
 ** Tagged Values. This is the basic representation of values in Lua,
@@ -81,7 +81,7 @@ typedef union Value Value;
 */
 
 #define TValuefields \
-  Value value_;      \
+  ValueUnion value_; \
   int tt_
 
 typedef struct lua_TValue TValue;
@@ -308,7 +308,7 @@ typedef struct lua_TValue TValue;
 ** =======================================================
 */
 
-union Value {
+union ValueUnion {
   GCObject *gc;    /* collectable objects */
   void *p;         /* light userdata */
   int b;           /* booleans */
@@ -371,8 +371,8 @@ typedef struct Udata {
   CommonHeader;
   lu_byte ttuv_; /* user value's tag */
   struct Table *metatable;
-  size_t len;        /* number of bytes */
-  union Value user_; /* user value */
+  size_t len;             /* number of bytes */
+  union ValueUnion user_; /* user value */
 } Udata;
 
 /*

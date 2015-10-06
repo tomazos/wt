@@ -1,15 +1,13 @@
 #pragma once
 
 #include "xxua/context.h"
-#include "xxua/pointer.h"
-#include "xxua/reference.h"
 #include "xxua/state.h"
 
 namespace xxua {
 
 template <typename T>
 uintptr_t GetTypeId() {
-  static int x;
+  static char x;
   void* p = &x;
   return reinterpret_cast<uintptr_t>(p);
 }
@@ -26,9 +24,13 @@ inline void NullTypeId(void* userdata) {
 }
 
 template <typename T>
+bool IsTypeId(void* userdata) {
+  return *static_cast<uintptr_t*>(GetTypeIdStorage(userdata)) == GetTypeId<T>();
+}
+
+template <typename T>
 void CheckTypeId(void* userdata) {
-  if (*static_cast<uintptr_t*>(GetTypeIdStorage(userdata)) != GetTypeId<T>())
-    Throw("userdata type mismatch");
+  if (!IsTypeId<T>(userdata)) Throw("userdata type mismatch");
 }
 
 template <typename T>

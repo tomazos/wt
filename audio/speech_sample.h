@@ -56,6 +56,14 @@ Eigen::Matrix<Float, Eigen::Dynamic, Eigen::Dynamic> GetSpeechSamples(
     SpeechSampler<float> sampler(results, width, nsamples, threshold);
     VisitSpeechText(sampler, 0, 1900000, 20);
   }
+  Eigen::MatrixXf old_results = results;
+  std::vector<size_t> I(nsamples);
+
+  for (size_t i = 0; i < nsamples; ++i) I[i] = i;
+
+  std::random_shuffle(I.begin(), I.end());
+  for (size_t i = 0; i < nsamples; ++i) results.col(i) = old_results.col(I[i]);
+
   return results;
 }
 

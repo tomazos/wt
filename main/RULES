@@ -24,4 +24,4 @@ test:
   sources:
     gtest_test.cc
   dependencies:
-    /gtest/gtest
+    /main/gtest

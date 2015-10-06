@@ -22,6 +22,15 @@ test:
     xxua
     /main/gtest
 
+program:
+  name = interpreter
+  sources:
+    interpreter.cc
+  dependencies:
+    value
+    /core/file_functions
+    /main/args
+
 test:
   name = lang_test
   sources:
@@ -48,6 +57,31 @@ library:
   dependencies:
     xxua
 
+test:
+  name = state_test
+  sources:
+    state_test.cc
+  dependencies:
+    xxua
+    /main/gtest
+
+library:
+  name = value
+  headers:
+    value.h
+  sources:
+    value.cc
+  dependencies:
+    xxua
+
+test:
+  name = value_test
+  sources:
+    value_test.cc
+  dependencies:
+    value
+    /main/gtest
+
 library:
   name = xxua
   headers:
@@ -55,10 +89,7 @@ library:
     api.h
     context.h
     debug_allocator.h
-    pointer.h
     reader.h
-    reference.h
-    stack.h
     state.h
     type.h
     writer.h
@@ -70,19 +101,3 @@ library:
   dependencies:
     /core/must
     /lua/core
-
-test:
-  name = stack_test
-  sources:
-    stack_test.cc
-  dependencies:
-    xxua
-    /main/gtest
-
-test:
-  name = state_test
-  sources:
-    state_test.cc
-  dependencies:
-    xxua
-    /main/gtest

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "lua/lua.h"
-#include "lua/lobject.h"
+#include "lua/object.h"
 
 namespace xxua {
 

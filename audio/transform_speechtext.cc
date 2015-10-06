@@ -56,5 +56,5 @@ struct SpeechTextTransformer : SpeechTextVisitor {
 void Main() {
   audio::SpeechTextTransformer transformer;
   audio::VisitSpeechText(transformer, 1000, 1000, 1);
-  DUMPEXPR(transformer.count);
+  LOGEXPR(transformer.count);
 }

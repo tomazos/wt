@@ -8,11 +8,11 @@ namespace {
 
 class ApiTest : public testing::Test {
  public:
-  ApiTest() : internal_state(allocator), context(internal_state) {}
+  ApiTest() : state(allocator), context(state) {}
   ~ApiTest() { EXPECT_EQ(StackSize(), 0); }
 
   DebugAllocator allocator;
-  State internal_state;
+  State state;
   Context context;
 };
 
