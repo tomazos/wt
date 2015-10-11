@@ -1,0 +1,9 @@
+library{
+  name = "OrderingMethods",
+  headers = {
+    "Eigen_Colamd.h",
+    "Amd.h",
+    "Ordering.h",
+  },
+};
+

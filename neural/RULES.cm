@@ -1,0 +1,88 @@
+library{
+  name = "feed_forward",
+  headers = {
+    "feed_forward.h",
+  },
+  dependencies = {
+    "/core/must",
+    "/core/random",
+    "/eigen/eigen",
+  },
+};
+
+program{
+  name = "feed_forward_audio",
+  sources = {
+    "feed_forward_audio.cc",
+  },
+  dependencies = {
+    "feed_forward",
+    "mnist",
+    "/audio/audio_functions",
+    "/audio/speech_sample",
+    "/main/noargs",
+  },
+};
+
+program{
+  name = "feed_forward_simple",
+  sources = {
+    "feed_forward_simple.cc",
+  },
+  dependencies = {
+    "feed_forward",
+    "mnist",
+    "/main/noargs",
+  },
+};
+
+program{
+  name = "feed_forward_mnist",
+  sources = {
+    "feed_forward_mnist.cc",
+  },
+  dependencies = {
+    "feed_forward",
+    "mnist",
+    "/main/noargs",
+  },
+};
+
+test{
+  name = "feed_forward_test",
+  sources = {
+    "feed_forward_test.cc",
+  },
+  dependencies = {
+    "feed_forward",
+    "/main/gtest",
+  },
+};
+
+library{
+  name = "mnist",
+  headers = {
+    "mnist.h",
+  },
+  sources = {
+    "mnist.cc",
+  },
+  dependencies = {
+    "/core/env",
+    "/core/file_functions",
+    "/core/must",
+    "/eigen/eigen",
+  },
+};
+
+test{
+  name = "mnist_test",
+  sources = {
+    "mnist_test.cc",
+  },
+  dependencies = {
+    "mnist",
+    "/main/gtest",
+  },
+};
+

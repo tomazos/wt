@@ -145,8 +145,8 @@ TEST(LangTest, All) {
 
   x = {2,4,6};
 
-  for (i = 1, 3)
-    assert(x[i] == 2*i);
+  for (i = 0, 3)
+    assert(x[i] == 2*(i+1));
 
   local tab = {foo = "bar", baz = "qux", [42] = "quux"};
 

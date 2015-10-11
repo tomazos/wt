@@ -611,3 +611,5 @@ lua/RULES.old
 xxua/value.cc
 xxua/value_test.cc
 xxua/interpreter.cc
+whee/convert_token_tree_to_xxua.cc
+xxua/lang_test_program.cc

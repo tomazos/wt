@@ -1,0 +1,17 @@
+library{
+  name = "internal",
+  headers = {
+    "gtest-tuple.h",
+    "gtest-port.h",
+    "gtest-linked_ptr.h",
+    "gtest-type-util.h",
+    "gtest-filepath.h",
+    "gtest-param-util-generated.h",
+    "gtest-death-test-internal.h",
+    "gtest-port-arch.h",
+    "gtest-internal.h",
+    "gtest-param-util.h",
+    "gtest-string.h",
+  },
+};
+

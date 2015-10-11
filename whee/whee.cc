@@ -15,6 +15,7 @@
 #include "whee/source_root_sentinal.h"
 #include "whee/token_tree.h"
 #include "xxua/api.h"
+#include "xxua/context.h"
 
 namespace whee {
 
@@ -152,8 +153,8 @@ SourceTree Whee::GetSourceTree() {
               directory);
       directory = directory.substr(source_root_strlen);
     }
-    if (source_path.filename() == "RULES") {
-      auto rules_sequence = token_tree::ParseSequenceFile(source_path);
+    if (source_path.filename() == "RULES.cm") {
+      auto rules_sequence = token_tree::ParseNewSequenceFile(source_path);
       for (const auto& rule_element : rules_sequence->elements) {
         const auto* rule_sequence =
             dynamic_cast<token_tree::Sequence*>(rule_element.get());
@@ -484,14 +485,14 @@ void Whee::HardLinkSourceFiles(const SourceTree& source_tree,
 
 std::vector<Platform> Whee::ReadPlatforms() {
   std::vector<Platform> result;
-  string s = GetFileContents(paths.root / "CONFIG.xxua.cpp");
+  string s = GetFileContents(paths.root / "CONFIG.cm");
 
   using namespace xxua;
   State state;
   Context context(state);
   PushGlobalTable();
   PushString("add_platform");
-  PushFunction([&result] {
+  PushFunction(&state, [&result] {
     if (StackSize() != 1 || GetType(1) != Type::TABLE)
       Error("invalid arguments to add_platform");
     PushNil();

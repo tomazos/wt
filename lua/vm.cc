@@ -1114,7 +1114,7 @@ newframe: /* reentry point when frame changes (call/return) */
           lua_Integer step = ivalue(ra + 2);
           lua_Integer idx = ivalue(ra) + step; /* increment index */
           lua_Integer limit = ivalue(ra + 1);
-          if ((0 < step) ? (idx <= limit) : (limit <= idx)) {
+          if ((0 < step) ? (idx < limit) : (limit < idx)) {
             ci->u.l.savedpc += GETARG_sBx(i); /* jump back */
             chgivalue(ra, idx);               /* update internal index... */
             setivalue(ra + 3, idx);           /* ...and external index */
@@ -1123,8 +1123,8 @@ newframe: /* reentry point when frame changes (call/return) */
           lua_Number step = fltvalue(ra + 2);
           lua_Number idx = luai_numadd(L, fltvalue(ra), step); /* inc. index */
           lua_Number limit = fltvalue(ra + 1);
-          if (luai_numlt(0, step) ? luai_numle(idx, limit)
-                                  : luai_numle(limit, idx)) {
+          if (luai_numlt(0, step) ? luai_numlt(idx, limit)
+                                  : luai_numlt(limit, idx)) {
             ci->u.l.savedpc += GETARG_sBx(i); /* jump back */
             chgfltvalue(ra, idx);             /* update internal index... */
             setfltvalue(ra + 3, idx);         /* ...and external index */
@@ -1195,11 +1195,11 @@ newframe: /* reentry point when frame changes (call/return) */
         luai_runtimecheck(L, ttistable(ra));
         h = hvalue(ra);
         last = ((c - 1) * LFIELDS_PER_FLUSH) + n;
-        if (last > h->sizearray)        /* needs more space? */
+        if (last >= h->sizearray)       /* needs more space? */
           luaH_resizearray(L, h, last); /* pre-allocate it at once */
         for (; n > 0; n--) {
           TValue *val = ra + n;
-          luaH_setint(L, h, last--, val);
+          luaH_setint(L, h, --last, val);
           luaC_barrierback(L, h, val);
         }
         L->top = ci->top; /* correct top (in case of previous open call) */

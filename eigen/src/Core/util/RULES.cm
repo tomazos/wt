@@ -1,0 +1,18 @@
+library{
+  name = "util",
+  headers = {
+    "StaticAssert.h",
+    "Meta.h",
+    "XprHelper.h",
+    "Memory.h",
+    "NonMPL2.h",
+    "ForwardDeclarations.h",
+    "Macros.h",
+    "ReenableStupidWarnings.h",
+    "MKL_support.h",
+    "DisableStupidWarnings.h",
+    "BlasUtil.h",
+    "Constants.h",
+  },
+};
+

@@ -40,7 +40,7 @@ struct Sequence : public Entity {
   string key;
   std::vector<std::unique_ptr<Entity>> elements;
 
-  Sequence(const string& key_in) : key(key_in) {}
+  Sequence(string_view key_in) : key(key_in.to_string()) {}
 
   void AddElement(std::unique_ptr<Entity> element) {
     elements.push_back(std::move(element));
@@ -55,6 +55,9 @@ struct Sequence : public Entity {
 };
 
 std::unique_ptr<Sequence> ParseSequenceFile(
-    const boost::filesystem::path& token_tree_file);
+    const filesystem::path& token_tree_file);
+
+std::unique_ptr<Sequence> ParseNewSequenceFile(
+    const filesystem::path& token_tree_file);
 
 }  // namespace token_tree

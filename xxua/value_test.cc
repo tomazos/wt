@@ -147,17 +147,53 @@ TEST_F(ValueTest, FunctionConstruction) {
 
 TEST_F(ValueTest, Compile) {
   Value f = Compile(R"(
+    x = 42;
+    return x;
+  )");
+  EXPECT_EQ(f({}).at(0), 42);
+  EXPECT_EQ(Global()["x"], 42);
+}
 
-   x = 42;
+namespace {
 
+class MyObject {
+ public:
+  MyObject(int x) : x_(x) {}
 
-          )");
-  f({});
-  for (auto kv : Global()) {
-    LOGEXPR(kv.first);
-    LOGEXPR(kv.second);
+  int f() {
+    x_ *= 2;
+    return x_;
   }
-  EXPECT_EQ(Global()[Value(string_view("x"))], 42);
+
+ private:
+  int x_;
+};
+
+}  // namespace
+
+TEST_F(ValueTest, Objects) {
+  Value v = MakeObject<MyObject>(42);
+  EXPECT_EQ(v.as<MyObject>().f(), 84);
+  EXPECT_EQ(v.as<MyObject>().f(), 168);
+}
+
+TEST_F(ValueTest, Metatable) {
+  ObjectMetatable<MyObject>().insert(
+      "__index", {{"f", MakeFunction([](const Values& args) -> Values {
+        return {args.at(0).as<MyObject>().f()};
+      })}});
+  Global().insert("myobject", MakeFunction([](const Values& args) -> Values {
+    return {MakeObject<MyObject>(int64(args.at(0)))};
+  }));
+
+  Value f = Compile(R"(
+    x = myobject(3);
+    x:f(); // 6
+    x:f(); // 12
+    return x;
+  )");
+  Values v = f({});
+  EXPECT_EQ(v.at(0).as<MyObject>().f(), 24);
 }
 
 }  // namespace xxua

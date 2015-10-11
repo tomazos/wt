@@ -1,0 +1,7 @@
+library{
+  name = "arch",
+  headers = {
+    "Inverse_SSE.h",
+  },
+};
+

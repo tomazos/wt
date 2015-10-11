@@ -640,7 +640,7 @@ static void constructor(LexState *ls, expdesc *t) {
     if (ls->t.token == '}') break;
     closelistfield(fs, &cc);
     field(ls, &cc);
-  } while (testnext(ls, ',') || testnext(ls, ';'));
+  } while (testnext(ls, ',') /*|| testnext(ls, ';') */);
   check_match(ls, '}', '{', line);
   lastlistfield(fs, &cc);
   SETARG_B(fs->f->code[pc], luaO_int2fb(cc.na)); /* set initial array size */

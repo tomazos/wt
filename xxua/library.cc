@@ -5,6 +5,7 @@
 #include "core/collection_functions.h"
 #include "core/must.h"
 #include "xxua/api.h"
+#include "xxua/context.h"
 
 namespace xxua {
 
@@ -38,7 +39,7 @@ GLOBAL_FUNCTION(throw) {
 
 GLOBAL_FUNCTION(keyvals) {
   if (GetType(1) != Type::TABLE) Error("expected table");
-  PushFunction([] {
+  PushFunction(Context::Current(), [] {
     if (GetType(1) != Type::TABLE) Error("expected table");
     if (GetType(2) == Type::NONE) Error("expected 2 parameters");
     if (Next(1)) {
@@ -203,7 +204,7 @@ static void PopFunctionsToTable(const char* funcset) {
     std::function<int()> f = kv.second;
 
     PushString(name);
-    PushFunction(f);
+    PushFunction(Context::Current(), f);
     PopField(-3);
   }
 }

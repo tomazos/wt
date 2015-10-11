@@ -1,0 +1,221 @@
+library{
+  name = "audio_functions",
+  headers = {
+    "audio_functions.h",
+  },
+  sources = {
+    "audio_functions.cc",
+  },
+  dependencies = {
+    "wave_file",
+    "/core/must",
+    "/core/process",
+  },
+};
+
+program{
+  name = "dump_srtproto",
+  sources = {
+    "dump_srtproto.cc",
+  },
+  dependencies = {
+    "srtproto_file",
+    "/core/file_functions",
+    "/core/must",
+    "/main/args",
+  },
+};
+
+program{
+  name = "extract_speechtext",
+  sources = {
+    "extract_speechtext.cc",
+  },
+  dependencies = {
+    "srtproto_file",
+    "wave_file",
+    "/core/file_functions",
+    "/core/must",
+    "/core/sequence_file",
+    "/main/args",
+  },
+};
+
+program{
+  name = "get_speechtext",
+  sources = {
+    "get_speechtext.cc",
+  },
+  dependencies = {
+    "audio_functions",
+    "srtproto_file",
+    "wave_file",
+    "/core/must",
+    "/database/database",
+    "/main/args",
+  },
+};
+
+program{
+  name = "load_speechtext_db",
+  sources = {
+    "load_speechtext_db.cc",
+  },
+  dependencies = {
+    "srtproto_file",
+    "/core/file_functions",
+    "/core/must",
+    "/core/sequence_file",
+    "/database/database",
+    "/main/noargs",
+  },
+};
+
+program{
+  name = "search_speechtext",
+  sources = {
+    "search_speechtext.cc",
+  },
+  dependencies = {
+    "audio_functions",
+    "srtproto_file",
+    "wave_file",
+    "/core/must",
+    "/database/database",
+    "/main/args",
+  },
+};
+
+program{
+  name = "shuffle_speechtext_db",
+  sources = {
+    "shuffle_speechtext_db.cc",
+  },
+  dependencies = {
+    "/core/must",
+    "/database/database",
+    "/main/noargs",
+  },
+};
+
+library{
+  name = "speech_sample",
+  headers = {
+    "speech_sample.h",
+  },
+  dependencies = {
+    "speechtext_visitor",
+    "/eigen/eigen",
+  },
+};
+
+test{
+  name = "speech_sample_test",
+  sources = {
+    "speech_sample_test.cc",
+  },
+  dependencies = {
+    "speech_sample",
+    "/main/gtest",
+  },
+};
+
+program{
+  name = "speech_sampler",
+  sources = {
+    "speech_sampler.cc",
+  },
+  dependencies = {
+    "audio_functions",
+    "speech_sample",
+    "/core/must",
+    "/main/args",
+  },
+};
+
+library{
+  name = "speechtext_visitor",
+  headers = {
+    "speechtext_visitor.h",
+  },
+  sources = {
+    "speechtext_visitor.cc",
+  },
+  dependencies = {
+    "/eigen/eigen",
+    "/core/must",
+    "/database/database",
+  },
+};
+
+test{
+  name = "speechtext_visitor_test",
+  sources = {
+    "speechtext_visitor_test.cc",
+  },
+  dependencies = {
+    "speechtext_visitor",
+    "/main/gtest",
+  },
+};
+
+proto{
+  name = "srtproto_file",
+  sources = {
+    "srtproto_file.proto",
+  },
+};
+
+test{
+  name = "srtproto_test",
+  sources = {
+    "srtproto_test.cc",
+  },
+  dependencies = {
+    "srtproto_file",
+    "/core/env",
+    "/core/file_functions",
+    "/main/gtest",
+  },
+};
+
+program{
+  name = "transform_speechtext",
+  sources = {
+    "transform_speechtext.cc",
+  },
+  dependencies = {
+    "audio_functions",
+    "speechtext_visitor",
+    "/core/must",
+    "/core/regex",
+    "/database/database",
+    "/main/noargs",
+  },
+};
+
+library{
+  name = "wave_file",
+  headers = {
+    "wave_file.h",
+  },
+  sources = {
+    "wave_file.cc",
+  },
+  dependencies = {
+    "/core/file_functions",
+  },
+};
+
+test{
+  name = "wave_file_test",
+  sources = {
+    "wave_file_test.cc",
+  },
+  dependencies = {
+    "wave_file",
+    "/core/env",
+    "/main/gtest",
+  },
+};
+

@@ -1,0 +1,9 @@
+library{
+  name = "Householder",
+  headers = {
+    "HouseholderSequence.h",
+    "Householder.h",
+    "BlockHouseholder.h",
+  },
+};
+

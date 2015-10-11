@@ -1,0 +1,28 @@
+library{
+  name = "products",
+  headers = {
+    "GeneralMatrixMatrixTriangular_MKL.h",
+    "SelfadjointMatrixMatrix.h",
+    "TriangularMatrixVector.h",
+    "GeneralMatrixVector.h",
+    "GeneralMatrixMatrixTriangular.h",
+    "Parallelizer.h",
+    "SelfadjointRank2Update.h",
+    "TriangularMatrixMatrix.h",
+    "TriangularSolverVector.h",
+    "TriangularSolverMatrix.h",
+    "CoeffBasedProduct.h",
+    "TriangularMatrixVector_MKL.h",
+    "GeneralBlockPanelKernel.h",
+    "GeneralMatrixVector_MKL.h",
+    "SelfadjointProduct.h",
+    "GeneralMatrixMatrix_MKL.h",
+    "GeneralMatrixMatrix.h",
+    "SelfadjointMatrixVector_MKL.h",
+    "SelfadjointMatrixMatrix_MKL.h",
+    "SelfadjointMatrixVector.h",
+    "TriangularMatrixMatrix_MKL.h",
+    "TriangularSolverMatrix_MKL.h",
+  },
+};
+

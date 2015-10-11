@@ -1,0 +1,9 @@
+library{
+  name = "custom",
+  headers = {
+    "gtest-port.h",
+    "gtest.h",
+    "gtest-printers.h",
+  },
+};
+

@@ -1,4 +1,4 @@
-#include "xxua/api.h"
+#include "xxua/context.h"
 
 #include "gtest/gtest.h"
 #include "xxua/debug_allocator.h"

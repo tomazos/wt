@@ -130,28 +130,31 @@ static Node *mainposition(const Table *t, const TValue *key) {
 
 /*
 ** returns the index for 'key' if 'key' is an appropriate key to live in
-** the array part of the table, 0 otherwise.
+** the array part of the table, arrayindex_npos otherwise.
 */
+constexpr unsigned int arrayindex_npos(-1);
+
 static unsigned int arrayindex(const TValue *key) {
   if (ttisinteger(key)) {
     lua_Integer k = ivalue(key);
-    if (0 < k && (lua_Unsigned)k <= MAXASIZE)
+    if (0 <= k && (lua_Unsigned)k < MAXASIZE)
       return cast(unsigned int, k); /* 'key' is an appropriate array index */
   }
-  return 0; /* 'key' did not match some condition */
+  return arrayindex_npos; /* 'key' did not match some condition */
 }
 
 /*
 ** returns the index of a 'key' for table traversals. First goes all
 ** elements in the array part, then elements in the hash part. The
-** beginning of a traversal is signaled by 0.
+** beginning of a traversal is signaled by arrayindex_npos.
 */
 static unsigned int findindex(lua_State *L, Table *t, StkId key) {
   unsigned int i;
-  if (ttisnil(key)) return 0; /* first iteration */
+  if (ttisnil(key)) return arrayindex_npos; /* first iteration */
   i = arrayindex(key);
-  if (i != 0 && i <= t->sizearray) /* is 'key' inside array part? */
-    return i;                      /* yes; that's the index */
+  if (i != arrayindex_npos &&
+      i < t->sizearray) /* is 'key' inside array part? */
+    return i;           /* yes; that's the index */
   else {
     int nx;
     Node *n = mainposition(t, key);
@@ -162,7 +165,7 @@ static unsigned int findindex(lua_State *L, Table *t, StkId key) {
            deadvalue(gkey(n)) == gcvalue(key))) {
         i = cast_int(n - gnode(t, 0)); /* key index in hash table */
         /* hash elements are numbered after array ones */
-        return (i + 1) + t->sizearray;
+        return i + t->sizearray;
       }
       nx = gnext(n);
       if (nx == 0)
@@ -175,9 +178,15 @@ static unsigned int findindex(lua_State *L, Table *t, StkId key) {
 
 int luaH_next(lua_State *L, Table *t, StkId key) {
   unsigned int i = findindex(L, t, key); /* find original element */
-  for (; i < t->sizearray; i++) {        /* try first array part */
-    if (!ttisnil(&t->array[i])) {        /* a non-nil value? */
-      setivalue(key, i + 1);
+
+  if (i == arrayindex_npos)
+    i = 0;
+  else
+    i++;
+
+  for (; i < t->sizearray; i++) { /* try first array part */
+    if (!ttisnil(&t->array[i])) { /* a non-nil value? */
+      setivalue(key, i);
       setobj2s(L, key + 1, &t->array[i]);
       return 1;
     }
@@ -228,7 +237,7 @@ static unsigned int computesizes(unsigned int nums[], unsigned int *pna) {
 
 static int countint(const TValue *key, unsigned int *nums) {
   unsigned int k = arrayindex(key);
-  if (k != 0) {               /* is 'key' an appropriate array index? */
+  if (k != arrayindex_npos) { /* is 'key' an appropriate array index? */
     nums[luaO_ceillog2(k)]++; /* count as such */
     return 1;
   } else
@@ -244,18 +253,18 @@ static unsigned int numusearray(const Table *t, unsigned int *nums) {
   int lg;
   unsigned int ttlg;     /* 2^lg */
   unsigned int ause = 0; /* summation of 'nums' */
-  unsigned int i = 1;    /* count to traverse all array keys */
+  unsigned int i = 0;    /* count to traverse all array keys */
   /* traverse each slice */
   for (lg = 0, ttlg = 1; lg <= MAXABITS; lg++, ttlg *= 2) {
     unsigned int lc = 0; /* counter */
     unsigned int lim = ttlg;
     if (lim > t->sizearray) {
-      lim = t->sizearray; /* adjust upper limit */
-      if (i > lim) break; /* no more elements to count */
+      lim = t->sizearray;  /* adjust upper limit */
+      if (i == lim) break; /* no more elements to count */
     }
-    /* count elements in range (2^(lg - 1), 2^lg] */
-    for (; i <= lim; i++) {
-      if (!ttisnil(&t->array[i - 1])) lc++;
+    /* count elements in range [2^(lg - 1), 2^lg) */
+    for (; i < lim; i++) {
+      if (!ttisnil(&t->array[i])) lc++;
     }
     nums[lg] += lc;
     ause += lc;
@@ -322,7 +331,7 @@ void luaH_resize(lua_State *L, Table *t, unsigned int nasize,
     t->sizearray = nasize;
     /* re-insert elements from vanishing slice */
     for (i = nasize; i < oldasize; i++) {
-      if (!ttisnil(&t->array[i])) luaH_setint(L, t, i + 1, &t->array[i]);
+      if (!ttisnil(&t->array[i])) luaH_setint(L, t, i, &t->array[i]);
     }
     /* shrink array */
     luaM_reallocvector(L, t->array, oldasize, nasize, TValue);
@@ -459,8 +468,10 @@ TValue *luaH_newkey(lua_State *L, Table *t, const TValue *key) {
 */
 const TValue *luaH_getint(Table *t, lua_Integer key) {
   /* (1 <= key && key <= t->sizearray) */
-  if (l_castS2U(key - 1) < t->sizearray)
-    return &t->array[key - 1];
+  //  if (l_castS2U(key - 1) < t->sizearray)
+  //    return &t->array[key - 1];
+  if (l_castS2U(key) < t->sizearray)
+    return &t->array[key];
   else {
     Node *n = hashint(t, key);
     for (;;) { /* check whether 'key' is somewhere in the chain */

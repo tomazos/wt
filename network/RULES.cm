@@ -1,0 +1,60 @@
+program{
+  name = "asio_client",
+  sources = {
+    "asio_client.cc",
+  },
+  dependencies = {
+    "/core/must",
+    "/main/noargs",
+  },
+};
+
+program{
+  name = "asio_server",
+  sources = {
+    "asio_server.cc",
+  },
+  dependencies = {
+    "/core/must",
+    "/main/noargs",
+  },
+};
+
+library{
+  name = "socket",
+  headers = {
+    "socket.h",
+  },
+  sources = {
+    "socket.cc",
+  },
+  dependencies = {
+    "/core/bigint",
+    "/core/must",
+  },
+};
+
+program{
+  name = "socket_client",
+  sources = {
+    "socket_client.cc",
+  },
+  dependencies = {
+    "socket",
+    "/core/must",
+    "/main/noargs",
+  },
+};
+
+program{
+  name = "socket_server",
+  sources = {
+    "socket_server.cc",
+  },
+  dependencies = {
+    "socket",
+    "/core/must",
+    "/main/noargs",
+  },
+};
+

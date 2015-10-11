@@ -3,8 +3,9 @@
 #include <vector>
 
 #include "xxua/api.h"
-#include "xxua/type.h"
+#include "xxua/context.h"
 #include "xxua/state.h"
+#include "xxua/type.h"
 
 namespace xxua {
 
@@ -25,6 +26,9 @@ Value MakePointer(T*);
 Value Compile(string_view code);
 
 Value Global();
+
+template <typename T>
+Value ObjectMetatable();
 
 bool operator==(const Value& a, const Value& b);
 bool operator!=(const Value& a, const Value& b);
@@ -65,6 +69,8 @@ class Value {
 
   // string
   Value(string_view);
+  Value(const string& s) : Value(string_view(s)) {}
+  Value(const char* s) : Value(string_view(s)) {}
 
   // table
   Value(std::initializer_list<std::pair<Value, Value>>);
@@ -113,16 +119,16 @@ class Value {
   bool is() const;
 
   template <class T>
-  const T& as() const;
-
-  template <class T>
-  T& as();
+  T& as() const;
 
   template <class T>
   T& ObjectCast(Value& operand);
 
   // table
   Value operator[](Value key) const;
+
+  Values ToSequence() const;
+
   struct Iterator;
   Iterator begin() const;
   Iterator end() const;
@@ -171,12 +177,14 @@ class Value {
   template <typename F>
   friend bool CompareValues(F f, const Value& a, const Value& b);
   friend std::ostream& operator<<(std::ostream& os, const Value& v);
+  template <typename T>
+  friend Value MakePointer(T* p);
   template <typename F>
   friend Value MakeFunction(F&& f);
   friend Value Compile(string_view code);
   friend Value Global();
   template <typename T>
-  friend Value MakePointer(T* p);
+  friend Value ObjectMetatable();
 };
 
 template <typename T, typename... Args>
@@ -255,21 +263,29 @@ bool Value::is() const {
 }
 
 template <class T>
-const T& Value::as() const {
+T& Value::as() const {
   MUST(type_ == Type::USERDATA);
   PushSelf();
-  void* userdata = registered_->ToUserdata(-1);
+  T& result = ToObject<T>(registered_, -1);
   registered_->Pop();
-  return registered_->ToObject<T>(userdata);
+  return result;
 }
 
-template <class T>
-T& Value::as() {
-  MUST(type_ == Type::USERDATA);
-  PushSelf();
-  void* userdata = registered_->ToUserdata(-1);
-  registered_->Pop();
-  return registered_->ToObject<T>(userdata);
+template <typename T, typename... Args>
+void Value::emplace(Args&&... args) {
+  clear();
+  EmplaceObject<T>(Context::Current(), std::forward<Args>(args)...);
+  type_ = Type::USERDATA;
+  PopRegister(Context::Current());
+}
+
+template <typename T>
+Value ObjectMetatable() {
+  State* registered = Context::Current();
+  PushObjectMetatable<T>(registered);
+  Value result(registered, -1);
+  Pop();
+  return result;
 }
 
 }  // namespace xxua

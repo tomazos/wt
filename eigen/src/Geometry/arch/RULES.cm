@@ -1,0 +1,7 @@
+library{
+  name = "arch",
+  headers = {
+    "Geometry_SSE.h",
+  },
+};
+

@@ -40,6 +40,15 @@ test:
     xxua
     /main/gtest
 
+program:
+  name = lang_test_program
+  sources:
+    lang_test_program.cc
+  dependencies:
+    value
+    library
+    /main/noargs
+
 test:
   name = lex_test
   sources:

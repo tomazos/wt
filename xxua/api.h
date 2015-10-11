@@ -1,6 +1,5 @@
 #pragma once
 
-#include "xxua/context.h"
 #include "xxua/state.h"
 
 namespace xxua {
@@ -30,7 +29,7 @@ bool IsTypeId(void* userdata) {
 
 template <typename T>
 void CheckTypeId(void* userdata) {
-  if (!IsTypeId<T>(userdata)) Throw("userdata type mismatch");
+  if (!IsTypeId<T>(userdata)) throw std::logic_error("userdata type mismatch");
 }
 
 template <typename T>
@@ -58,13 +57,13 @@ void* GetObjectStorage(void* userdata) {
 template <typename T>
 void CheckAlignment(void* ptr) {
   uintptr_t address = reinterpret_cast<uintptr_t>(ptr);
-  if (address % alignof(T) != 0) Throw("misaligned pointer");
+  if (address % alignof(T) != 0) throw std::logic_error("misaligned pointer");
 }
 
 template <typename T>
 int DestroyObject(lua_State* L) {
   void* userdata = lua_touserdata(L, 1);
-  if (!userdata) Throw("DestroyObject expected userdata");
+  if (!userdata) throw std::logic_error("destructor attached to non-userdata");
   CheckTypeId<T>(userdata);
   T* object = static_cast<T*>(GetObjectStorage<T>(userdata));
   object->~T();
@@ -72,26 +71,54 @@ int DestroyObject(lua_State* L) {
   return 0;
 }
 
+template <typename T>
+void PushObjectMetatable(State* state) {
+  int top = state->StackSize();
+  state->PushString("object_metatables");
+  state->PushField(State::REGISTRY);
+  if (state->GetType(-1) == Type::NIL) {
+    state->Pop();
+    state->PushNewTable();
+    state->PushString("object_metatables");
+    state->PushCopy(-2);
+    state->PopField(State::REGISTRY);
+  }
+  MUST(state->GetType(-1) == Type::TABLE);
+  state->PushInteger(GetTypeId<T>());
+  state->PushField(-2);
+  if (state->GetType(-1) == Type::NIL) {
+    state->Pop();
+    state->PushNewTable();
+    state->PushString("__gc");
+    state->PushCFunction(DestroyObject<T>);
+    state->PopField(-3);
+    state->PushInteger(GetTypeId<T>());
+    state->PushCopy(-2);
+    state->PopField(-4);
+  }
+  MUST(state->GetType(-2) == Type::TABLE);
+  MUST(state->GetType(-1) == Type::TABLE);
+  state->Remove(-2);
+  MUST(state->StackSize(), top + 1);
+}
+
 template <typename T, typename... Args>
-void EmplaceObject(Args&&... args) {
-  void* userdata = PushNewUserdata(ObjectStorageSize<T>());
+void EmplaceObject(State* state, Args&&... args) {
+  void* userdata = state->PushNewUserdata(ObjectStorageSize<T>());
   CheckAlignment<uintptr_t>(GetTypeIdStorage(userdata));
   CheckAlignment<T>(GetObjectStorage<T>(userdata));
   SetTypeId<T>(userdata);
   CheckTypeId<T>(userdata);
   T* object = static_cast<T*>(GetObjectStorage<T>(userdata));
   new (object) T(std::forward<Args>(args)...);
-  PushNewTable();
-  PushString("__gc");
-  PushCFunction(DestroyObject<T>);
-  PopField(-3);
-  PopMetatable(-2);
+  PushObjectMetatable<T>(state);
+  state->PopMetatable(-2);
 }
 
 template <typename T>
-T& ToObject(Index index) {
-  if (GetType(index) != Type::USERDATA) Throw("not a userdata");
-  void* userdata = ToUserdata(index);
+T& ToObject(State* state, State::Index index) {
+  if (state->GetType(index) != Type::USERDATA) state->Throw("not a userdata");
+  void* userdata = state->ToUserdata(index);
   CheckTypeId<T>(userdata);
   T* object = static_cast<T*>(GetObjectStorage<T>(userdata));
   return *object;
@@ -99,9 +126,9 @@ T& ToObject(Index index) {
 
 int DispatchFunction(lua_State* L);
 
-inline void PushFunction(std::function<int()> f) {
-  EmplaceObject<std::function<int()>>(std::move(f));
-  PushCFunction(DispatchFunction, 1);
+inline void PushFunction(State* state, std::function<int()> f) {
+  EmplaceObject<std::function<int()>>(state, std::move(f));
+  state->PushCFunction(DispatchFunction, 1);
 }
 
 }  // namespace xxua

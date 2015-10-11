@@ -2,6 +2,8 @@
 
 #include <cstring>
 
+#include "xxua/context.h"
+
 namespace xxua {
 
 int DispatchFunction(lua_State* L) {
@@ -14,7 +16,7 @@ int DispatchFunction(lua_State* L) {
   }
   State& state = *static_cast<State*>(state_void);
   Context context(state);
-  return ToObject<std::function<int()>>(UPVALUE(1))();
+  return ToObject<std::function<int()>>(&state, UPVALUE(1))();
 }
 
 }  // namespace xxua

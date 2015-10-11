@@ -1,0 +1,66 @@
+program{
+  name = "convert_token_tree_to_xxua",
+  sources = {
+    "convert_token_tree_to_xxua.cc",
+  },
+  dependencies = {
+    "token_tree",
+    "/core/file_functions",
+    "/main/args",
+  },
+};
+
+library{
+  name = "token_tree",
+  headers = {
+    "token_tree.h",
+  },
+  sources = {
+    "token_tree.cc",
+  },
+  dependencies = {
+    "/core/file_functions",
+    "/xxua/xxua",
+    "/xxua/value",
+  },
+};
+
+program{
+  name = "whee",
+  headers = {
+    "paths.h",
+    "whee.h",
+  },
+  sources = {
+    "whee.cc",
+    "paths.cc",
+  },
+  dependencies = {
+    "source_file_attributes",
+    "source_root_sentinal",
+    "token_tree",
+    "/core/env",
+    "/core/process",
+    "/core/file_functions",
+    "/main/args",
+    "/xxua/xxua",
+  },
+};
+
+proto{
+  name = "source_file_attributes",
+  sources = {
+    "source_file_attributes.proto",
+  },
+};
+
+library{
+  name = "source_root_sentinal",
+  headers = {
+    "source_root_sentinal.h",
+  },
+  sources = {
+    "source_root_sentinal.cc",
+  },
+};
+

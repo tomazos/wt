@@ -18,8 +18,8 @@ namespace {
 using Float = float32;
 
 const Float threshold = 0.05;
-const Float epsilon = 0.0001;
-const Float learning_rate = 0.1;
+const Float epsilon = 0.1;
+const Float learning_rate = 1;
 const Float regularize = 0;  // .000025;
 const size_t ntraining = 1000000;
 const size_t nbatches = 1000;
@@ -32,7 +32,7 @@ const size_t outputsize = 60;
 
 std::vector<LayerLayout> layers = {{inputsize, 800, SIGMOID},
                                    {800, outputsize, SIGMOID},
-                                   {outputsize, inputsize, LINEAR}};
+                                   {outputsize, inputsize, SIGMOID}};
 
 // std::vector<LayerLayout> layers = {{inputsize, outputsize, SOFTMAX}};
 
@@ -42,6 +42,9 @@ using Matrix = NeuralNet::Matrix;
 void FeedForwardAudio() {
   Matrix audio_samples =
       audio::GetSpeechSamples<Float>(inputsize, ntraining, threshold);
+  audio_samples = audio_samples.unaryExpr([](Float x) -> Float {
+    return (x + 1.0) / 2.0;
+  }).eval();
 
   Lock lock;
   NeuralNet neural_net(layers);

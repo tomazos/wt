@@ -1,5 +1,7 @@
 #include "xxua/value.h"
 
+#include <iterator>
+
 #include "core/must.h"
 #include "xxua/api.h"
 #include "xxua/context.h"
@@ -71,7 +73,7 @@ Value::Value(std::initializer_list<std::pair<Value, Value>> il)
 }
 
 Value::Value(const Function& func) {
-  PushFunction([func]() {
+  PushFunction(Context::Current(), [func]() {
     State* registered = Context::Current();
     const int nargs = StackSize();
     Values args(nargs);
@@ -436,6 +438,21 @@ Value::Iterator Value::begin() const {
 
 Value::Iterator Value::end() const { return {}; }
 
+Values Value::ToSequence() const {
+  Values result;
+  for (int64 i = 0; true; ++i) {
+    Value v = (*this)[i];
+    if (v.empty()) break;
+    result.push_back(v);
+  }
+  size_t t = 0;
+  for (const auto& v : *this) {
+    t++;
+  }
+  MUST_EQ(result.size(), t);
+  return result;
+}
+
 Values Value::operator()(const Values& args) const {
   MUST(IsRegistered(type_));
   State* registered = registered_;
@@ -458,6 +475,15 @@ void Value::clear() {
     Deregister();
   }
   type_ = Type::NIL;
+}
+
+void Value::insert(Value key, Value val) {
+  MUST(type_ == Type::TABLE);
+  PushSelf();
+  key.PushSelf(registered_);
+  val.PushSelf(registered_);
+  registered_->PopField(-3);
+  Pop();
 }
 
 void Value::PopRegister(State* registered) {

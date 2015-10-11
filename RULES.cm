@@ -1,0 +1,30 @@
+library{
+  name = "primitives",
+  headers = {
+    "primitives.h",
+  },
+};
+
+test{
+  name = "primitives_test",
+  sources = {
+    "primitives_test.cc",
+  },
+  dependencies = {
+    "testing",
+  },
+};
+
+library{
+  name = "testing",
+  headers = {
+    "testing.h",
+  },
+  sources = {
+    "testing.cc",
+  },
+  dependencies = {
+    "/core/must",
+  },
+};
+

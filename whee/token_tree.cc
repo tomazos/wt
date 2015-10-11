@@ -8,10 +8,14 @@
 #include "core/must.h"
 #include "core/string_functions.h"
 
+#include "xxua/context.h"
+#include "xxua/value.h"
+
 namespace token_tree {
 
 using boost::algorithm::split;
 using boost::algorithm::token_compress_on;
+using namespace xxua;
 
 std::unique_ptr<Sequence> ParseSequenceFile(
     const boost::filesystem::path& token_tree_file) {
@@ -81,6 +85,54 @@ std::unique_ptr<Sequence> ParseSequenceFile(
   }
 
   return std::move(open_sequences.front());
+}
+
+Values AddRule(Sequence& sequence, string_view rule, const Values& args) {
+  if (args.size() != 1) Throw("expected 1 argument");
+
+  auto rule_sequence = std::make_unique<Sequence>(rule);
+  for (const std::pair<Value, Value>& kv : args.at(0)) {
+    const Value& key = kv.first;
+    const Value& value = kv.second;
+
+    if (key.type() == Type::INTEGER) {
+      rule_sequence->AddElement(std::make_unique<Leaf>(string(value)));
+    } else {
+      MUST(key.type() == Type::STRING);
+      if (value.type() == Type::TABLE) {
+        auto sub_sequence = std::make_unique<Sequence>(string(key));
+        for (std::pair<Value, Value> kv : value) {
+          const Value& key = kv.first;
+          const Value& value = kv.second;
+          MUST(key.type() == Type::INTEGER);
+          MUST(value.type() == Type::STRING);
+          sub_sequence->AddElement(std::make_unique<Leaf>(string(value)));
+        }
+        rule_sequence->AddElement(std::move(sub_sequence));
+      } else if (value.type() == Type::STRING) {
+        rule_sequence->AddElement(
+            std::make_unique<KeyVal>(string(key), string(value)));
+      }
+    }
+  }
+
+  sequence.AddElement(std::move(rule_sequence));
+  return {};
+}
+
+std::unique_ptr<Sequence> ParseNewSequenceFile(
+    const filesystem::path& token_tree_file) {
+  State state;
+  Context context(state);
+
+  Value rules = Compile(GetFileContents(token_tree_file));
+  auto sequence = std::make_unique<Sequence>(token_tree_file.string());
+  for (auto rule : {"test", "library", "program", "proto"})
+    Global().insert(rule, MakeFunction([&, rule](const Values& args) -> Values {
+      return AddRule(*sequence, rule, args);
+    }));
+  rules({});
+  return sequence;
 }
 
 }  // namespace token_tree
