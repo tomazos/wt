@@ -12,7 +12,7 @@ core/process.h
 core/random.cc
 core/random.h
 core/rand_float_test.cc
-core/RULES
+core/RULES.cm
 core/string_functions.h
 core/string_functions_test.cc
 ladybug/accelerometer_read.cc
@@ -22,7 +22,7 @@ ladybug/ladybug_motor_set.cc
 ladybug/sonar_subsystem_read.cc
 ladybug/motor_subsystem.cc
 ladybug/motor_subsystem.h
-ladybug/RULES
+ladybug/RULES.cm
 ladybug/sonar_subsystem.cc
 ladybug/sonar_subsystem.h
 ladybug/subsystem.cc
@@ -31,7 +31,7 @@ main/args.cc
 main/args.h
 main/noargs.cc
 main/noargs.h
-main/RULES
+main/RULES.cm
 wiring/drcSerial.c
 wiring/drcSerial.h
 wiring/i2c_device.cc
@@ -93,10 +93,10 @@ wiring/wpiExtensions.c
 wiring/wpiExtensions.h
 primitives.h
 primitives_test.cc
-RULES
+RULES.cm
 testing.cc
 testing.h
-whee/RULES
+whee/RULES.cm
 whee/token_tree.cc
 whee/token_tree.h
 whee/whee.cc
@@ -115,7 +115,7 @@ ladybug/magnetometer_subsystem_read.cc
 ladybug/donuts.cc
 ladybug/ladybug_state.proto
 ladybug/ladybug_server.cc
-network/RULES
+network/RULES.cm
 network/asio_server.cc
 network/asio_client.cc
 network/socket.h
@@ -128,7 +128,7 @@ raspicam/private_still_impl.h
 raspicam/raspicam.cc
 raspicam/vmcs_sm_ioctl.h
 raspicam/threadcondition.cc
-raspicam/RULES
+raspicam/RULES.cm
 raspicam/private_impl.cc
 raspicam/raspicamtypes.h
 raspicam/raspicam_still.h
@@ -153,7 +153,7 @@ eigen/StdVector
 eigen/Core
 eigen/Sparse
 eigen/SVD
-eigen/RULES
+eigen/RULES.cm
 eigen/Jacobi
 eigen/QtAlignedMalloc
 eigen/src/IterativeLinearSolvers/BasicPreconditioners.h
@@ -415,7 +415,7 @@ lua/table.cc
 lua/object.cc
 lua/string.h
 lua/func.h
-lua/RULES
+lua/RULES.cm
 lua/vm.cc
 lua/dump.cc
 lua/api.cc
@@ -453,7 +453,7 @@ lua/state.h
 xxua/state.h
 xxua/allocator.h
 xxua/state.cc
-xxua/RULES
+xxua/RULES.cm
 xxua/state_test.cc
 xxua/allocator_test.cc
 xxua/debug_allocator.h
@@ -501,7 +501,7 @@ gtest/gtest.cc
 gtest/gtest-port.cc
 gtest/gtest-death-test.h
 gtest/gtest-spi.h
-gtest/RULES
+gtest/RULES.cm
 main/gtest.cc
 main/gtest_test.cc
 xxua/GRAMMAR
@@ -538,7 +538,7 @@ core/testdata/ShortMsgKAT_SHA3-512.txt
 core/testdata/ShortMsgKAT_SHA3-224.txt
 cryptography/proof_of_work.h
 cryptography/proof_of_work_test.cc
-cryptography/RULES
+cryptography/RULES.cm
 cryptography/pow_worker.cc
 cryptography/pow_server.cc
 cryptography/pow.proto
@@ -549,7 +549,7 @@ scripts/get_torrent.pl
 scripts/filter_shows.pl
 scripts/process_shows.cc
 scripts/download_target.pl
-audio/RULES
+audio/RULES.cm
 audio/wave_file.h
 audio/wave_file.cc
 audio/wave_file_test.cc
@@ -569,7 +569,7 @@ audio/search_speechtext.cc
 audio/audio_functions.h
 audio/audio_functions.cc
 audio/alsa_demo.cc
-database/RULES
+database/RULES.cm
 database/database_test.cc
 database/connection.h
 database/connection.cc
@@ -584,7 +584,7 @@ audio/speechtext_visitor.h
 audio/speechtext_visitor.cc
 audio/speechtext_visitor_test.cc
 math/fft.h
-math/RULES
+math/RULES.cm
 math/fft_test.cc
 audio/transform_speechtext.cc
 core/regex.h
@@ -595,7 +595,7 @@ audio/speech_sample.h
 audio/speech_sample_test.cc
 audio/speech_sampler.cc
 neural/feed_forward.h
-neural/RULES
+neural/RULES.cm
 neural/feed_forward_test.cc
 neural/testdata/t.txt
 neural/mnist.h
@@ -607,9 +607,14 @@ math/matrix_test.cc
 neural/feed_forward_simple.cc
 neural/feed_forward_audio.cc
 neural/pathways.h
-lua/RULES.old
+lua/RULES.cm
 xxua/value.cc
 xxua/value_test.cc
 xxua/interpreter.cc
 whee/convert_token_tree_to_xxua.cc
 xxua/lang_test_program.cc
+whee/whee.proto
+xxua/proto.h
+xxua/proto.cc
+xxua/proto_test.proto
+xxua/proto_test.cc
