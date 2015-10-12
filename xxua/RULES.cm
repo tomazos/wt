@@ -79,6 +79,39 @@ library{
   },
 };
 
+library{
+  name = "proto",
+  headers = {
+    "proto.h",
+  },
+  sources = {
+    "proto.cc",
+  },
+  dependencies = {
+    "xxua",
+    "value",
+  },
+};
+
+test{
+  name = "proto_test",
+  sources = {
+    "proto_test.cc",
+  },
+  dependencies = {
+    "proto",
+    "proto_test_proto",
+    "/main/gtest",
+  },
+};
+
+proto{
+  name = "proto_test_proto",
+  sources = {
+    "proto_test.proto",
+  },
+};
+
 test{
   name = "state_test",
   sources = {
