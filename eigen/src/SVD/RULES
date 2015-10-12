@@ -1,6 +1,0 @@
-library:
-  name = SVD
-  headers:
-    UpperBidiagonalization.h
-    JacobiSVD_MKL.h
-    JacobiSVD.h

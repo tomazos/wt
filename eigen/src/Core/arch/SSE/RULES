@@ -1,6 +1,0 @@
-library:
-  name = SSE
-  headers:
-    MathFunctions.h
-    Complex.h
-    PacketMath.h

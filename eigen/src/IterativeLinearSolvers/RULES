@@ -1,8 +1,0 @@
-library:
-  name = IterativeLinearSolvers
-  headers:
-    BasicPreconditioners.h
-    IterativeSolverBase.h
-    ConjugateGradient.h
-    BiCGSTAB.h
-    IncompleteLUT.h

@@ -1,5 +1,0 @@
-library:
-  name = NEON
-  headers:
-    Complex.h
-    PacketMath.h

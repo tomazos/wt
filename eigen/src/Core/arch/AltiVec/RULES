@@ -1,5 +1,0 @@
-library:
-  name = AltiVec
-  headers:
-    Complex.h
-    PacketMath.h

@@ -1,5 +1,0 @@
-library:
-  name = SparseCholesky
-  headers:
-    SimplicialCholesky.h
-    SimplicialCholesky_impl.h

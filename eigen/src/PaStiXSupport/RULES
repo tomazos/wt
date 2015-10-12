@@ -1,4 +1,0 @@
-library:
-  name = PaStiXSupport
-  headers:
-    PaStiXSupport.h

@@ -1,7 +1,0 @@
-library:
-  name = StlSupport
-  headers:
-    details.h
-    StdList.h
-    StdVector.h
-    StdDeque.h

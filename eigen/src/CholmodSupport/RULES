@@ -1,4 +1,0 @@
-library:
-  name = CholmodSupport
-  headers:
-    CholmodSupport.h

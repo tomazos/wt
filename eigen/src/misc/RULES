@@ -1,8 +1,0 @@
-library:
-  name = misc
-  headers:
-    SparseSolve.h
-    blas.h
-    Solve.h
-    Kernel.h
-    Image.h
