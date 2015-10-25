@@ -1,15 +1,8 @@
+#include "core/must.h"
+#include "core/rwlock.h"
 #include "neural/feed_forward.h"
 #include "neural/mnist.h"
-
-#include "core/must.h"
 #include "main/noargs.h"
-
-#include <boost/thread/locks.hpp>
-#include <boost/thread/shared_mutex.hpp>
-
-typedef boost::shared_mutex Lock;
-typedef boost::unique_lock<Lock> WriteLock;
-typedef boost::shared_lock<Lock> ReadLock;
 
 namespace neural {
 namespace {
@@ -49,7 +42,7 @@ void FeedForwardMNIST() {
   mnist.training_images.array() -= 0.5;
   mnist.test_images.array() -= 0.5;
 
-  Lock lock;
+  ReadWriteMutex mutex;
   NeuralNet neural_net(layers);
   neural_net.Randomize(epsilon);
 
@@ -84,13 +77,13 @@ void FeedForwardMNIST() {
           NeuralNet::BackPropogation back_propogation(neural_net, activation,
                                                       nbatch);
           {
-            ReadLock rlock(lock);
+            ReaderLockGuard rlock(mutex);
             const auto& batch = training_batches.at(batch_index);
             activation(batch.first);
             back_propogation(batch.second);
           }
           {
-            WriteLock wlock(lock);
+            WriterLockGuard wlock(mutex);
             back_propogation.Learn(learning_rate);
             neural_net.Regularize(regularize);
           }

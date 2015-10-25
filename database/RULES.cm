@@ -27,6 +27,10 @@ library{
   },
   dependencies = {
     "/core/must",
+    "/core/boost_filesystem",
+  },
+  syslibs = {
+    "-lsqlite3",
   },
 };
 

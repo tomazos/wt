@@ -91,8 +91,8 @@ static int l_hashfloat(lua_Number n) {
     lua_assert(luai_numisnan(n) || l_mathop(fabs)(n) == HUGE_VAL);
     return 0;
   } else { /* normal case */
-    unsigned int u = cast(unsigned int, i) + cast(unsigned int, ni);
-    return cast_int(u <= cast(unsigned int, INT_MAX) ? u : ~u);
+    unsigned int u = CAST(unsigned int, i) + CAST(unsigned int, ni);
+    return cast_int(u <= CAST(unsigned int, INT_MAX) ? u : ~u);
   }
 }
 #endif
@@ -138,7 +138,7 @@ static unsigned int arrayindex(const TValue *key) {
   if (ttisinteger(key)) {
     lua_Integer k = ivalue(key);
     if (0 <= k && (lua_Unsigned)k < MAXASIZE)
-      return cast(unsigned int, k); /* 'key' is an appropriate array index */
+      return CAST(unsigned int, k); /* 'key' is an appropriate array index */
   }
   return arrayindex_npos; /* 'key' did not match some condition */
 }
@@ -297,7 +297,7 @@ static void setarrayvector(lua_State *L, Table *t, unsigned int size) {
 static void setnodevector(lua_State *L, Table *t, unsigned int size) {
   int lsize;
   if (size == 0) {                     /* no elements to hash part? */
-    t->node = cast(Node *, dummynode); /* use common 'dummynode' */
+    t->node = CAST(Node *, dummynode); /* use common 'dummynode' */
     lsize = 0;
   } else {
     int i;
@@ -346,7 +346,7 @@ void luaH_resize(lua_State *L, Table *t, unsigned int nasize,
     }
   }
   if (!isdummy(nold))
-    luaM_freearray(L, nold, cast(size_t, twoto(oldhsize))); /* free old hash */
+    luaM_freearray(L, nold, CAST(size_t, twoto(oldhsize))); /* free old hash */
 }
 
 void luaH_resizearray(lua_State *L, Table *t, unsigned int nasize) {
@@ -392,7 +392,7 @@ Table *luaH_new(lua_State *L) {
 }
 
 void luaH_free(lua_State *L, Table *t) {
-  if (!isdummy(t->node)) luaM_freearray(L, t->node, cast(size_t, sizenode(t)));
+  if (!isdummy(t->node)) luaM_freearray(L, t->node, CAST(size_t, sizenode(t)));
   luaM_freearray(L, t->array, t->sizearray);
   luaM_free(L, t);
 }
@@ -546,7 +546,7 @@ const TValue *luaH_get(Table *t, const TValue *key) {
 TValue *luaH_set(lua_State *L, Table *t, const TValue *key) {
   const TValue *p = luaH_get(t, key);
   if (p != luaO_nilobject)
-    return cast(TValue *, p);
+    return CAST(TValue *, p);
   else
     return luaH_newkey(L, t, key);
 }
@@ -555,7 +555,7 @@ void luaH_setint(lua_State *L, Table *t, lua_Integer key, TValue *value) {
   const TValue *p = luaH_getint(t, key);
   TValue *cell;
   if (p != luaO_nilobject)
-    cell = cast(TValue *, p);
+    cell = CAST(TValue *, p);
   else {
     TValue k;
     setivalue(&k, key);
@@ -570,7 +570,7 @@ static int unbound_search(Table *t, unsigned int j) {
   /* find 'i' and 'j' such that i is present and j is not */
   while (!ttisnil(luaH_getint(t, j))) {
     i = j;
-    if (j > cast(unsigned int, MAX_INT) / 2) { /* overflow? */
+    if (j > CAST(unsigned int, MAX_INT) / 2) { /* overflow? */
       /* table was built with bad purposes: resort to linear search */
       i = 1;
       while (!ttisnil(luaH_getint(t, i))) i++;

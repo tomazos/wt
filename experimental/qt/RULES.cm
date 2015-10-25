@@ -1,0 +1,28 @@
+//program{
+//  name = "hello",
+//  sources = {
+//    "hello.cc",
+//  },
+//  dependencies = {
+//    "triangle",
+//    "/core/must",
+//    "/core/random",
+//  },
+//  syslibs = {
+//    "-lQt5Gui",
+//    "-lQt5Widgets",
+//    "-lQt5Core",
+//    "-lGL",
+//    "-lGLU",
+//  },
+//  platforms = {
+//    "native",
+//  },
+//};
+
+//library{
+//  name = "triangle",
+//  headers = {
+//    "triangle.h"
+//  },
+//};

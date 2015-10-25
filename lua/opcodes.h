@@ -73,15 +73,15 @@ enum OpMode { iABC, iABx, iAsBx, iAx }; /* basic instruction format */
 ** the following macros help to manipulate instructions
 */
 
-#define GET_OPCODE(i) (cast(OpCode, ((i) >> POS_OP) & MASK1(SIZE_OP, 0)))
+#define GET_OPCODE(i) (CAST(OpCode, ((i) >> POS_OP) & MASK1(SIZE_OP, 0)))
 #define SET_OPCODE(i, o)                 \
   ((i) = (((i)&MASK0(SIZE_OP, POS_OP)) | \
-          ((cast(Instruction, o) << POS_OP) & MASK1(SIZE_OP, POS_OP))))
+          ((CAST(Instruction, o) << POS_OP) & MASK1(SIZE_OP, POS_OP))))
 
-#define getarg(i, pos, size) (cast(int, ((i) >> pos) & MASK1(size, 0)))
+#define getarg(i, pos, size) (CAST(int, ((i) >> pos) & MASK1(size, 0)))
 #define setarg(i, v, pos, size)    \
   ((i) = (((i)&MASK0(size, pos)) | \
-          ((cast(Instruction, v) << pos) & MASK1(size, pos))))
+          ((CAST(Instruction, v) << pos) & MASK1(size, pos))))
 
 #define GETARG_A(i) getarg(i, POS_A, SIZE_A)
 #define SETARG_A(i, v) setarg(i, v, POS_A, SIZE_A)
@@ -99,18 +99,18 @@ enum OpMode { iABC, iABx, iAsBx, iAx }; /* basic instruction format */
 #define SETARG_Ax(i, v) setarg(i, v, POS_Ax, SIZE_Ax)
 
 #define GETARG_sBx(i) (GETARG_Bx(i) - MAXARG_sBx)
-#define SETARG_sBx(i, b) SETARG_Bx((i), cast(unsigned int, (b) + MAXARG_sBx))
+#define SETARG_sBx(i, b) SETARG_Bx((i), CAST(unsigned int, (b) + MAXARG_sBx))
 
 #define CREATE_ABC(o, a, b, c)                                          \
-  ((cast(Instruction, o) << POS_OP) | (cast(Instruction, a) << POS_A) | \
-   (cast(Instruction, b) << POS_B) | (cast(Instruction, c) << POS_C))
+  ((CAST(Instruction, o) << POS_OP) | (CAST(Instruction, a) << POS_A) | \
+   (CAST(Instruction, b) << POS_B) | (CAST(Instruction, c) << POS_C))
 
 #define CREATE_ABx(o, a, bc)                                            \
-  ((cast(Instruction, o) << POS_OP) | (cast(Instruction, a) << POS_A) | \
-   (cast(Instruction, bc) << POS_Bx))
+  ((CAST(Instruction, o) << POS_OP) | (CAST(Instruction, a) << POS_A) | \
+   (CAST(Instruction, bc) << POS_Bx))
 
 #define CREATE_Ax(o, a) \
-  ((cast(Instruction, o) << POS_OP) | (cast(Instruction, a) << POS_Ax))
+  ((CAST(Instruction, o) << POS_OP) | (CAST(Instruction, a) << POS_Ax))
 
 /*
 ** Macros to operate RK indices
@@ -219,7 +219,7 @@ typedef enum {
                  */
 } OpCode;
 
-#define NUM_OPCODES (cast(int, OP_EXTRAARG) + 1)
+#define NUM_OPCODES (CAST(int, OP_EXTRAARG) + 1)
 
 /*===========================================================================
   Notes:
@@ -262,9 +262,9 @@ enum OpArgMask {
 
 LUAI_DDEC const lu_byte luaP_opmodes[NUM_OPCODES];
 
-#define getOpMode(m) (cast(enum OpMode, luaP_opmodes[m] & 3))
-#define getBMode(m) (cast(enum OpArgMask, (luaP_opmodes[m] >> 4) & 3))
-#define getCMode(m) (cast(enum OpArgMask, (luaP_opmodes[m] >> 2) & 3))
+#define getOpMode(m) (CAST(enum OpMode, luaP_opmodes[m] & 3))
+#define getBMode(m) (CAST(enum OpArgMask, (luaP_opmodes[m] >> 4) & 3))
+#define getCMode(m) (CAST(enum OpArgMask, (luaP_opmodes[m] >> 2) & 3))
 #define testAMode(m) (luaP_opmodes[m] & (1 << 6))
 #define testTMode(m) (luaP_opmodes[m] & (1 << 7))
 

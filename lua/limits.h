@@ -89,21 +89,21 @@ typedef LUAI_UACINT l_uacInt;
 #endif
 
 /* type casts (a macro highlights casts in the code) */
-#define cast(t, exp) ((t)(exp))
+#define CAST(t, exp) ((t)(exp))
 
-#define cast_void(i) cast(void, (i))
-#define cast_byte(i) cast(lu_byte, (i))
-#define cast_num(i) cast(lua_Number, (i))
-#define cast_int(i) cast(int, (i))
-#define cast_uchar(i) cast(unsigned char, (i))
+#define cast_void(i) CAST(void, (i))
+#define cast_byte(i) CAST(lu_byte, (i))
+#define cast_num(i) CAST(lua_Number, (i))
+#define cast_int(i) CAST(int, (i))
+#define cast_uchar(i) CAST(unsigned char, (i))
 
-/* cast a signed lua_Integer to lua_Unsigned */
+/* CAST a signed lua_Integer to lua_Unsigned */
 #if !defined(l_castS2U)
 #define l_castS2U(i) ((lua_Unsigned)(i))
 #endif
 
 /*
-** cast a lua_Unsigned to a signed lua_Integer; this cast is
+** CAST a lua_Unsigned to a signed lua_Integer; this CAST is
 ** not strict ISO C, but two-complement architectures should
 ** work fine.
 */

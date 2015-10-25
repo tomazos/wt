@@ -181,6 +181,7 @@ assert(s:find("bar") == 4);
 assert(s:find("o") == 2);
 assert(s:find("o", 3) == 3);
 
+fsaf
 assert(s:at(1) == 'f');
 assert(s:at(2) == 'o');
 assert(s:at(3) == 'o');

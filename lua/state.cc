@@ -34,7 +34,7 @@
 */
 #if !defined(luai_makeseed)
 #include <time.h>
-#define luai_makeseed() cast(unsigned int, time(NULL))
+#define luai_makeseed() CAST(unsigned int, time(NULL))
 #endif
 
 /*
@@ -53,7 +53,7 @@ typedef struct LG {
   global_State g;
 } LG;
 
-#define fromstate(L) (cast(LX *, cast(lu_byte *, (L)) - offsetof(LX, l)))
+#define fromstate(L) (CAST(LX *, CAST(lu_byte *, (L)) - offsetof(LX, l)))
 
 /*
 ** Compute an initial seed as random as possible. Rely on Address Space
@@ -61,7 +61,7 @@ typedef struct LG {
 */
 #define addbuff(b, p, e)             \
   {                                  \
-    size_t t = cast(size_t, e);      \
+    size_t t = CAST(size_t, e);      \
     memcpy(buff + p, &t, sizeof(t)); \
     p += sizeof(t);                  \
   }
@@ -227,7 +227,7 @@ LUA_API lua_State *lua_newthread(lua_State *L) {
   lua_lock(L);
   luaC_checkGC(L);
   /* create new thread */
-  L1 = &cast(LX *, luaM_newobject(L, LUA_TTHREAD, sizeof(LX)))->l;
+  L1 = &CAST(LX *, luaM_newobject(L, LUA_TTHREAD, sizeof(LX)))->l;
   L1->marked = luaC_white(g);
   L1->tt = LUA_TTHREAD;
   /* link it on list 'allgc' */
@@ -263,7 +263,7 @@ LUA_API lua_State *lua_newstate(lua_Alloc f, void *ud) {
   int i;
   lua_State *L;
   global_State *g;
-  LG *l = cast(LG *, (*f)(ud, NULL, LUA_TTHREAD, sizeof(LG)));
+  LG *l = CAST(LG *, (*f)(ud, NULL, LUA_TTHREAD, sizeof(LG)));
   if (l == NULL) return NULL;
   L = &l->l.l;
   g = &l->g;

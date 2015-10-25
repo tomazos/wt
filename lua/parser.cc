@@ -152,7 +152,7 @@ static void new_localvar(LexState *ls, TString *name) {
              "local variables");
   luaM_growvector(ls->L, dyd->actvar.arr, dyd->actvar.n + 1, dyd->actvar.size,
                   Vardesc, MAX_INT, "local variables");
-  dyd->actvar.arr[dyd->actvar.n++].idx = cast(short, reg);
+  dyd->actvar.arr[dyd->actvar.n++].idx = CAST(short, reg);
 }
 
 static void new_localvarliteral_(LexState *ls, const char *name, size_t sz) {

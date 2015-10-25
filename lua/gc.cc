@@ -97,7 +97,7 @@ static void reallymarkobject(global_State *g, GCObject *o);
 /*
 ** one after last element in a hash array
 */
-#define gnodelast(h) gnode(h, cast(size_t, sizenode(h)))
+#define gnodelast(h) gnode(h, CAST(size_t, sizenode(h)))
 
 /*
 ** link collectable object 'o' into list pointed by 'p'
@@ -187,7 +187,7 @@ void luaC_fix(lua_State *L, GCObject *o) {
 */
 GCObject *luaC_newobj(lua_State *L, int tt, size_t sz) {
   global_State *g = G(L);
-  GCObject *o = cast(GCObject *, luaM_newobject(L, novariant(tt), sz));
+  GCObject *o = CAST(GCObject *, luaM_newobject(L, novariant(tt), sz));
   o->marked = luaC_white(g);
   o->tt = tt;
   o->next = g->allgc;
@@ -434,7 +434,7 @@ static lu_mem traversetable(global_State *g, Table *h) {
   } else                         /* not weak */
     traversestrongtable(g, h);
   return sizeof(Table) + sizeof(TValue) * h->sizearray +
-         sizeof(Node) * cast(size_t, sizenode(h));
+         sizeof(Node) * CAST(size_t, sizenode(h));
 }
 
 /*

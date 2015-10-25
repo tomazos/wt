@@ -171,7 +171,7 @@ union GCUnion {
   struct lua_State th; /* thread */
 };
 
-#define cast_u(o) cast(union GCUnion *, (o))
+#define cast_u(o) CAST(union GCUnion *, (o))
 
 /* macros to convert a GCObject into a specific value */
 #define gco2ts(o) \

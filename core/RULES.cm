@@ -23,6 +23,23 @@ test{
 };
 
 library{
+  name = "boost_filesystem",
+  dependencies = {
+    "boost_system",
+  },
+  syslibs = {
+    "-lboost_filesystem",
+  },
+};
+
+library{
+  name = "boost_system",
+  syslibs = {
+    "-lboost_system",
+  },
+};
+
+library{
   name = "collection_functions",
   headers = {
     "collection_functions.h",
@@ -103,6 +120,8 @@ library{
     "file_functions.cc",
   },
   dependencies = {
+    "boost_filesystem",
+    "boost_system",
     "bigint",
     "must",
   },
@@ -228,6 +247,9 @@ library{
   dependencies = {
     "must",
   },
+  syslibs = {
+    "-lpcre2-8",
+  },
 };
 
 test{
@@ -238,6 +260,16 @@ test{
   dependencies = {
     "regex",
     "/main/gtest",
+  },
+};
+
+library{
+  name = "rwlock",
+  headers = {
+    "rwlock.h",
+  },
+  syslibs = {
+    "-lboost_thread",
   },
 };
 

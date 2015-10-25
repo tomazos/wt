@@ -3,6 +3,25 @@ library{
   headers = {
     "primitives.h",
   },
+  dependencies = {
+    "pthread",
+    "protobuf",
+  },
+};
+
+library{
+  name = "protobuf",
+  syslibs = {
+    "-lprotobuf",
+  },
+};
+
+library{
+  name = "pthread",
+  syslibs = {
+    "-lpthread"
+  },
+  whole_archive = true,
 };
 
 test{
@@ -27,4 +46,3 @@ library{
     "/core/must",
   },
 };
-

@@ -1,5 +1,5 @@
 #pragma once
 
-const string& GetSourceRootSentinal();
+string GetSourceRootSentinal();
 
 string ReplaceSourceRootSentinal(const string& input);

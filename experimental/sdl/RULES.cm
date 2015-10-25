@@ -1,0 +1,49 @@
+p = {
+  "native",
+};
+
+program{
+  name = "hello",
+  sources = {
+    "hello.cc",
+  },
+  dependencies = {
+    "opengl",
+    "/core/must",
+    "/core/random",
+    "/main/args",
+  },
+  platforms = p,
+};
+
+library{
+  name = "opengl",
+  headers = {
+    "attrib.h",
+    "buffer.h",
+    "error.h",
+    "object.h",
+    "opengl.h",
+    "program.h",
+    "shader.h",
+    "types.h",
+    "vertex_array.h",
+  },
+  sources = {
+    "attrib.cc",
+    "buffer.cc",
+    "error.cc",
+    "object.cc",
+    "program.cc",
+    "shader.cc",
+    "vertex_array.cc",
+  },
+  dependencies = {
+    "/core/must",
+  },
+  syslibs = {
+    "-lSDL2",
+    "-lGL",
+  },
+  platforms = p,
+};

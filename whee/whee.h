@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "whee/paths.h"
+#include "whee/rule.pb.h"
 
 namespace whee {
 
@@ -30,39 +31,42 @@ struct RuleRef {
 };
 
 struct Rule {
-  string name;
-  string full_name;
-  enum RuleKind { PROTO, LIBRARY, PROGRAM, TEST };
-  RuleKind kind;
-  std::vector<string> raw_headers;
-  std::vector<string> raw_sources;
-  std::vector<string> raw_datafiles;
+  RuleProto proto;
   std::vector<RuleRef> dependencies;
 
   std::vector<string> cc_headers() const {
-    if (kind != PROTO) {
-      return raw_headers;
+    if (proto.kind() != RuleProto::PROTO) {
+      return {proto.headers().begin(), proto.headers().end()};
     }
 
     std::vector<string> headers;
 
-    for (const string& raw_source : raw_sources)
+    for (const string& raw_source : proto.sources())
       headers.push_back(ProtoToH(raw_source));
 
     return headers;
   }
 
   std::vector<string> cc_sources() const {
-    if (kind != PROTO) {
-      return raw_sources;
+    if (proto.kind() != RuleProto::PROTO) {
+      return {proto.sources().begin(), proto.sources().end()};
     }
 
     std::vector<string> sources;
 
-    for (const string& raw_source : raw_sources)
+    for (const string& raw_source : proto.sources())
       sources.push_back(ProtoToCC(raw_source));
 
     return sources;
+  }
+
+  bool build_on_platform(const string& platform) const {
+    if (proto.platforms_size() == 0) return true;
+
+    for (const string& build_on : proto.platforms())
+      if (build_on == platform) return true;
+
+    return false;
   }
 };
 
@@ -71,13 +75,6 @@ struct SourceDirectory {
 };
 
 using SourceTree = std::map<string, SourceDirectory>;
-
-struct Platform {
-  string name;
-  string tool_prefix;
-  string lib_path;
-  string flags;
-};
 
 using RuleDeps = std::map<RuleRef, std::set<RuleRef>>;
 
@@ -112,7 +109,8 @@ class Whee {
                         const std::vector<path>& objects);
 
   string ProgramCommand(const Platform& platform, const path& program,
-                        const std::set<path>& libraries);
+                        const std::set<path>& libraries,
+                        const std::vector<string>& flags);
 
   RuleDeps ResolveRuleDeps(const SourceTree& source_tree);
 

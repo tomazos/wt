@@ -1,16 +1,10 @@
-#include <boost/thread/locks.hpp>
-#include <boost/thread/shared_mutex.hpp>
-
 #include "audio/audio_functions.h"
 #include "audio/speech_sample.h"
 #include "core/must.h"
+#include "core/rwlock.h"
 #include "neural/feed_forward.h"
 #include "neural/mnist.h"
 #include "main/noargs.h"
-
-typedef boost::shared_mutex Lock;
-typedef boost::unique_lock<Lock> WriteLock;
-typedef boost::shared_lock<Lock> ReadLock;
 
 namespace neural {
 namespace {
@@ -46,7 +40,7 @@ void FeedForwardAudio() {
     return (x + 1.0) / 2.0;
   }).eval();
 
-  Lock lock;
+  ReadWriteMutex mutex;
   NeuralNet neural_net(layers);
   neural_net.Randomize(epsilon);
 
@@ -72,13 +66,13 @@ void FeedForwardAudio() {
           NeuralNet::BackPropogation back_propogation(neural_net, activation,
                                                       nbatch);
           {
-            ReadLock rlock(lock);
+            ReaderLockGuard rlock(mutex);
             const auto& batch = training_batches.at(batch_index);
             activation(batch);
             back_propogation(batch);
           }
           {
-            WriteLock wlock(lock);
+            WriterLockGuard wlock(mutex);
             back_propogation.Learn(learning_rate);
             total_cost += back_propogation.cost;
             neural_net.Regularize(regularize);

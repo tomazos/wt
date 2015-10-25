@@ -1,3 +1,7 @@
+local p = {
+  "zapi",
+};
+
 library{
   name = "raspicam",
   headers = {
@@ -21,7 +25,24 @@ library{
   dependencies = {
     "/core/must",
   },
+  platforms = p,
+  syslibs = {
+    "-lmmal",
+    "-lmmal_core",
+    "-lmmal_util",
+    "-lmmal_components",
+    "-lvcos",
+    "-Wl,--whole-archive -lmmal_vc_client -Wl,--no-whole-archive",
+    "-lvchiq_arm",
+    "-lmmal",
+    "-lmmal_core",
+    "-lmmal_util",
+    "-lmmal_components",
+    "-lvcos",
+    "-lvcsm",
+  }
 };
+
 
 program{
   name = "raspicam_test",
@@ -31,6 +52,7 @@ program{
   dependencies = {
     "raspicam",
   },
+  platforms = p,
 };
 
 library{
@@ -42,5 +64,6 @@ library{
   sources = {
     "user-vcsm.c",
   },
+  platforms = p,
 };
 

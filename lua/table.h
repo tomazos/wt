@@ -7,7 +7,7 @@
 #define gnext(n) ((n)->i_key.nk.next)
 
 /* 'const' to avoid wrong writings that can mess up field 'next' */
-#define gkey(n) cast(const TValue *, (&(n)->i_key.tvk))
+#define gkey(n) CAST(const TValue *, (&(n)->i_key.tvk))
 
 #define wgkey(n) (&(n)->i_key.nk)
 
@@ -15,7 +15,7 @@
 
 /* returns the key, given the value of a table entry */
 #define keyfromval(v) \
-  (gkey(cast(Node *, cast(char *, (v)) - offsetof(Node, i_val))))
+  (gkey(CAST(Node *, CAST(char *, (v)) - offsetof(Node, i_val))))
 
 LUAI_FUNC const TValue *luaH_getint(Table *t, lua_Integer key);
 LUAI_FUNC void luaH_setint(lua_State *L, Table *t, lua_Integer key,

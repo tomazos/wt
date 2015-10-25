@@ -3,8 +3,8 @@
 // Proposals: N4121, Dnnnn
 //
 // std::experimental::fixed_string is a fixed length string of literal type,
-// suitable to be used as the type of a constexpr object, the parameter, return
-// type and local variables of a constexpr object.
+// suitable to be used as the type of a constexpr object, a parameter, a return
+// value or a local variable of a constexpr function.
 //
 // It fits into the standard taxonomy orthogonally as follows:
 //

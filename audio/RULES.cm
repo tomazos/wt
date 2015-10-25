@@ -217,5 +217,9 @@ test{
     "/core/env",
     "/main/gtest",
   },
+  platforms = {
+    "native",
+    "coverage",
+  },
 };
 

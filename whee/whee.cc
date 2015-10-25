@@ -13,13 +13,15 @@
 #include "main/args.h"
 #include "whee/source_file_attributes.pb.h"
 #include "whee/source_root_sentinal.h"
-#include "whee/token_tree.h"
 #include "xxua/api.h"
 #include "xxua/context.h"
+#include "xxua/proto.h"
+#include "xxua/value.h"
 
 namespace whee {
 
 using namespace boost::filesystem;
+using namespace xxua;
 using boost::filesystem::path;
 
 const string source_root_sentinal = GetSourceRootSentinal();
@@ -137,6 +139,45 @@ void Whee::Tidy(const std::vector<string>& args) {
   });
 }
 
+static RuleProto::Kind RuleNameToRuleKind(string_view rule_name) {
+  if (rule_name == "proto") {
+    return RuleProto::PROTO;
+  } else if (rule_name == "library") {
+    return RuleProto::LIBRARY;
+  } else if (rule_name == "program") {
+    return RuleProto::PROGRAM;
+  } else if (rule_name == "test") {
+    return RuleProto::TEST;
+  } else {
+    FAIL("no such rule kind ", rule_name);
+  }
+}
+
+static Values AddRule(std::vector<RuleProto>& rules, string_view rule_name,
+                      const Values& args) {
+  if (args.size() != 1) Throw("expected 1 argument");
+  rules.emplace_back();
+  TableToProto(args.at(0), rules.back());
+  rules.back().set_kind(RuleNameToRuleKind(rule_name));
+  return {};
+}
+
+static std::vector<RuleProto> ParseRulesFile(
+    const filesystem::path& rules_file) {
+  State state;
+  Context context(state);
+
+  Value add_rules = Compile(GetFileContents(rules_file));
+  std::vector<RuleProto> rules;
+  for (string_view rule_name : {"test", "library", "program", "proto"})
+    Global().insert(rule_name,
+                    MakeFunction([&, rule_name](const Values& args) -> Values {
+                      return AddRule(rules, rule_name, args);
+                    }));
+  add_rules({});
+  return rules;
+}
+
 SourceTree Whee::GetSourceTree() {
   SourceTree source_tree;
 
@@ -154,77 +195,31 @@ SourceTree Whee::GetSourceTree() {
       directory = directory.substr(source_root_strlen);
     }
     if (source_path.filename() == "RULES.cm") {
-      auto rules_sequence = token_tree::ParseNewSequenceFile(source_path);
-      for (const auto& rule_element : rules_sequence->elements) {
-        const auto* rule_sequence =
-            dynamic_cast<token_tree::Sequence*>(rule_element.get());
-        MUST(rule_sequence, "Unexpected element: ", rule_element->ToString());
-        Rule rule;
-        if (rule_sequence->key == "proto") {
-          rule.kind = Rule::PROTO;
-        } else if (rule_sequence->key == "library") {
-          rule.kind = Rule::LIBRARY;
-        } else if (rule_sequence->key == "program") {
-          rule.kind = Rule::PROGRAM;
-        } else if (rule_sequence->key == "test") {
-          rule.kind = Rule::TEST;
-        } else {
-          FAIL("Unknown rule: ", rule_sequence->key);
-        }
-        for (const auto& section_element : rule_sequence->elements) {
-          if (const auto* section_keyval =
-                  dynamic_cast<token_tree::KeyVal*>(section_element.get())) {
-            if (section_keyval->key == "name") {
-              MUST(rule.name.empty());
-              rule.name = section_keyval->value;
-            } else {
-              FAIL("unknown keyval kind: ", section_keyval->key);
-            }
-          } else if (const auto* section_sequence =
-                         dynamic_cast<token_tree::Sequence*>(
-                             section_element.get())) {
-            std::vector<string> pathlist;
-            for (const auto& element : section_sequence->elements) {
-              const auto* leaf = dynamic_cast<token_tree::Leaf*>(element.get());
-              pathlist.push_back(leaf->token);
-            }
+      std::vector<RuleProto> rule_protos = ParseRulesFile(source_path);
 
-            if (section_sequence->key == "headers") {
-              MUST(rule.raw_headers.empty());
-              rule.raw_headers = std::move(pathlist);
-            } else if (section_sequence->key == "sources") {
-              MUST(rule.raw_sources.empty());
-              rule.raw_sources = std::move(pathlist);
-            } else if (section_sequence->key == "datafiles") {
-              MUST(rule.raw_datafiles.empty());
-              rule.raw_datafiles = std::move(pathlist);
-            } else if (section_sequence->key == "dependencies") {
-              MUST(rule.dependencies.empty());
-              for (const string& dependency : pathlist) {
-                MUST(!dependency.empty());
-                RuleRef rule_ref;
-                if (dependency[0] == '/') {
-                  size_t pos = dependency.find_last_of("/");
-                  if (pos == 0) {
-                    rule_ref.directory = "";
-                  } else {
-                    rule_ref.directory = dependency.substr(1, pos - 1);
-                  }
-                  rule_ref.name = dependency.substr(pos + 1);
-                } else {
-                  rule_ref.directory = directory;
-                  rule_ref.name = dependency;
-                }
-                rule.dependencies.push_back(rule_ref);
-              }
+      for (const RuleProto& rule_proto : rule_protos) {
+        Rule rule;
+        rule.proto = rule_proto;
+
+        for (const string& dependency : rule.proto.dependencies()) {
+          MUST(!dependency.empty());
+          RuleRef rule_ref;
+          if (dependency[0] == '/') {
+            size_t pos = dependency.find_last_of("/");
+            if (pos == 0) {
+              rule_ref.directory = "";
             } else {
-              FAIL("unknown section sequence: ", section_sequence->key);
+              rule_ref.directory = dependency.substr(1, pos - 1);
             }
+            rule_ref.name = dependency.substr(pos + 1);
           } else {
-            FAIL("unexpected section in ", rule.name);
+            rule_ref.directory = directory;
+            rule_ref.name = dependency;
           }
+          rule.dependencies.push_back(rule_ref);
         }
-        Insert(source_tree[directory].rules, rule.name, rule);
+
+        Insert(source_tree[directory].rules, rule.proto.name(), rule);
       }
     }
   });
@@ -252,8 +247,8 @@ string Whee::CompileCommand(const Platform& platform, const path& source,
     include_paths_strings.push_back("-I" + include_path.string());
 
   return EncodeAsString(
-      platform.tool_prefix, "g++ -c -g -std=gnu++14 -Wall -Werror -O3 ",
-      platform.flags, " ", boost::algorithm::join(include_paths_strings, " "),
+      platform.tool_prefix(), "g++ -c -g -std=gnu++14 -Wall -Werror -O3 ",
+      platform.flags(), " ", boost::algorithm::join(include_paths_strings, " "),
       " -include ", primitives_header.string(), " -o ", object.string(), " ",
       source.string(), " 2> ", object.string(), ".stderr");
 }
@@ -262,27 +257,29 @@ string Whee::LibraryCommand(const Platform& platform, const path& library,
                             const std::vector<path>& objects) {
   std::vector<string> object_strings;
   for (const path& object : objects) object_strings.push_back(object.string());
-  return EncodeAsString(platform.tool_prefix, "ar rcs ", library.string(), " ",
-                        boost::algorithm::join(object_strings, " "));
+  return EncodeAsString(platform.tool_prefix(), "ar rcs ", library.string(),
+                        " ", boost::algorithm::join(object_strings, " "));
 }
 
 string Whee::ProgramCommand(const Platform& platform, const path& program,
-                            const std::set<path>& libraries) {
+                            const std::set<path>& libraries,
+                            const std::vector<string>& flags) {
   std::vector<string> library_strings;
   for (const path& library : libraries)
     library_strings.push_back(library.string());
   return EncodeAsString(
-      platform.tool_prefix, "g++ -std=gnu++14 -g -O3 ", platform.flags,
-      " -static -o ", program.string(),
-      " -Wl,--start-group -Wl,--whole-archive ",
-      boost::algorithm::join(library_strings, " "),
-      " -Wl,--no-whole-archive -lboost_filesystem -lboost_system -lprotobuf "
-      "-Wl,--whole-archive -lpthread -Wl,--no-whole-archive -lmmal "
-      "-lmmal_core -lmmal_util -lmmal_components -lvcos "
-      "-Wl,--whole-archive -lmmal_vc_client -Wl,--no-whole-archive "
-      "-lvchiq_arm -lmmal -lmmal_core -lmmal_util -lmmal_components "
-      "-lvcos -lvcsm -Wl,--end-group ",
-      platform.lib_path);
+      platform.tool_prefix(), "g++ -std=gnu++14 -g -O3 ", platform.flags(),
+      " -o ", program.string(), " -Wl,--start-group -Wl,--whole-archive ",
+      boost::algorithm::join(library_strings, " "), " -Wl,--no-whole-archive ",
+      boost::algorithm::join(flags, " "), " -Wl,--no-whole-archive ",
+      //      " -Wl,--no-whole-archive -lboost_filesystem -lboost_system
+      //      -lprotobuf "
+      //      "-Wl,--whole-archive -lpthread -Wl,--no-whole-archive -lmmal "
+      //      "-lmmal_core -lmmal_util -lmmal_components -lvcos "
+      //      "-Wl,--whole-archive -lmmal_vc_client -Wl,--no-whole-archive "
+      //      "-lvchiq_arm -lmmal -lmmal_core -lmmal_util -lmmal_components "
+      //      "-lvcos -lvcsm -Wl,--end-group ",
+      platform.lib_path());
 }
 
 RuleDeps Whee::ResolveRuleDeps(const SourceTree& source_tree) {
@@ -301,7 +298,7 @@ RuleDeps Whee::ResolveRuleDeps(const SourceTree& source_tree) {
       RuleRef me(directory_name, rule_name);
       std::set<RuleRef> deps;
       deps.insert(me);
-      if (rule.kind != Rule::PROTO) deps.insert(primitives_rule);
+      if (rule.proto.kind() != RuleProto::PROTO) deps.insert(primitives_rule);
       bool deps_added;
       do {
         deps_added = false;
@@ -344,12 +341,12 @@ void Whee::HardLinkProtoFiles(const SourceTree& source_tree,
       const string& rule_name = rule_kv.first;
       const Rule& rule = rule_kv.second;
 
-      if (rule.kind != Rule::PROTO) continue;
+      if (rule.proto.kind() != RuleProto::PROTO) continue;
 
       const path protos_root =
           protos_superroot / directory_name / rule_name / source_root_sentinal;
 
-      for (const string& proto : rule.raw_sources) {
+      for (const string& proto : rule.proto.sources()) {
         const path origin_proto = paths.root / directory_name / proto;
         const path linked_proto = protos_root / directory_name / proto;
         create_directories(protos_root / directory_name);
@@ -374,7 +371,7 @@ void Whee::GenProtoFiles(const SourceTree& source_tree,
       const string& rule_name = rule_kv.first;
       const Rule& rule = rule_kv.second;
 
-      if (rule.kind != Rule::PROTO) continue;
+      if (rule.proto.kind() != RuleProto::PROTO) continue;
 
       RuleRef me(directory_name, rule_name);
 
@@ -389,7 +386,7 @@ void Whee::GenProtoFiles(const SourceTree& source_tree,
                                 source_root_sentinal);
         const SourceDirectory& dep_directory = source_tree.at(dep.directory);
         const Rule& dep_rule = dep_directory.rules.at(dep.name);
-        for (const string& proto_name : dep_rule.raw_sources) {
+        for (const string& proto_name : dep_rule.proto.sources()) {
           int64 proto_last_write_time =
               LastModificationTime(paths.root / dep.directory / proto_name);
           if (proto_last_write_time > protos_last_write_time)
@@ -397,7 +394,7 @@ void Whee::GenProtoFiles(const SourceTree& source_tree,
         }
       }
 
-      for (const string& source_file : rule.raw_sources) {
+      for (const string& source_file : rule.proto.sources()) {
         const path source = protos_root / directory_name / source_file;
         const path pb_header = pb_directory / ProtoToH(source_file);
         const path pb_source = pb_directory / ProtoToCC(source_file);
@@ -450,8 +447,8 @@ void Whee::HardLinkSourceFiles(const SourceTree& source_tree,
       const path units_root =
           units_superroot / directory_name / rule_name / source_root_sentinal;
 
-      if (rule.kind == Rule::PROTO) {
-        for (const string& proto : rule.raw_sources) {
+      if (rule.proto.kind() == RuleProto::PROTO) {
+        for (const string& proto : rule.proto.sources()) {
           const path pb_header = pb_directory / ProtoToH(proto);
           const path pb_unit = pb_directory / ProtoToCC(proto);
 
@@ -465,14 +462,14 @@ void Whee::HardLinkSourceFiles(const SourceTree& source_tree,
           create_hard_link(pb_unit, linked_pb_unit);
         }
       } else {
-        for (const string& header : rule.raw_headers) {
+        for (const string& header : rule.proto.headers()) {
           const path origin_header = paths.root / directory_name / header;
           const path linked_header = headers_root / directory_name / header;
           create_directories(headers_root / directory_name);
           create_hard_link(origin_header, linked_header);
         }
 
-        for (const string& unit : rule.raw_sources) {
+        for (const string& unit : rule.proto.sources()) {
           const path origin_unit = paths.root / directory_name / unit;
           const path linked_unit = units_root / directory_name / unit;
           create_directories(units_root / directory_name);
@@ -483,42 +480,65 @@ void Whee::HardLinkSourceFiles(const SourceTree& source_tree,
   }
 }
 
-std::vector<Platform> Whee::ReadPlatforms() {
-  std::vector<Platform> result;
-  string s = GetFileContents(paths.root / "CONFIG.cm");
+// std::vector<Platform> Whee::ReadPlatforms() {
+//  std::vector<Platform> result;
+//  string s = GetFileContents(paths.root / "CONFIG.cm");
 
-  using namespace xxua;
+//  using namespace xxua;
+//  State state;
+//  Context context(state);
+//  PushGlobalTable();
+//  PushString("add_platform");
+//  PushFunction(&state, [&result] {
+//    if (StackSize() != 1 || GetType(1) != Type::TABLE)
+//      Error("invalid arguments to add_platform");
+//    PushNil();
+//    Platform platform;
+//    while (Next(1)) {
+//      string_view key = ToString(-2);
+//      string_view val = ToString(-1);
+//      if (key == "name")
+//        platform.name = val.to_string();
+//      else if (key == "tool_prefix")
+//        platform.tool_prefix = val.to_string();
+//      else if (key == "lib_path")
+//        platform.lib_path = val.to_string();
+//      else if (key == "flags")
+//        platform.flags = val.to_string();
+//      else
+//        Error(EncodeAsString("unknown platform field: ", key));
+//      Pop();
+//    }
+//    result.push_back(platform);
+//    return 0;
+//  });
+//  PopField(-3);
+//  LoadFromString(s);
+//  Call(0, 0);
+//  return result;
+//}
+
+static Values AddPlatform(std::vector<Platform>& platforms,
+                          const Values& args) {
+  if (args.size() != 1) Throw("expected 1 argument");
+  platforms.emplace_back();
+  TableToProto(args.at(0), platforms.back());
+  return {};
+}
+
+static std::vector<Platform> ParsePlatformsFile(
+    const filesystem::path& platforms_file) {
   State state;
   Context context(state);
-  PushGlobalTable();
-  PushString("add_platform");
-  PushFunction(&state, [&result] {
-    if (StackSize() != 1 || GetType(1) != Type::TABLE)
-      Error("invalid arguments to add_platform");
-    PushNil();
-    Platform platform;
-    while (Next(1)) {
-      string_view key = ToString(-2);
-      string_view val = ToString(-1);
-      if (key == "name")
-        platform.name = val.to_string();
-      else if (key == "tool_prefix")
-        platform.tool_prefix = val.to_string();
-      else if (key == "lib_path")
-        platform.lib_path = val.to_string();
-      else if (key == "flags")
-        platform.flags = val.to_string();
-      else
-        Error(EncodeAsString("unknown platform field: ", key));
-      Pop();
-    }
-    result.push_back(platform);
-    return 0;
-  });
-  PopField(-3);
-  LoadFromString(s);
-  Call(0, 0);
-  return result;
+
+  std::vector<Platform> platforms;
+  Value add_platforms = Compile(GetFileContents(platforms_file));
+  Global().insert("add_platform",
+                  MakeFunction([&](const Values& args) -> Values {
+                    return AddPlatform(platforms, args);
+                  }));
+  add_platforms({});
+  return platforms;
 }
 
 void Whee::Build(const std::vector<string>& args) {
@@ -528,7 +548,8 @@ void Whee::Build(const std::vector<string>& args) {
 
   FileLock l(paths.whee / "lock");
 
-  std::vector<Platform> platforms = ReadPlatforms();
+  std::vector<Platform> platforms =
+      ParsePlatformsFile(paths.root / "CONFIG.cm");
   const SourceTree source_tree = GetSourceTree();
 
   std::map<RuleRef, std::set<RuleRef>> ruledeps = ResolveRuleDeps(source_tree);
@@ -547,8 +568,8 @@ void Whee::Build(const std::vector<string>& args) {
   HardLinkSourceFiles(source_tree, pb_root, headers_superroot, units_superroot);
 
   for (const Platform& platform : platforms) {
-    const path build_root = paths.whee / "build" / platform.name;
-    const path programs_root = paths.whee / "programs" / platform.name;
+    const path build_root = paths.whee / "build" / platform.name();
+    const path programs_root = paths.whee / "programs" / platform.name();
 
     std::map<RuleRef, path> library_files;
 
@@ -563,6 +584,8 @@ void Whee::Build(const std::vector<string>& args) {
       for (const auto& rule_kv : directory.rules) {
         const string& rule_name = rule_kv.first;
         const Rule& rule = rule_kv.second;
+
+        if (!rule.build_on_platform(platform.name())) continue;
 
         RuleRef me(directory_name, rule_name);
 
@@ -603,7 +626,7 @@ void Whee::Build(const std::vector<string>& args) {
               LastModificationTime(object) <= source_last_write_time) {
             optional<Error> error;
             try {
-              std::cout << " [CC] " << platform.name << " " << directory_name
+              std::cout << " [CC] " << platform.name() << " " << directory_name
                         << "/" << source_file << std::endl;
               ExecuteShellCommand(CompileCommand(
                   platform, source, object, primitives_header, include_paths));
@@ -632,7 +655,9 @@ void Whee::Build(const std::vector<string>& args) {
           const path library = build_directory / (rule_name + ".a");
           if (!exists(library) ||
               LastModificationTime(library) <= objects_last_write_time) {
-            std::cout << " [AR] " << platform.name << " " << directory_name
+            remove(library);
+
+            std::cout << " [AR] " << platform.name() << " " << directory_name
                       << "/" << rule_name << std::endl;
             ExecuteShellCommand(LibraryCommand(platform, library, objects));
           }
@@ -652,9 +677,14 @@ void Whee::Build(const std::vector<string>& args) {
       for (const auto& rule_kv : directory.rules) {
         const string& rule_name = rule_kv.first;
         const Rule& rule = rule_kv.second;
+
+        if (!rule.build_on_platform(platform.name())) continue;
+
         RuleRef me(directory_name, rule_name);
 
-        if (rule.kind != Rule::PROGRAM && rule.kind != Rule::TEST) continue;
+        if (rule.proto.kind() != RuleProto::PROGRAM &&
+            rule.proto.kind() != RuleProto::TEST)
+          continue;
 
         const path program = programs_directory / rule_name;
 
@@ -666,23 +696,43 @@ void Whee::Build(const std::vector<string>& args) {
 
         int64 libs_last_write_time = 0;
         for (const path& lib : libs) {
-          int64 lib_last_write_time = LastModificationTime(lib);
+          const int64 lib_last_write_time = LastModificationTime(lib);
           if (lib_last_write_time > libs_last_write_time) {
             libs_last_write_time = lib_last_write_time;
           }
         }
         if (!exists(program) ||
             LastModificationTime(program) <= libs_last_write_time) {
-          std::cout << " [LN] " << platform.name << " " << directory_name << "/"
-                    << rule_name << std::endl;
-          ExecuteShellCommand(ProgramCommand(platform, program, libs));
+          std::cout << " [LN] " << platform.name() << " " << directory_name
+                    << "/" << rule_name << std::endl;
+
+          std::vector<string> flags;
+          flags.push_back("-Wl,--no-whole-archive");
+          bool whole_archive = false;
+          for (const RuleRef& dep : ruledeps.at(me)) {
+            const Rule& dep_rule =
+                source_tree.at(dep.directory).rules.at(dep.name);
+            for (const string& syslib : dep_rule.proto.syslibs()) {
+              if (dep_rule.proto.whole_archive() != whole_archive) {
+                whole_archive = dep_rule.proto.whole_archive();
+                flags.push_back(whole_archive ? "-Wl,--whole-archive"
+                                              : "-Wl,--no-whole-archive");
+              }
+              flags.push_back(syslib);
+            }
+          }
+
+          string program_command =
+              ProgramCommand(platform, program, libs, flags);
+          //          LOGEXPR(program_command);
+          ExecuteShellCommand(program_command);
         }
-        if (rule.kind == Rule::TEST && platform.name == "coverage") {
+        if (rule.proto.kind() == RuleProto::TEST && platform.test()) {
           int64 program_last_mod = LastModificationTime(program);
           SourceFileAttributes attributes;
           GetFileAttribute(program, "user.srcfile", attributes);
           if (attributes.last_tested() != program_last_mod) {
-            std::cout << " [TEST] " << platform.name << " " << directory_name
+            std::cout << " [TEST] " << platform.name() << " " << directory_name
                       << "/" << rule_name << std::endl;
             ExecuteShellCommand(program.string());
             attributes.set_last_tested(program_last_mod);

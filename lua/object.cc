@@ -164,7 +164,7 @@ void luaO_arith(lua_State *L, int op, const TValue *p1, const TValue *p2,
   }
   /* could not perform raw operation; try metamethod */
   lua_assert(L != NULL); /* should not fail when folding (compile time) */
-  luaT_trybinTM(L, p1, p2, res, cast(TMS, (op - LUA_OPADD) + TM_ADD));
+  luaT_trybinTM(L, p1, p2, res, CAST(TMS, (op - LUA_OPADD) + TM_ADD));
 }
 
 int luaO_hexavalue(int c) {
@@ -207,7 +207,7 @@ static int isneg(const char **s) {
 //  int e = 0;                            /* exponent correction */
 //  int neg;                              /* 1 if number is negative */
 //  int hasdot = 0;                       /* true after seen a dot */
-//  *endptr = cast(char *, s);            /* nothing is valid yet */
+//  *endptr = CAST(char *, s);            /* nothing is valid yet */
 //  while (lisspace(cast_uchar(*s))) s++; /* skip initial spaces */
 //  neg = isneg(&s);                      /* check signal */
 //  if (!(*s == '0' && (*(s + 1) == 'x' || *(s + 1) == 'X'))) /* check '0x' */
@@ -231,7 +231,7 @@ static int isneg(const char **s) {
 //  }
 //  if (nosigdig + sigdig == 0)   /* no digits? */
 //    return 0.0;                 /* invalid format */
-//  *endptr = cast(char *, s);    /* valid up to here */
+//  *endptr = CAST(char *, s);    /* valid up to here */
 //  e *= 4;                       /* each digit multiplies/divides value by 2^4
 //  */
 //  if (*s == 'p' || *s == 'P') { /* exponent part? */
@@ -246,7 +246,7 @@ static int isneg(const char **s) {
 //      exp1 = exp1 * 10 + *(s++) - '0';
 //    if (neg1) exp1 = -exp1;
 //    e += exp1;
-//    *endptr = cast(char *, s); /* valid up to here */
+//    *endptr = CAST(char *, s); /* valid up to here */
 //  }
 //  if (neg) r = -r;
 //  return l_mathop(ldexp)(r, e);
@@ -329,15 +329,15 @@ int luaO_utf8esc(char *buff, unsigned long x) {
   int n = 1; /* number of bytes put in buffer (backwards) */
   lua_assert(x <= 0x10FFFF);
   if (x < 0x80) /* ascii? */
-    buff[UTF8BUFFSZ - 1] = cast(char, x);
+    buff[UTF8BUFFSZ - 1] = CAST(char, x);
   else {                     /* need continuation bytes */
     unsigned int mfb = 0x3f; /* maximum that fits in first byte */
     do {                     /* add continuation bytes */
-      buff[UTF8BUFFSZ - (n++)] = cast(char, 0x80 | (x & 0x3f));
+      buff[UTF8BUFFSZ - (n++)] = CAST(char, 0x80 | (x & 0x3f));
       x >>= 6;         /* remove added bits */
       mfb >>= 1;       /* now there is one less bit available in first byte */
     } while (x > mfb); /* still needs continuation byte? */
-    buff[UTF8BUFFSZ - n] = cast(char, (~mfb << 1) | x); /* add first byte */
+    buff[UTF8BUFFSZ - n] = CAST(char, (~mfb << 1) | x); /* add first byte */
   }
   return n;
 }
@@ -387,7 +387,7 @@ const char *luaO_pushvfstring(lua_State *L, const char *fmt, va_list argp) {
         break;
       }
       case 'c': {
-        char buff = cast(char, va_arg(argp, int));
+        char buff = CAST(char, va_arg(argp, int));
         if (lisprint(cast_uchar(buff)))
           pushstr(L, &buff, 1);
         else /* non-printable character; print its code */
@@ -400,7 +400,7 @@ const char *luaO_pushvfstring(lua_State *L, const char *fmt, va_list argp) {
         break;
       }
       case 'I': {
-        setivalue(L->top++, cast(lua_Integer, va_arg(argp, l_uacInt)));
+        setivalue(L->top++, CAST(lua_Integer, va_arg(argp, l_uacInt)));
         luaO_tostring(L, L->top - 1);
         break;
       }
@@ -418,7 +418,7 @@ const char *luaO_pushvfstring(lua_State *L, const char *fmt, va_list argp) {
       }
       case 'U': {
         char buff[UTF8BUFFSZ];
-        int l = luaO_utf8esc(buff, cast(long, va_arg(argp, long)));
+        int l = luaO_utf8esc(buff, CAST(long, va_arg(argp, long)));
         pushstr(L, buff + UTF8BUFFSZ - l, l);
         break;
       }

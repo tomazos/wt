@@ -171,7 +171,7 @@ void luaV_settable(lua_State *L, const TValue *t, TValue *key, StkId val) {
     const TValue *tm;
     if (ttistable(t)) { /* 't' is a table? */
       Table *h = hvalue(t);
-      TValue *oldval = cast(TValue *, luaH_get(h, key));
+      TValue *oldval = CAST(TValue *, luaH_get(h, key));
       /* if previous value is not nil, there must be a previous entry
          in the table; a metamethod has no relevance */
       if (!ttisnil(oldval) ||
@@ -250,7 +250,7 @@ static int LTintfloat(lua_Integer i, lua_Number f) {
     if (f >= -cast_num(LUA_MININTEGER))    /* -minint == maxint + 1 */
       return 1;                            /* f >= maxint + 1 > i */
     else if (f > cast_num(LUA_MININTEGER)) /* minint < f <= maxint ? */
-      return (i < cast(lua_Integer, f));   /* compare them as integers */
+      return (i < CAST(lua_Integer, f));   /* compare them as integers */
     else /* f <= minint <= i (or 'f' is NaN)  -->  not(i < f) */
       return 0;
   }
@@ -268,7 +268,7 @@ static int LEintfloat(lua_Integer i, lua_Number f) {
     if (f >= -cast_num(LUA_MININTEGER))     /* -minint == maxint + 1 */
       return 1;                             /* f >= maxint + 1 > i */
     else if (f >= cast_num(LUA_MININTEGER)) /* minint <= f <= maxint ? */
-      return (i <= cast(lua_Integer, f));   /* compare them as integers */
+      return (i <= CAST(lua_Integer, f));   /* compare them as integers */
     else /* f < minint <= i (or 'f' is NaN)  -->  not(i <= f) */
       return 0;
   }

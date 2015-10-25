@@ -1,25 +1,3 @@
-program{
-  name = "asio_client",
-  sources = {
-    "asio_client.cc",
-  },
-  dependencies = {
-    "/core/must",
-    "/main/noargs",
-  },
-};
-
-program{
-  name = "asio_server",
-  sources = {
-    "asio_server.cc",
-  },
-  dependencies = {
-    "/core/must",
-    "/main/noargs",
-  },
-};
-
 library{
   name = "socket",
   headers = {

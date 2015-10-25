@@ -1,23 +1,28 @@
 add_platform{
   name = "native",
-  lib_path = "-L/usr/local/lib -lsqlite3 -lpcre2-8 -lboost_thread",
-  flags = "",
+  lib_path = "-L/usr/local/lib -L/usr/lib/fglrx",
+  flags = "-isystem /usr/include/x86_64-linux-gnu/qt5/ -fPIE",
+      test = true,
 };
 
 add_platform{
   name = "coverage",
-  lib_path = "-L/usr/local/lib -lsqlite3 -lpcre2-8 -lboost_thread",
+  lib_path = "-L/usr/local/lib",
   flags = "--coverage",
+  test = true,
 };
 
-//add_platform{
-//  name="zubu",
-//  tool_prefix="x86_64-zubu-linux-gnu-",
-//  lib_path = "-lsqlite3 -lpcre2-8"
-//};
+add_platform{
+  name="zubu",
+  tool_prefix="x86_64-zubu-linux-gnu-",
+  lib_path = "",
+  flags = "-static",
+      test = true,
+};
 
-//add_platform{
-//  name="zapi",
-//  tool_prefix="arm-zapi-linux-gnueabihf-",
-//  lib_path = "-lsqlite3 -lpcre2-8"
-//};
+add_platform{
+  name="zapi",
+  tool_prefix="arm-zapi-linux-gnueabihf-",
+  lib_path = "",
+  flags = "-static",
+};

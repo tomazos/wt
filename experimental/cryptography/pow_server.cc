@@ -3,8 +3,8 @@
 
 #include "core/hex.h"
 #include "core/must.h"
-#include "cryptography/proof_of_work.h"
-#include "cryptography/pow.pb.h"
+#include "experimental/cryptography/proof_of_work.h"
+#include "experimental/cryptography/pow.pb.h"
 #include "main/noargs.h"
 #include "network/socket.h"
 

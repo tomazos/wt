@@ -312,7 +312,7 @@ int luaK_stringK(FuncState *fs, TString *s) {
 */
 int luaK_intK(FuncState *fs, lua_Integer n) {
   TValue k, o;
-  setpvalue(&k, cast(void *, cast(size_t, n)));
+  setpvalue(&k, CAST(void *, CAST(size_t, n)));
   setivalue(&o, n);
   return addk(fs, &k, &o);
 }
@@ -794,7 +794,7 @@ void luaK_prefix(FuncState *fs, UnOpr op, expdesc *e, int line) {
   switch (op) {
     case OPR_MINUS:
     case OPR_BNOT: {
-      codeexpval(fs, cast(OpCode, (op - OPR_MINUS) + OP_UNM), e, &e2, line);
+      codeexpval(fs, CAST(OpCode, (op - OPR_MINUS) + OP_UNM), e, &e2, line);
       break;
     }
     case OPR_NOT:
@@ -861,19 +861,19 @@ void luaK_posfix(FuncState *fs, BinOpr op, expdesc *e1, expdesc *e2, int line) {
     case OPR_BXOR:
     case OPR_SHL:
     case OPR_SHR: {
-      codeexpval(fs, cast(OpCode, (op - OPR_ADD) + OP_ADD), e1, e2, line);
+      codeexpval(fs, CAST(OpCode, (op - OPR_ADD) + OP_ADD), e1, e2, line);
       break;
     }
     case OPR_EQ:
     case OPR_LT:
     case OPR_LE: {
-      codecomp(fs, cast(OpCode, (op - OPR_EQ) + OP_EQ), 1, e1, e2);
+      codecomp(fs, CAST(OpCode, (op - OPR_EQ) + OP_EQ), 1, e1, e2);
       break;
     }
     case OPR_NE:
     case OPR_GT:
     case OPR_GE: {
-      codecomp(fs, cast(OpCode, (op - OPR_NE) + OP_EQ), 0, e1, e2);
+      codecomp(fs, CAST(OpCode, (op - OPR_NE) + OP_EQ), 0, e1, e2);
       break;
     }
     default:

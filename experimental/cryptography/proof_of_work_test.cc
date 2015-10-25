@@ -1,4 +1,4 @@
-#include "cryptography/proof_of_work.h"
+#include "experimental/cryptography/proof_of_work.h"
 
 #include "gtest/gtest.h"
 

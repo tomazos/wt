@@ -50,7 +50,7 @@
 /*
 ** some useful bit tricks
 */
-#define resetbits(x, m) ((x) &= cast(lu_byte, ~(m)))
+#define resetbits(x, m) ((x) &= CAST(lu_byte, ~(m)))
 #define setbits(x, m) ((x) |= (m))
 #define testbits(x, m) ((x) & (m))
 #define bitmask(b) (1 << (b))
@@ -82,7 +82,7 @@
 #define changewhite(x) ((x)->marked ^= WHITEBITS)
 #define gray2black(x) l_setbit((x)->marked, BLACKBIT)
 
-#define luaC_white(g) cast(lu_byte, (g)->currentwhite &WHITEBITS)
+#define luaC_white(g) CAST(lu_byte, (g)->currentwhite &WHITEBITS)
 
 #define luaC_condGC(L, c)   \
   {                         \

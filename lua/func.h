@@ -3,10 +3,10 @@
 #include "lua/object.h"
 
 #define sizeCclosure(n) \
-  (cast(int, sizeof(CClosure)) + cast(int, sizeof(TValue) * ((n)-1)))
+  (CAST(int, sizeof(CClosure)) + CAST(int, sizeof(TValue) * ((n)-1)))
 
 #define sizeLclosure(n) \
-  (cast(int, sizeof(LClosure)) + cast(int, sizeof(TValue *) * ((n)-1)))
+  (CAST(int, sizeof(LClosure)) + CAST(int, sizeof(TValue *) * ((n)-1)))
 
 /* test whether thread is in 'twups' list */
 #define isintwups(L) (L->twups != L)

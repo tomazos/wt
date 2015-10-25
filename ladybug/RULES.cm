@@ -1,3 +1,7 @@
+local p = {
+  "zapi",
+};
+
 library{
   name = "accelerometer_subsystem",
   headers = {
@@ -10,6 +14,7 @@ library{
     "subsystem",
     "/wiring/i2c_device",
   },
+  platforms = p,
 };
 
 program{
@@ -21,6 +26,7 @@ program{
     "accelerometer_subsystem",
     "/main/noargs",
   },
+  platforms = p,
 };
 
 library{
@@ -35,6 +41,7 @@ library{
     "subsystem",
     "/raspicam/raspicam",
   },
+  platforms = p,
 };
 
 program{
@@ -46,6 +53,7 @@ program{
     "camera_subsystem",
     "/main/noargs",
   },
+  platforms = p,
 };
 
 program{
@@ -57,6 +65,7 @@ program{
     "ladybug",
     "/main/noargs",
   },
+  platforms = p,
 };
 
 library{
@@ -76,6 +85,7 @@ library{
     "sonar_subsystem",
     "ladybug_state",
   },
+  platforms = p,
 };
 
 library{
@@ -92,6 +102,7 @@ library{
     "/main/args",
     "/network/socket",
   },
+  platforms = p,
 };
 
 program{
@@ -104,6 +115,7 @@ program{
     "/core/must",
     "/main/args",
   },
+  platforms = p,
 };
 
 proto{
@@ -123,6 +135,7 @@ program{
     "/main/noargs",
     "/network/socket",
   },
+  platforms = p,
 };
 
 library{
@@ -137,6 +150,7 @@ library{
     "subsystem",
     "/wiring/i2c_device",
   },
+  platforms = p,
 };
 
 program{
@@ -148,6 +162,7 @@ program{
     "gyroscope_subsystem",
     "/main/noargs",
   },
+  platforms = p,
 };
 
 library{
@@ -162,6 +177,7 @@ library{
     "subsystem",
     "/wiring/i2c_device",
   },
+  platforms = p,
 };
 
 program{
@@ -173,6 +189,7 @@ program{
     "magnetometer_subsystem",
     "/main/noargs",
   },
+  platforms = p,
 };
 
 library{
@@ -188,6 +205,7 @@ library{
     "/core/random",
     "/wiring/wiring",
   },
+  platforms = p,
 };
 
 program{
@@ -199,6 +217,7 @@ program{
     "ladybug",
     "/main/noargs",
   },
+  platforms = p,
 };
 
 library{
@@ -213,6 +232,7 @@ library{
     "subsystem",
     "/wiring/wiring",
   },
+  platforms = p,
 };
 
 program{
@@ -223,6 +243,7 @@ program{
   dependencies = {
     "sonar_subsystem",
   },
+  platforms = p,
 };
 
 library{
@@ -236,5 +257,6 @@ library{
   dependencies = {
     "/core/must",
   },
+  platforms = p,
 };
 

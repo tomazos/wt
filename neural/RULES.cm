@@ -20,6 +20,7 @@ program{
     "mnist",
     "/audio/audio_functions",
     "/audio/speech_sample",
+    "/core/rwlock",
     "/main/noargs",
   },
 };
@@ -44,6 +45,7 @@ program{
   dependencies = {
     "feed_forward",
     "mnist",
+    "/core/rwlock",
     "/main/noargs",
   },
 };

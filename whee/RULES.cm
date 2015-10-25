@@ -1,27 +1,7 @@
-program{
-  name = "convert_token_tree_to_xxua",
+proto{
+  name = "rule",
   sources = {
-    "convert_token_tree_to_xxua.cc",
-  },
-  dependencies = {
-    "token_tree",
-    "/core/file_functions",
-    "/main/args",
-  },
-};
-
-library{
-  name = "token_tree",
-  headers = {
-    "token_tree.h",
-  },
-  sources = {
-    "token_tree.cc",
-  },
-  dependencies = {
-    "/core/file_functions",
-    "/xxua/xxua",
-    "/xxua/value",
+    "rule.proto",
   },
 };
 
@@ -36,13 +16,15 @@ program{
     "paths.cc",
   },
   dependencies = {
+    "rule",
     "source_file_attributes",
     "source_root_sentinal",
-    "token_tree",
     "/core/env",
     "/core/process",
     "/core/file_functions",
     "/main/args",
+    "/xxua/proto",
+    "/xxua/value",
     "/xxua/xxua",
   },
 };

@@ -454,7 +454,7 @@ static const char *getfuncname(lua_State *L, CallInfo *ci, const char **name) {
     case OP_SHL:
     case OP_SHR: {
       int offset = cast_int(GET_OPCODE(i)) - cast_int(OP_ADD); /* ORDER OP */
-      tm = cast(TMS, offset + cast_int(TM_ADD));               /* ORDER TM */
+      tm = CAST(TMS, offset + cast_int(TM_ADD));               /* ORDER TM */
       break;
     }
     case OP_UNM:

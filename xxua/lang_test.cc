@@ -200,6 +200,7 @@ TEST(LangTest, All) {
   assert(!s:empty());
   assert(es:empty());
 
+
 )";
 
   DebugAllocator allocator;
