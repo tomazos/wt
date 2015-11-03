@@ -1,12 +1,12 @@
-#include "xxua/state.h"
+#include "cm/state.h"
 
 #include <vector>
 
 #include "core/collection_functions.h"
 #include "gtest/gtest.h"
-#include "xxua/debug_allocator.h"
+#include "cm/debug_allocator.h"
 
-namespace xxua {
+namespace cm {
 namespace {
 
 class StateTest : public testing::Test {
@@ -15,14 +15,14 @@ class StateTest : public testing::Test {
   ~StateTest() { EXPECT_EQ(state.StackSize(), 0); }
 
   DebugAllocator allocator;
-  xxua::State state;
+  cm::State state;
 };
 
 TEST_F(StateTest, Smoke) {}
 
 TEST_F(StateTest, Throw) {
   DebugAllocator allocator;
-  xxua::State state(allocator);
+  cm::State state(allocator);
 
   bool threw = false;
   try {
@@ -541,4 +541,4 @@ TEST_F(StateTest, Metatable) {
 }
 
 }  // namespace
-}  // namespace xxua
+}  // namespace cm

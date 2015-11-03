@@ -1,13 +1,13 @@
 #include "testing.h"
 
-#include "xxua/debug_allocator.h"
-#include "xxua/state.h"
+#include "cm/debug_allocator.h"
+#include "cm/state.h"
 
 namespace {
 
 void Smoke() {
-  xxua::DebugAllocator debug_allocator;
-  xxua::State state(debug_allocator);
+  cm::DebugAllocator debug_allocator;
+  cm::State state(debug_allocator);
 }
 
 }  // namespace

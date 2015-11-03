@@ -1,11 +1,11 @@
-#include "xxua/debug_allocator.h"
+#include "cm/debug_allocator.h"
 
 #include <cstring>
 
 #include "core/collection_functions.h"
 #include "core/must.h"
 
-namespace xxua {
+namespace cm {
 
 DebugAllocator::~DebugAllocator() { MUST(blocks.empty()); }
 
@@ -48,4 +48,4 @@ void DebugAllocator::Remove(const BlockInfo& block_info) {
   blocks.erase(block_info.ptr());
 }
 
-}  // namespace xxua
+}  // namespace cm

@@ -2,11 +2,11 @@
 
 #include "core/file_functions.h"
 #include "main/args.h"
-#include "xxua/context.h"
-#include "xxua/state.h"
-#include "xxua/value.h"
+#include "cm/context.h"
+#include "cm/state.h"
+#include "cm/value.h"
 
-using namespace xxua;
+using namespace cm;
 
 void Main(const std::vector<string>& args) {
   State state;

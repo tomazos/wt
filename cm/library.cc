@@ -1,13 +1,13 @@
-#include "xxua/library.h"
+#include "cm/library.h"
 
 #include <map>
 
 #include "core/collection_functions.h"
 #include "core/must.h"
-#include "xxua/api.h"
-#include "xxua/context.h"
+#include "cm/api.h"
+#include "cm/context.h"
 
-namespace xxua {
+namespace cm {
 
 static std::map<string, std::function<int()>>& GetFunctions(
     const char* funcset) {
@@ -239,4 +239,4 @@ void InstallStandardLibrary() {
   InstallStrings();
 }
 
-}  // namespace xxua
+}  // namespace cm

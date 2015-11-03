@@ -1,9 +1,9 @@
 #pragma once
 
-#include "lua/lua.h"
-#include "lua/object.h"
+#include "cm/private/lua.h"
+#include "cm/private/object.h"
 
-namespace xxua {
+namespace cm {
 
 enum class Type : uint8 {
   NONE = XLUA_TNONE,
@@ -22,4 +22,4 @@ enum class Type : uint8 {
 
 string_view TypeToString(Type t);
 
-}  // namespace xxua
+}  // namespace cm

@@ -1,12 +1,12 @@
-#include "xxua/value.h"
+#include "cm/value.h"
 
 #include <iterator>
 
 #include "core/must.h"
-#include "xxua/api.h"
-#include "xxua/context.h"
+#include "cm/api.h"
+#include "cm/context.h"
 
-namespace xxua {
+namespace cm {
 
 namespace {
 
@@ -567,4 +567,4 @@ void Value::Deregister() {
   registered_ = nullptr;
 }
 
-}  // namespace xxua
+}  // namespace cm

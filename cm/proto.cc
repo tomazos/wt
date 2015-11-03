@@ -1,8 +1,8 @@
-#include "xxua/proto.h"
+#include "cm/proto.h"
 
 #include "google/protobuf/descriptor.h"
 
-namespace xxua {
+namespace cm {
 
 using protobuf::EnumDescriptor;
 using protobuf::EnumValueDescriptor;
@@ -275,4 +275,4 @@ void TableToProto(const Value& table, Message& message) {
 // virtual Message *
 // AddMessage(Message * message, const FieldDescriptor * field,
 
-}  // namespace xxua
+}  // namespace cm

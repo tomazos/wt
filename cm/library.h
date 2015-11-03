@@ -1,7 +1,7 @@
 #pragma once
 
-namespace xxua {
+namespace cm {
 
 void InstallStandardLibrary();
 
-}  // namespace xxua
+}  // namespace cm

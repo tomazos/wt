@@ -4,7 +4,7 @@ test{
     "api_test.cc",
   },
   dependencies = {
-    "xxua",
+    "cm",
     "/main/gtest",
   },
 };
@@ -15,7 +15,7 @@ test{
     "allocator_test.cc",
   },
   dependencies = {
-    "xxua",
+    "cm",
     "/testing",
   },
 };
@@ -26,7 +26,7 @@ test{
     "context_test.cc",
   },
   dependencies = {
-    "xxua",
+    "cm",
     "/main/gtest",
   },
 };
@@ -50,7 +50,7 @@ test{
   },
   dependencies = {
     "library",
-    "xxua",
+    "cm",
     "/main/gtest",
   },
 };
@@ -61,7 +61,7 @@ test{
     "lex_test.cc",
   },
   dependencies = {
-    "xxua",
+    "cm",
     "/main/gtest",
   },
 };
@@ -75,7 +75,7 @@ library{
     "library.cc",
   },
   dependencies = {
-    "xxua",
+    "cm",
   },
 };
 
@@ -88,7 +88,7 @@ library{
     "proto.cc",
   },
   dependencies = {
-    "xxua",
+    "cm",
     "value",
   },
 };
@@ -118,7 +118,7 @@ test{
     "state_test.cc",
   },
   dependencies = {
-    "xxua",
+    "cm",
     "/main/gtest",
   },
 };
@@ -132,7 +132,7 @@ library{
     "value.cc",
   },
   dependencies = {
-    "xxua",
+    "cm",
   },
 };
 
@@ -148,7 +148,7 @@ test{
 };
 
 library{
-  name = "xxua",
+  name = "cm",
   headers = {
     "allocator.h",
     "api.h",
@@ -167,7 +167,7 @@ library{
   },
   dependencies = {
     "/core/must",
-    "/lua/core",
+    "/cm/private/core",
   },
 };
 

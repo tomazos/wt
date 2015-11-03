@@ -2,7 +2,7 @@
 
 #include <ostream>
 
-namespace xxua {
+namespace cm {
 
 class Writer {
  public:
@@ -24,4 +24,4 @@ class OutputStreamWriter : public Writer {
   std::ostream& output_stream_;
 };
 
-}  // namespace xxua
+}  // namespace cm

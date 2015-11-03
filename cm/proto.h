@@ -1,10 +1,10 @@
 #pragma once
 
 #include "google/protobuf/message.h"
-#include "xxua/value.h"
+#include "cm/value.h"
 
-namespace xxua {
+namespace cm {
 
 void TableToProto(const Value& table, protobuf::Message& message);
 
-}  // namespace xxua
+}  // namespace cm

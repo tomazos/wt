@@ -1,8 +1,8 @@
-#include "xxua/type.h"
+#include "cm/type.h"
 
 #include "core/must.h"
 
-namespace xxua {
+namespace cm {
 
 string_view TypeToString(Type t) {
   switch (t) {
@@ -34,4 +34,4 @@ string_view TypeToString(Type t) {
       FAIL("unknown type");
   }
 }
-}  // namespace xxua
+}  // namespace cm

@@ -1,8 +1,8 @@
-#include "xxua/api.h"
-#include "xxua/context.h"
-#include "xxua/debug_allocator.h"
-#include "xxua/library.h"
-#include "xxua/state.h"
+#include "cm/api.h"
+#include "cm/context.h"
+#include "cm/debug_allocator.h"
+#include "cm/library.h"
+#include "cm/state.h"
 
 #include <boost/any.hpp>
 
@@ -197,7 +197,7 @@ assert(!s:empty());
 assert(es:empty());
 )";
 
-using namespace xxua;
+using namespace cm;
 
 void Main() {
   DebugAllocator allocator;

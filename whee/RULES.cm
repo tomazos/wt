@@ -23,9 +23,9 @@ program{
     "/core/process",
     "/core/file_functions",
     "/main/args",
-    "/xxua/proto",
-    "/xxua/value",
-    "/xxua/xxua",
+    "/cm/proto",
+    "/cm/value",
+    "/cm/cm",
   },
 };
 

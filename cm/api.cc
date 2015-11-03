@@ -1,10 +1,10 @@
-#include "xxua/api.h"
+#include "cm/api.h"
 
 #include <cstring>
 
-#include "xxua/context.h"
+#include "cm/context.h"
 
-namespace xxua {
+namespace cm {
 
 int DispatchFunction(lua_State* L) {
   void* extraspace = lua_getextraspace(L);
@@ -19,4 +19,4 @@ int DispatchFunction(lua_State* L) {
   return ToObject<std::function<int()>>(&state, UPVALUE(1))();
 }
 
-}  // namespace xxua
+}  // namespace cm

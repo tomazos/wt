@@ -1,12 +1,12 @@
-#include "xxua/context.h"
+#include "cm/context.h"
 
 #include <vector>
 
 #include "core/collection_functions.h"
 #include "gtest/gtest.h"
-#include "xxua/debug_allocator.h"
+#include "cm/debug_allocator.h"
 
-namespace xxua {
+namespace cm {
 namespace {
 
 class ContextTest : public testing::Test {
@@ -541,4 +541,4 @@ TEST_F(ContextTest, Metatable) {
 }
 
 }  // namespace
-}  // namespace xxua
+}  // namespace cm

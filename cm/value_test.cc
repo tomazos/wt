@@ -1,11 +1,11 @@
-#include "xxua/value.h"
+#include "cm/value.h"
 
-#include "xxua/context.h"
-#include "xxua/debug_allocator.h"
+#include "cm/context.h"
+#include "cm/debug_allocator.h"
 
 #include "gtest/gtest.h"
 
-namespace xxua {
+namespace cm {
 
 struct ValueTest : testing::Test {
   ValueTest() : state(allocator), context(state) {}
@@ -196,4 +196,4 @@ TEST_F(ValueTest, Metatable) {
   EXPECT_EQ(v.at(0).as<MyObject>().f(), 24);
 }
 
-}  // namespace xxua
+}  // namespace cm

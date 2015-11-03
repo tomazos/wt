@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package xxua;
+package cm;
 
 enum ProtoTestEnum {
   ProtoTestEnumOne = 1;

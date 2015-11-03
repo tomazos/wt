@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xxua {
+namespace cm {
 
 class Allocator {
  public:
@@ -13,4 +13,4 @@ class Allocator {
   virtual ~Allocator() = default;
 };
 
-}  // namespace xxua
+}  // namespace cm

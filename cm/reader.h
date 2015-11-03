@@ -4,7 +4,7 @@
 
 #include "core/must.h"
 
-namespace xxua {
+namespace cm {
 
 class Reader {
  public:
@@ -39,4 +39,4 @@ class InputStreamReader : public Reader {
   char buffer_[kBufferSize];
 };
 
-}  // namespace xxua
+}  // namespace cm

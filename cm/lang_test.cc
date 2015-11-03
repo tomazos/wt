@@ -1,14 +1,14 @@
 #include "gtest/gtest.h"
 
-#include "xxua/api.h"
-#include "xxua/context.h"
-#include "xxua/debug_allocator.h"
-#include "xxua/library.h"
-#include "xxua/state.h"
+#include "cm/api.h"
+#include "cm/context.h"
+#include "cm/debug_allocator.h"
+#include "cm/library.h"
+#include "cm/state.h"
 
 #include <boost/any.hpp>
 
-namespace xxua {
+namespace cm {
 
 TEST(LangTest, All) {
   const char* code = R"(
@@ -216,4 +216,4 @@ TEST(LangTest, All) {
   EXPECT_EQ(ToString(-1), "a\a\b\f\n\r\t\v\\\"\'");
 }
 
-}  // namespace xxua
+}  // namespace cm

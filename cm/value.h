@@ -2,12 +2,12 @@
 
 #include <vector>
 
-#include "xxua/api.h"
-#include "xxua/context.h"
-#include "xxua/state.h"
-#include "xxua/type.h"
+#include "cm/api.h"
+#include "cm/context.h"
+#include "cm/state.h"
+#include "cm/type.h"
 
-namespace xxua {
+namespace cm {
 
 class Value;
 
@@ -288,4 +288,4 @@ Value ObjectMetatable() {
   return result;
 }
 
-}  // namespace xxua
+}  // namespace cm

@@ -1,33 +1,33 @@
-#include "xxua/proto_test.pb.h"
-#include "xxua/proto.h"
+#include "cm/proto_test.pb.h"
+#include "cm/proto.h"
 
 #include "gtest/gtest.h"
 
-namespace xxua {
+namespace cm {
 
 TEST(ProtoTest, Smoke) { ProtoTestMessage m; }
 
 TEST(ProtoTest, Basic) {
-  xxua::State state;
-  xxua::Context context(state);
+  cm::State state;
+  cm::Context context(state);
 
   ProtoTestMessage m;
-  xxua::TableToProto(xxua::Compile(R"(
+  cm::TableToProto(cm::Compile(R"(
     return {
       optional_int64_field = 42,
     };
   )")({}).at(0),
-                     m);
+                   m);
 
   EXPECT_EQ(m.optional_int64_field(), 42);
 }
 
 TEST(ProtoTest, Full) {
-  xxua::State state;
-  xxua::Context context(state);
+  cm::State state;
+  cm::Context context(state);
 
   ProtoTestMessage m;
-  xxua::TableToProto(xxua::Compile(R"(
+  cm::TableToProto(cm::Compile(R"(
     return {
       optional_double_field = 2.5,
       optional_float_field = 3.5,
@@ -71,7 +71,7 @@ TEST(ProtoTest, Full) {
       },
     };
   )")({}).at(0),
-                     m);
+                   m);
 
   EXPECT_EQ(m.optional_double_field(), 2.5);
   EXPECT_EQ(m.optional_float_field(), 3.5f);
@@ -155,4 +155,4 @@ TEST(ProtoTest, Full) {
   EXPECT_EQ(m.repeated_message_field(3).s(), "two");
 }
 
-}  // namespace xxua
+}  // namespace cm

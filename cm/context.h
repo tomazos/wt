@@ -1,8 +1,8 @@
 #pragma once
 
-#include "xxua/state.h"
+#include "cm/state.h"
 
-namespace xxua {
+namespace cm {
 
 class Context {
  public:
@@ -323,4 +323,4 @@ inline void PopMetatable(Index index) {
   return Context::Current()->PushMetatable(index);
 }
 
-}  //  namespace xxua
+}  //  namespace cm

@@ -13,15 +13,15 @@
 #include "main/args.h"
 #include "whee/source_file_attributes.pb.h"
 #include "whee/source_root_sentinal.h"
-#include "xxua/api.h"
-#include "xxua/context.h"
-#include "xxua/proto.h"
-#include "xxua/value.h"
+#include "cm/api.h"
+#include "cm/context.h"
+#include "cm/proto.h"
+#include "cm/value.h"
 
 namespace whee {
 
 using namespace boost::filesystem;
-using namespace xxua;
+using namespace cm;
 using boost::filesystem::path;
 
 const string source_root_sentinal = GetSourceRootSentinal();
@@ -484,7 +484,7 @@ void Whee::HardLinkSourceFiles(const SourceTree& source_tree,
 //  std::vector<Platform> result;
 //  string s = GetFileContents(paths.root / "CONFIG.cm");
 
-//  using namespace xxua;
+//  using namespace cm;
 //  State state;
 //  Context context(state);
 //  PushGlobalTable();

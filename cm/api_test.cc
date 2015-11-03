@@ -1,9 +1,9 @@
-#include "xxua/api.h"
+#include "cm/api.h"
 
 #include "gtest/gtest.h"
-#include "xxua/debug_allocator.h"
+#include "cm/debug_allocator.h"
 
-namespace xxua {
+namespace cm {
 namespace {
 
 class ApiTest : public testing::Test {
@@ -54,4 +54,4 @@ TEST_F(ApiTest, PushFunction) {
 }
 
 }  // namespace
-}  // namespace xxua
+}  // namespace cm

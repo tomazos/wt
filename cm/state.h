@@ -1,12 +1,12 @@
 #pragma once
 
-#include "lua/lua.h"
-#include "xxua/allocator.h"
-#include "xxua/reader.h"
-#include "xxua/type.h"
-#include "xxua/writer.h"
+#include "cm/private/lua.h"
+#include "cm/allocator.h"
+#include "cm/reader.h"
+#include "cm/type.h"
+#include "cm/writer.h"
 
-namespace xxua {
+namespace cm {
 
 class State {
  public:
@@ -414,4 +414,4 @@ inline void* State::ToUserdata(Index index) { return lua_touserdata(L, index); }
 
 inline State::Index State::UPVALUE(int i) { return lua_upvalueindex(i); }
 
-}  // namespace xxua
+}  // namespace cm

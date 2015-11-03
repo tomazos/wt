@@ -2,9 +2,9 @@
 
 #include <map>
 
-#include "xxua/allocator.h"
+#include "cm/allocator.h"
 
-namespace xxua {
+namespace cm {
 
 class DebugAllocator : public Allocator {
  public:
@@ -32,4 +32,4 @@ class DebugAllocator : public Allocator {
   std::map<void*, BlockInfo> blocks;
 };
 
-}  // namespace xxua
+}  // namespace cm

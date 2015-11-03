@@ -1,8 +1,8 @@
 #pragma once
 
-#include "xxua/state.h"
+#include "cm/state.h"
 
-namespace xxua {
+namespace cm {
 
 template <typename T>
 uintptr_t GetTypeId() {
@@ -131,4 +131,4 @@ inline void PushFunction(State* state, std::function<int()> f) {
   state->PushCFunction(DispatchFunction, 1);
 }
 
-}  // namespace xxua
+}  // namespace cm

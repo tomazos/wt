@@ -1,9 +1,9 @@
-#include "xxua/context.h"
+#include "cm/context.h"
 
 #include "gtest/gtest.h"
-#include "xxua/debug_allocator.h"
+#include "cm/debug_allocator.h"
 
-namespace xxua {
+namespace cm {
 namespace {
 
 class LexTest : public testing::Test {
@@ -38,4 +38,4 @@ TEST_F(LexTest, Comments) {
 }
 
 }  // namespace
-}  // namespace xxua
+}  // namespace cm

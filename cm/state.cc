@@ -1,8 +1,8 @@
-#include "xxua/state.h"
+#include "cm/state.h"
 
 #include <cstring>
 
-namespace xxua {
+namespace cm {
 
 static void* DefaultAllocate(void* ud[[gnu::unused]], void* ptr,
                              size_t osize[[gnu::unused]], size_t nsize) {
@@ -125,4 +125,4 @@ void State::Load(Reader& reader, const string& chunkname, const char* mode) {
 
 State::~State() { Close(); }
 
-}  // namespace xxua
+}  // namespace cm
