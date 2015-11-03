@@ -2,12 +2,14 @@
 
 #include <chrono>
 #include <cstdint>
+#include <cstring>
 #include <experimental/optional>
 #include <experimental/string_view>
 #include <mutex>
 #include <string>
 #include <type_traits>
 #include <thread>
+#include <sys/time.h>
 
 #define STATIC_ASSERT(cond) static_assert(cond, #cond);
 
@@ -83,3 +85,11 @@ STATIC_ASSERT(std::is_unsigned<uint32>::value);
 STATIC_ASSERT(std::is_unsigned<uint64>::value);
 // TODO(zos): Specialize numeric_limits etc for uint128
 // STATIC_ASSERT(std::is_unsigned<uint128>::value);
+
+inline float64 now_secs() {
+  timeval tv;
+  std::memset(&tv, 0, sizeof tv);
+  int gettimeofday_result = gettimeofday(&tv, nullptr);
+  if (gettimeofday_result != 0) throw std::logic_error("gettimeofday");
+  return float64(tv.tv_sec) + float64(tv.tv_usec) / 1'000'000;
+}

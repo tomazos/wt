@@ -33,7 +33,7 @@ void VertexArray::DisableAttribArray(const Attrib& attrib) {
   ThrowIfError();
 }
 
-void VertexArray::AttribFormat(Attrib& attrib, GLint size, GLenum type,
+void VertexArray::AttribFormat(const Attrib& attrib, GLint size, GLenum type,
                                GLboolean normalized, GLuint relativeoffset) {
   Bind();
   glVertexAttribFormat(attrib.location_, size, type, normalized,
@@ -41,14 +41,14 @@ void VertexArray::AttribFormat(Attrib& attrib, GLint size, GLenum type,
   ThrowIfError();
 }
 
-void VertexArray::AttribIFormat(Attrib& attrib, GLint size, GLenum type,
+void VertexArray::AttribIFormat(const Attrib& attrib, GLint size, GLenum type,
                                 GLuint relativeoffset) {
   Bind();
   glVertexAttribIFormat(attrib.location_, size, type, relativeoffset);
   ThrowIfError();
 }
 
-void VertexArray::AttribLFormat(Attrib& attrib, GLint size, GLenum type,
+void VertexArray::AttribLFormat(const Attrib& attrib, GLint size, GLenum type,
                                 GLuint relativeoffset) {
   Bind();
   glVertexAttribLFormat(attrib.location_, size, type, relativeoffset);

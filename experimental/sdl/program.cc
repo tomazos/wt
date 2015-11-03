@@ -156,58 +156,58 @@ void Program::Uniform(const string& name, dvec4 value) {
 }
 
 void Program::Uniform(const string& name, mat2 value) {
-  UniformImpl(glProgramUniformMatrix2fv, name, 1, GL_TRUE, value.data());
+  UniformImpl(glProgramUniformMatrix2fv, name, 1, GL_FALSE, value.data());
 }
 void Program::Uniform(const string& name, mat2x3 value) {
-  UniformImpl(glProgramUniformMatrix2x3fv, name, 1, GL_TRUE, value.data());
+  UniformImpl(glProgramUniformMatrix2x3fv, name, 1, GL_FALSE, value.data());
 }
 void Program::Uniform(const string& name, mat2x4 value) {
-  UniformImpl(glProgramUniformMatrix2x4fv, name, 1, GL_TRUE, value.data());
+  UniformImpl(glProgramUniformMatrix2x4fv, name, 1, GL_FALSE, value.data());
 }
 void Program::Uniform(const string& name, mat3x2 value) {
-  UniformImpl(glProgramUniformMatrix3x2fv, name, 1, GL_TRUE, value.data());
+  UniformImpl(glProgramUniformMatrix3x2fv, name, 1, GL_FALSE, value.data());
 }
 void Program::Uniform(const string& name, mat3 value) {
-  UniformImpl(glProgramUniformMatrix3fv, name, 1, GL_TRUE, value.data());
+  UniformImpl(glProgramUniformMatrix3fv, name, 1, GL_FALSE, value.data());
 }
 void Program::Uniform(const string& name, mat3x4 value) {
-  UniformImpl(glProgramUniformMatrix3x4fv, name, 1, GL_TRUE, value.data());
+  UniformImpl(glProgramUniformMatrix3x4fv, name, 1, GL_FALSE, value.data());
 }
 void Program::Uniform(const string& name, mat4x2 value) {
-  UniformImpl(glProgramUniformMatrix4x2fv, name, 1, GL_TRUE, value.data());
+  UniformImpl(glProgramUniformMatrix4x2fv, name, 1, GL_FALSE, value.data());
 }
 void Program::Uniform(const string& name, mat4x3 value) {
-  UniformImpl(glProgramUniformMatrix4x3fv, name, 1, GL_TRUE, value.data());
+  UniformImpl(glProgramUniformMatrix4x3fv, name, 1, GL_FALSE, value.data());
 }
 void Program::Uniform(const string& name, mat4 value) {
-  UniformImpl(glProgramUniformMatrix4fv, name, 1, GL_TRUE, value.data());
+  UniformImpl(glProgramUniformMatrix4fv, name, 1, GL_FALSE, value.data());
 }
 void Program::Uniform(const string& name, dmat2 value) {
-  UniformImpl(glProgramUniformMatrix2dv, name, 1, GL_TRUE, value.data());
+  UniformImpl(glProgramUniformMatrix2dv, name, 1, GL_FALSE, value.data());
 }
 void Program::Uniform(const string& name, dmat2x3 value) {
-  UniformImpl(glProgramUniformMatrix2x3dv, name, 1, GL_TRUE, value.data());
+  UniformImpl(glProgramUniformMatrix2x3dv, name, 1, GL_FALSE, value.data());
 }
 void Program::Uniform(const string& name, dmat2x4 value) {
-  UniformImpl(glProgramUniformMatrix2x4dv, name, 1, GL_TRUE, value.data());
+  UniformImpl(glProgramUniformMatrix2x4dv, name, 1, GL_FALSE, value.data());
 }
 void Program::Uniform(const string& name, dmat3x2 value) {
-  UniformImpl(glProgramUniformMatrix3x2dv, name, 1, GL_TRUE, value.data());
+  UniformImpl(glProgramUniformMatrix3x2dv, name, 1, GL_FALSE, value.data());
 }
 void Program::Uniform(const string& name, dmat3 value) {
-  UniformImpl(glProgramUniformMatrix3dv, name, 1, GL_TRUE, value.data());
+  UniformImpl(glProgramUniformMatrix3dv, name, 1, GL_FALSE, value.data());
 }
 void Program::Uniform(const string& name, dmat3x4 value) {
-  UniformImpl(glProgramUniformMatrix3x4dv, name, 1, GL_TRUE, value.data());
+  UniformImpl(glProgramUniformMatrix3x4dv, name, 1, GL_FALSE, value.data());
 }
 void Program::Uniform(const string& name, dmat4x2 value) {
-  UniformImpl(glProgramUniformMatrix4x2dv, name, 1, GL_TRUE, value.data());
+  UniformImpl(glProgramUniformMatrix4x2dv, name, 1, GL_FALSE, value.data());
 }
 void Program::Uniform(const string& name, dmat4x3 value) {
-  UniformImpl(glProgramUniformMatrix4x3dv, name, 1, GL_TRUE, value.data());
+  UniformImpl(glProgramUniformMatrix4x3dv, name, 1, GL_FALSE, value.data());
 }
 void Program::Uniform(const string& name, dmat4 value) {
-  UniformImpl(glProgramUniformMatrix4dv, name, 1, GL_TRUE, value.data());
+  UniformImpl(glProgramUniformMatrix4dv, name, 1, GL_FALSE, value.data());
 }
 
 GLint Program::Get(GLenum pname) const {

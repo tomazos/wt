@@ -9,6 +9,7 @@ program{
   },
   dependencies = {
     "opengl",
+    "sdl",
     "/core/must",
     "/core/random",
     "/main/args",
@@ -20,30 +21,67 @@ library{
   name = "opengl",
   headers = {
     "attrib.h",
+    "attrib_arrays.h",
     "buffer.h",
     "error.h",
     "object.h",
     "opengl.h",
+    "pov.h",
     "program.h",
     "shader.h",
-    "types.h",
+    "system.h",
     "vertex_array.h",
   },
   sources = {
     "attrib.cc",
+    "attrib_arrays.cc",
     "buffer.cc",
     "error.cc",
     "object.cc",
     "program.cc",
     "shader.cc",
+    "system.cc",
     "vertex_array.cc",
+  },
+  dependencies = {
+    "/core/must",
+    "/eigen/eigen",
+    "/gl/geometry",
+  },
+  syslibs = {
+    "-lGL",
+  },
+  platforms = p,
+};
+
+library{
+  name = "sdl",
+  headers = {
+    "application.h",
+    "window.h",
+    "glcontext.h",
+  },
+  sources = {
+    "application.cc",
+    "window.cc",
+    "glcontext.cc",
   },
   dependencies = {
     "/core/must",
   },
   syslibs = {
     "-lSDL2",
-    "-lGL",
   },
   platforms = p,
+};
+
+test{
+  name = "types_test",
+  sources = {
+    "types_test.cc",
+  },
+  dependencies = {
+    "opengl",
+    "/main/gtest",
+  },
 };

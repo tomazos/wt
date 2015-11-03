@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "experimental/sdl/object.h"
 #include "experimental/sdl/opengl.h"
 
@@ -23,7 +25,12 @@ class Buffer {
   // GL_TEXTURE_BUFFER
   // GL_TRANSFORM_FEEDBACK_BUFFER
   // GL_UNIFORM_BUFFER
-  Buffer(void* data, size_t size, GLenum target, GLenum usage);
+  Buffer(const void* data, size_t size, GLenum target, GLenum usage);
+
+  template <typename T>
+  Buffer(const std::vector<T>& data, GLenum target, GLenum usage)
+      : Buffer((const void*)data.data(), data.size() * sizeof(T), target,
+               usage) {}
 
  private:
   void Bind(GLenum target);

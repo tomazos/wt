@@ -5,7 +5,7 @@
 #include "experimental/sdl/opengl.h"
 #include "experimental/sdl/object.h"
 #include "experimental/sdl/shader.h"
-#include "experimental/sdl/types.h"
+#include "gl/geometry.h"
 
 namespace gl {
 

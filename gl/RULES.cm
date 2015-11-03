@@ -1,0 +1,24 @@
+library{
+  name = "geometry",
+  headers = {
+    "geometry.h",
+  },
+  sources = {
+    "geometry.cc",
+  },
+  dependencies = {
+    "/core/must",
+    "/eigen/eigen",
+  },
+};
+
+test{
+  name = "geometry_test",
+  sources = {
+    "geometry_test.cc",
+  },
+  dependencies = {
+    "geometry",
+    "/main/gtest",
+  },
+};

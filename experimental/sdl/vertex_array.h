@@ -25,13 +25,13 @@ class VertexArray {
   void BindBuffer(GLuint bindingindex, const Buffer& buffer, GLintptr offset,
                   GLintptr stride);
 
-  void AttribFormat(Attrib& attrib, GLint size, GLenum type,
+  void AttribFormat(const Attrib& attrib, GLint size, GLenum type,
                     GLboolean normalized, GLuint relativeoffset);
 
-  void AttribIFormat(Attrib& attrib, GLint size, GLenum type,
+  void AttribIFormat(const Attrib& attrib, GLint size, GLenum type,
                      GLuint relativeoffset);
 
-  void AttribLFormat(Attrib& attrib, GLint size, GLenum type,
+  void AttribLFormat(const Attrib& attrib, GLint size, GLenum type,
                      GLuint relativeoffset);
 
  private:

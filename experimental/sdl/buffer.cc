@@ -20,7 +20,7 @@ auto delete_buffer = [](GLuint name) { glDeleteBuffers(1, &name); };
 
 Buffer::Buffer() : buffer_(create_buffer(), delete_buffer) {}
 
-Buffer::Buffer(void* data, size_t size, GLenum target, GLenum usage)
+Buffer::Buffer(const void* data, size_t size, GLenum target, GLenum usage)
     : Buffer() {
   Bind(target);
   glBufferData(target, size, data, usage);

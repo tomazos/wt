@@ -6,6 +6,8 @@ namespace gl {
 
 class Attrib {
  public:
+  const string& name() const { return name_; }
+
  private:
   Attrib(const string& name, GLuint location);
 
