@@ -3,3 +3,5 @@ core
 ladybug
 main
 wiring
+experimental/sdl
+gl
