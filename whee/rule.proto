@@ -1,0 +1,29 @@
+syntax = "proto2";
+
+package whee;
+
+message RuleProto {
+  enum Kind {
+    PROTO = 1;
+    LIBRARY = 2;
+    PROGRAM = 3;
+    TEST = 4;
+  };
+
+  optional Kind kind = 5;
+  required string name = 1;
+  repeated string sources = 2;
+  repeated string headers = 3;
+  repeated string dependencies = 4;
+  repeated string syslibs = 6;
+  optional bool whole_archive = 7;
+  repeated string platforms = 8;
+};
+
+message Platform {
+  required string name = 1;
+  optional string tool_prefix = 2;
+  optional string lib_path = 3;
+  optional string flags = 4;
+  optional bool test = 5;
+};

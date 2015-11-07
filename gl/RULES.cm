@@ -22,3 +22,43 @@ test{
     "/main/gtest",
   },
 };
+
+library{
+  name = "gl",
+  headers = {
+    "attrib.h",
+    "attrib_arrays.h",
+    "buffer.h",
+    "error.h",
+    "object.h",
+    "opengl.h",
+    "program.h",
+    "sampler.h",
+    "shader.h",
+    "system.h",
+    "texture.h",
+    "vertex_array.h",
+  },
+  sources = {
+    "attrib.cc",
+    "attrib_arrays.cc",
+    "buffer.cc",
+    "error.cc",
+    "object.cc",
+    "program.cc",
+    "sampler.cc",
+    "shader.cc",
+    "system.cc",
+    "texture.cc",
+    "vertex_array.cc",
+  },
+  dependencies = {
+    "/core/must",
+    "/gl/geometry",
+  },
+  syslibs = {
+    "-lGL",
+  },
+  platforms = p,
+};
+

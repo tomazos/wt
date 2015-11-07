@@ -78,6 +78,7 @@ void FeedForwardMNIST() {
                                                       nbatch);
           {
             ReaderLockGuard rlock(mutex);
+
             const auto& batch = training_batches.at(batch_index);
             activation(batch.first);
             back_propogation(batch.second);

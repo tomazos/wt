@@ -1,0 +1,51 @@
+p = {
+  "native",
+};
+
+library{
+  name = "sdl",
+  headers = {
+    "application.h",
+    "glcontext.h",
+    "palette.h",
+    "pixel_format.h",
+    "pov.h",
+    "renderer.h",
+    "rect.h",
+    "surface.h",
+    "texture.h",
+    "window.h",
+  },
+  sources = {
+    "application.cc",
+    "glcontext.cc",
+    "palette.cc",
+    "pixel_format.cc",
+    "renderer.cc",
+    "surface.cc",
+    "texture.cc",
+    "window.cc",
+  },
+  dependencies = {
+    "/gl/geometry",
+    "/core/file_functions",
+    "/core/must",
+  },
+  syslibs = {
+    "-lSDL2",
+  },
+  platforms = p,
+};
+
+library{
+  name = "pov",
+  headers = {
+    "pov.h",
+  },
+  dependencies = {
+    "sdl",
+    "/gl/gl",
+  },
+  platforms = p,
+};
+

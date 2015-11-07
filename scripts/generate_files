@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -e
+
+c=`pwd`
+b=`basename $c`
+files="$b.files"
+if [ ! -f $files ]
+  then
+    echo "$files not found"
+    exit -1
+fi
+
+find . -type f | grep -v '^\./\.\(whee\|git\)/' > $files
+

@@ -7,12 +7,12 @@
 
 #include "core/must.h"
 #include "core/random.h"
-#include "experimental/sdl/attrib_arrays.h"
-#include "experimental/sdl/pov.h"
-#include "experimental/sdl/program.h"
-#include "experimental/sdl/shader.h"
-#include "experimental/sdl/system.h"
+#include "gl/attrib_arrays.h"
+#include "gl/program.h"
+#include "gl/shader.h"
+#include "gl/system.h"
 #include "gl/geometry.h"
+#include "sdl/pov.h"
 
 using namespace gl;
 

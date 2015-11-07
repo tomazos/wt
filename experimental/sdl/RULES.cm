@@ -3,13 +3,13 @@ p = {
 };
 
 program{
-  name = "hello",
+  name = "cat_texture",
   sources = {
-    "hello.cc",
+    "cat_texture.cc",
   },
   dependencies = {
-    "opengl",
-    "sdl",
+    "/gl/gl",
+    "/sdl/sdl",
     "/core/must",
     "/core/random",
     "/main/args",
@@ -17,71 +17,48 @@ program{
   platforms = p,
 };
 
-library{
-  name = "opengl",
-  headers = {
-    "attrib.h",
-    "attrib_arrays.h",
-    "buffer.h",
-    "error.h",
-    "object.h",
-    "opengl.h",
-    "pov.h",
-    "program.h",
-    "shader.h",
-    "system.h",
-    "vertex_array.h",
-  },
+program{
+  name = "hello",
   sources = {
-    "attrib.cc",
-    "attrib_arrays.cc",
-    "buffer.cc",
-    "error.cc",
-    "object.cc",
-    "program.cc",
-    "shader.cc",
-    "system.cc",
-    "vertex_array.cc",
+    "hello.cc",
   },
   dependencies = {
+    "/gl/gl",
+    "/sdl/sdl",
     "/core/must",
-    "/eigen/eigen",
-    "/gl/geometry",
-  },
-  syslibs = {
-    "-lGL",
+    "/core/random",
+    "/main/args",
   },
   platforms = p,
 };
 
-library{
-  name = "sdl",
-  headers = {
-    "application.h",
-    "window.h",
-    "glcontext.h",
-  },
+program{
+  name = "gof",
   sources = {
-    "application.cc",
-    "window.cc",
-    "glcontext.cc",
+    "gof.cc",
   },
   dependencies = {
+    "/gl/gl",
+    "/sdl/sdl",
     "/core/must",
-  },
-  syslibs = {
-    "-lSDL2",
+    "/core/random",
+    "/main/noargs",
   },
   platforms = p,
 };
 
-test{
-  name = "types_test",
+program{
+  name = "render_image",
   sources = {
-    "types_test.cc",
+    "render_image.cc",
   },
   dependencies = {
-    "opengl",
-    "/main/gtest",
+    "/gl/gl",
+    "/sdl/sdl",
+    "/core/must",
+    "/core/random",
+    "/main/noargs",
   },
+  platforms = p,
 };
+

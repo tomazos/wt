@@ -24,7 +24,7 @@ long_line_column=72
 
 [files]
 current_page=0
-FILE_NAME_0=0;C++;0;EUTF-8;0;1;0;%2Fhome%2Fzos%2F.cache%2F.fr-xekIva%2Fkiss_fft130%2Ftest%2Ftestcpp.cc;0;2
+FILE_NAME_0=0;C++;0;EUTF-8;0;1;0;%2Fhome%2Fzos%2Frobo%2Fexperimental%2Fsdl%2Ferror.cc;0;2
 
 [VTE]
 last_dir=/home/zos/robo
@@ -42,3 +42,8 @@ NF_02_WD=
 EX_00_LB=
 EX_00_CM="./%e"
 EX_00_WD=
+
+[editor]
+line_wrapping=false
+line_break_column=72
+auto_continue_multiline=true
