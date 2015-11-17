@@ -136,7 +136,7 @@ class IncompleteLUT : internal::noncopyable {
 
   /** \brief Reports whether previous computation was successful.
     *
-    * \returns \c Success if computation was succesful,
+    * \returns \c ComputationSuccess if computation was succesful,
     *          \c NumericalIssue if the matrix.appears to be negative.
     */
   ComputationInfo info() const {
@@ -446,7 +446,7 @@ void IncompleteLUT<Scalar>::factorize(const _MatrixType& amat) {
 
   m_factorizationIsOk = true;
   m_isInitialized = m_factorizationIsOk;
-  m_info = Success;
+  m_info = ComputationSuccess;
 }
 
 namespace internal {

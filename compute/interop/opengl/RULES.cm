@@ -1,0 +1,13 @@
+library{
+  name = "opengl",
+  headers = {
+    "opengl_buffer.h",
+    "cl_gl_ext.h",
+    "opengl_renderbuffer.h",
+    "context.h",
+    "acquire.h",
+    "gl.h",
+    "cl_gl.h",
+    "opengl_texture.h",
+  },
+};

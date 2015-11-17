@@ -1,0 +1,6 @@
+library{
+  name = "detail",
+  headers = {
+    "scalar.h",
+  },
+};

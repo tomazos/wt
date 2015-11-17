@@ -1,0 +1,21 @@
+library{
+  name = "functional",
+  headers = {
+    "as.h",
+    "hash.h",
+    "geometry.h",
+    "field.h",
+    "operator.h",
+    "relational.h",
+    "common.h",
+    "logical.h",
+    "popcount.h",
+    "bind.h",
+    "convert.h",
+    "identity.h",
+    "integer.h",
+    "atomic.h",
+    "math.h",
+    "get.h",
+  },
+};

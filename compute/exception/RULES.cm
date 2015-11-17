@@ -1,0 +1,9 @@
+library{
+  name = "exception",
+  headers = {
+    "unsupported_extension_error.h",
+    "context_error.h",
+    "opencl_error.h",
+    "no_device_found.h",
+  },
+};

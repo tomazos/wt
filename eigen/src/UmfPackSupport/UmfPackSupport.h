@@ -189,7 +189,7 @@ class UmfPackLU : internal::noncopyable {
 
   /** \brief Reports whether previous computation was successful.
     *
-    * \returns \c Success if computation was succesful,
+    * \returns \c ComputationSuccess if computation was succesful,
     *          \c NumericalIssue if the matrix.appears to be negative.
     */
   ComputationInfo info() const {
@@ -357,7 +357,7 @@ class UmfPackLU : internal::noncopyable {
                                  &m_symbolic, 0, 0);
 
     m_isInitialized = true;
-    m_info = errorCode ? InvalidInput : Success;
+    m_info = errorCode ? InvalidInput : ComputationSuccess;
     m_analysisIsOk = true;
     m_factorizationIsOk = false;
     m_extractedDataAreDirty = true;
@@ -368,7 +368,7 @@ class UmfPackLU : internal::noncopyable {
     errorCode = umfpack_numeric(m_outerIndexPtr, m_innerIndexPtr, m_valuePtr,
                                 m_symbolic, &m_numeric, 0, 0);
 
-    m_info = errorCode ? NumericalIssue : Success;
+    m_info = errorCode ? NumericalIssue : ComputationSuccess;
     m_factorizationIsOk = true;
     m_extractedDataAreDirty = true;
   }

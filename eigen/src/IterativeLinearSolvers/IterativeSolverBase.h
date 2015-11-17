@@ -62,7 +62,7 @@ class IterativeSolverBase : internal::noncopyable {
     m_preconditioner.analyzePattern(A);
     m_isInitialized = true;
     m_analysisIsOk = true;
-    m_info = Success;
+    m_info = ComputationSuccess;
     return derived();
   }
 
@@ -81,7 +81,7 @@ class IterativeSolverBase : internal::noncopyable {
     mp_matrix = &A;
     m_preconditioner.factorize(A);
     m_factorizationIsOk = true;
-    m_info = Success;
+    m_info = ComputationSuccess;
     return derived();
   }
 
@@ -104,7 +104,7 @@ class IterativeSolverBase : internal::noncopyable {
     m_isInitialized = true;
     m_analysisIsOk = true;
     m_factorizationIsOk = true;
-    m_info = Success;
+    m_info = ComputationSuccess;
     return derived();
   }
 
@@ -184,7 +184,8 @@ class IterativeSolverBase : internal::noncopyable {
                                                                    b.derived());
   }
 
-  /** \returns Success if the iterations converged, and NoConvergence otherwise.
+  /** \returns ComputationSuccess if the iterations converged, and NoConvergence
+   * otherwise.
    */
   ComputationInfo info() const {
     eigen_assert(m_isInitialized && "IterativeSolverBase is not initialized.");

@@ -18,6 +18,22 @@ program{
 };
 
 program{
+  name = "cl_texture",
+  sources = {
+    "cl_texture.cc",
+  },
+  dependencies = {
+    "/compute/compute",
+    "/gl/gl",
+    "/sdl/sdl",
+    "/core/must",
+    "/core/random",
+    "/main/args",
+  },
+  platforms = p,
+};
+
+program{
   name = "hello",
   sources = {
     "hello.cc",

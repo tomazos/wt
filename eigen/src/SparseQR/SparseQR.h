@@ -219,7 +219,7 @@ class SparseQR {
     else
       dest = y.topRows(cols());
 
-    m_info = Success;
+    m_info = ComputationSuccess;
     return true;
   }
 
@@ -264,7 +264,7 @@ class SparseQR {
 
   /** \brief Reports whether previous computation was successful.
     *
-    * \returns \c Success if computation was successful,
+    * \returns \c ComputationSuccess if computation was successful,
     *          \c NumericalIssue if the QR factorization reports a numerical
     *problem
     *          \c InvalidInput if the input matrix is invalid
@@ -616,7 +616,7 @@ void SparseQR<MatrixType, OrderingType>::factorize(const MatrixType& mat) {
 
   m_isInitialized = true;
   m_factorizationIsok = true;
-  m_info = Success;
+  m_info = ComputationSuccess;
 }
 
 namespace internal {

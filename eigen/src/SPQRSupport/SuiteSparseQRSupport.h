@@ -134,7 +134,7 @@ class SPQR {
       m_isInitialized = false;
       return;
     }
-    m_info = Success;
+    m_info = ComputationSuccess;
     m_isInitialized = true;
     m_isRUpToDate = false;
   }
@@ -194,7 +194,7 @@ class SPQR {
     //       y.bottomRows(y.rows()-rk).setZero();
     //       dest = colsPermutation() * y.topRows(cols());
 
-    m_info = Success;
+    m_info = ComputationSuccess;
   }
 
   /** \returns the sparse triangular factor R. It is a sparse matrix
@@ -242,7 +242,7 @@ class SPQR {
 
   /** \brief Reports whether previous computation was successful.
     *
-    * \returns \c Success if computation was succesful,
+    * \returns \c ComputationSuccess if computation was succesful,
     *          \c NumericalIssue if the sparse QR can not be computed
     */
   ComputationInfo info() const {

@@ -1,0 +1,14 @@
+library{
+  name = "random",
+  headers = {
+    "mersenne_twister_engine.h",
+    "default_random_engine.h",
+    "uniform_real_distribution.h",
+    "threefry_engine.h",
+    "linear_congruential_engine.h",
+    "discrete_distribution.h",
+    "bernoulli_distribution.h",
+    "normal_distribution.h",
+    "uniform_int_distribution.h",
+  },
+};

@@ -58,7 +58,7 @@ namespace Eigen {
     if (matrix.cols() == 1) {                                               \
       m_matT = matrix.cast<ComplexScalar>();                                \
       if (computeU) m_matU = ComplexMatrixType::Identity(1, 1);             \
-      m_info = Success;                                                     \
+      m_info = ComputationSuccess;                                          \
       m_isInitialized = true;                                               \
       m_matUisUptodate = computeU;                                          \
       return *this;                                                         \
@@ -78,7 +78,7 @@ namespace Eigen {
         matrix_order, jobvs, sort, select, n, (MKLTYPE*)m_matT.data(), lda, \
         &sdim, (MKLTYPE*)w.data(), (MKLTYPE*)m_matU.data(), ldvs);          \
     if (info == 0)                                                          \
-      m_info = Success;                                                     \
+      m_info = ComputationSuccess;                                          \
     else                                                                    \
       m_info = NoConvergence;                                               \
                                                                             \

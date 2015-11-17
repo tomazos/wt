@@ -1,0 +1,7 @@
+library{
+  name = "allocator",
+  headers = {
+    "pinned_allocator.h",
+    "buffer_allocator.h",
+  },
+};

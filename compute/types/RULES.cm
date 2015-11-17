@@ -1,0 +1,11 @@
+library{
+  name = "types",
+  headers = {
+    "tuple.h",
+    "struct.h",
+    "pair.h",
+    "fundamental.h",
+    "complex.h",
+    "builtin.h",
+  },
+};

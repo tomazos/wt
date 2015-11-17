@@ -1,0 +1,11 @@
+library{
+  name = "qt",
+  headers = {
+    "qpointf.h",
+    "qtcore.h",
+    "qimage.h",
+    "qvector.h",
+    "qpoint.h",
+    "qtgui.h",
+  },
+};

@@ -1,4 +1,26 @@
 library{
+  name = "cl",
+  headers = {
+    "cl2.h",
+  },
+  syslibs = {
+    "-lOpenCL",
+  },
+};
+
+test{
+  name = "cl2_test",
+  sources = {
+    "cl2_test.cc",
+  },
+  dependencies = {
+    "cl",
+    "/core/must",
+    "/main/gtest",
+  },
+};
+
+library{
   name = "geometry",
   headers = {
     "geometry.h",

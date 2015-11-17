@@ -410,15 +410,15 @@ enum QRPreconditioners {
   FullPivHouseholderQRPreconditioner
 };
 
-#ifdef Success
-#error The preprocessor symbol 'Success' is defined, possibly by the X11 header file X.h
+#ifdef ComputationSuccess
+#error The preprocessor symbol 'ComputationSuccess' is defined, possibly by the X11 header file X.h
 #endif
 
 /** \ingroup enums
   * Enum for reporting the status of a computation. */
 enum ComputationInfo {
   /** Computation was successful. */
-  Success = 0,
+  ComputationSuccess = 0,
   /** The provided data did not satisfy the prerequisites. */
   NumericalIssue = 1,
   /** Iterative procedure did not converge. */

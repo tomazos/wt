@@ -224,7 +224,8 @@ class ComplexSchur {
 
   /** \brief Reports whether previous computation was successful.
     *
-    * \returns \c Success if computation was succesful, \c NoConvergence
+    * \returns \c ComputationSuccess if computation was succesful, \c
+    *NoConvergence
     *otherwise.
     */
   ComputationInfo info() const {
@@ -332,7 +333,7 @@ ComplexSchur<MatrixType>& ComplexSchur<MatrixType>::compute(
   if (matrix.cols() == 1) {
     m_matT = matrix.template cast<ComplexScalar>();
     if (computeU) m_matU = ComplexMatrixType::Identity(1, 1);
-    m_info = Success;
+    m_info = ComputationSuccess;
     m_isInitialized = true;
     m_matUisUptodate = computeU;
     return *this;
@@ -449,7 +450,7 @@ void ComplexSchur<MatrixType>::reduceToTriangularForm(bool computeU) {
   }
 
   if (totalIter <= maxIters)
-    m_info = Success;
+    m_info = ComputationSuccess;
   else
     m_info = NoConvergence;
 

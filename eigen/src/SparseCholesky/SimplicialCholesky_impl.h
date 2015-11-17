@@ -85,7 +85,7 @@ void SimplicialCholeskyBase<Derived>::analyzePattern_preordered(
   m_matrix.resizeNonZeros(Lp[size]);
 
   m_isInitialized = true;
-  m_info = Success;
+  m_info = ComputationSuccess;
   m_analysisIsOk = true;
   m_factorizationIsOk = false;
 }
@@ -177,7 +177,7 @@ void SimplicialCholeskyBase<Derived>::factorize_preordered(
     }
   }
 
-  m_info = ok ? Success : NumericalIssue;
+  m_info = ok ? ComputationSuccess : NumericalIssue;
   m_factorizationIsOk = true;
 }
 

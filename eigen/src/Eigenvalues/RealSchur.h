@@ -200,7 +200,8 @@ class RealSchur {
                                    bool computeU);
   /** \brief Reports whether previous computation was successful.
     *
-    * \returns \c Success if computation was succesful, \c NoConvergence
+    * \returns \c ComputationSuccess if computation was succesful, \c
+    *NoConvergence
     *otherwise.
     */
   ComputationInfo info() const {
@@ -325,7 +326,7 @@ RealSchur<MatrixType>& RealSchur<MatrixType>::computeFromHessenberg(
     }
   }
   if (totalIter <= maxIters)
-    m_info = Success;
+    m_info = ComputationSuccess;
   else
     m_info = NoConvergence;
 

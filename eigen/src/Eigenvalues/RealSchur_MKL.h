@@ -70,7 +70,7 @@ namespace Eigen {
                                      (MKLTYPE*)wr.data(), (MKLTYPE*)wi.data(), \
                                      (MKLTYPE*)m_matU.data(), ldvs);           \
     if (info == 0)                                                             \
-      m_info = Success;                                                        \
+      m_info = ComputationSuccess;                                             \
     else                                                                       \
       m_info = NoConvergence;                                                  \
                                                                                \

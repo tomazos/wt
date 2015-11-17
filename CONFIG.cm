@@ -1,7 +1,7 @@
 add_platform{
   name = "native",
   lib_path = "-L/usr/lib/fglrx",
-  flags = "-isystem /usr/include/x86_64-linux-gnu/qt5/ -fPIE",
+  flags = "-isystem /usr/include/x86_64-linux-gnu/qt5/ -isystem /usr/include/freetype2 -fPIE",
   test = true,
 };
 

@@ -221,7 +221,7 @@ class SparseLU : public internal::SparseLUImpl<typename _MatrixType::Scalar,
 
   /** \brief Reports whether previous computation was successful.
     *
-    * \returns \c Success if computation was succesful,
+    * \returns \c ComputationSuccess if computation was succesful,
     *          \c NumericalIssue if the LU factorization reports a problem, zero
     *diagonal for instance
     *          \c InvalidInput if the input matrix is invalid
@@ -714,7 +714,7 @@ void SparseLU<MatrixType, OrderingType>::factorize(const MatrixType& matrix) {
   new (&m_Ustore) MappedSparseMatrix<Scalar, ColMajor, Index>(
       m, n, m_nnzU, m_glu.xusub.data(), m_glu.usub.data(), m_glu.ucol.data());
 
-  m_info = Success;
+  m_info = ComputationSuccess;
   m_factorizationIsOk = true;
 }
 

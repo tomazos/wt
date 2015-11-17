@@ -1,0 +1,9 @@
+library{
+  name = "vtk",
+  headers = {
+    "points.h",
+    "data_array.h",
+    "matrix4x4.h",
+    "bounds.h",
+  },
+};

@@ -1,0 +1,16 @@
+program{
+  name = "render_fonts",
+  sources = {
+    "render_fonts.cc",
+  },
+  dependencies = {
+    "/gl/gl",
+    "/sdl/sdl",
+    "/core/env",
+    "/core/must",
+    "/core/random",
+    "/font/font",
+    "/main/noargs",
+  },
+  platforms = p,
+};

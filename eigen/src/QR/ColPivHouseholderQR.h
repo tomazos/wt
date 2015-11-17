@@ -398,14 +398,15 @@ class ColPivHouseholderQR {
 
   /** \brief Reports whether the QR factorization was succesful.
     *
-    * \note This function always returns \c Success. It is provided for
+    * \note This function always returns \c ComputationSuccess. It is provided
+    *for
     *compatibility
     * with other factorization routines.
-    * \returns \c Success
+    * \returns \c ComputationSuccess
     */
   ComputationInfo info() const {
     eigen_assert(m_isInitialized && "Decomposition is not initialized.");
-    return Success;
+    return ComputationSuccess;
   }
 
  protected:

@@ -1,0 +1,10 @@
+library{
+  name = "interop",
+  headers = {
+    "opengl.h",
+    "opencv.h",
+    "eigen.h",
+    "qt.h",
+    "vtk.h",
+  },
+};

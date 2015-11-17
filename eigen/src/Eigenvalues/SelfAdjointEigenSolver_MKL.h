@@ -62,7 +62,7 @@ namespace Eigen {
     if (n == 1) {                                                             \
       m_eivalues.coeffRef(0, 0) = numext::real(matrix.coeff(0, 0));           \
       if (computeEigenvectors) m_eivec.setOnes(n, n);                         \
-      m_info = Success;                                                       \
+      m_info = ComputationSuccess;                                            \
       m_isInitialized = true;                                                 \
       m_eigenvectorsOk = computeEigenvectors;                                 \
       return *this;                                                           \
@@ -76,7 +76,7 @@ namespace Eigen {
     info = LAPACKE_##MKLNAME(matrix_order, jobz, uplo, n,                     \
                              (MKLTYPE*)m_eivec.data(), lda,                   \
                              (MKLRTYPE*)m_eivalues.data());                   \
-    m_info = (info == 0) ? Success : NoConvergence;                           \
+    m_info = (info == 0) ? ComputationSuccess : NoConvergence;                \
     m_isInitialized = true;                                                   \
     m_eigenvectorsOk = computeEigenvectors;                                   \
     return *this;                                                             \

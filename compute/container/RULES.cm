@@ -1,0 +1,15 @@
+library{
+  name = "container",
+  headers = {
+    "valarray.h",
+    "flat_map.h",
+    "mapped_view.h",
+    "string.h",
+    "dynamic_bitset.h",
+    "basic_string.h",
+    "flat_set.h",
+    "stack.h",
+    "vector.h",
+    "array.h",
+  },
+};

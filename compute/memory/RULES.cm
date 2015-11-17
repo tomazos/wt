@@ -1,0 +1,7 @@
+library{
+  name = "memory",
+  headers = {
+    "local_buffer.h",
+    "svm_ptr.h",
+  },
+};

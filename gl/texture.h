@@ -19,7 +19,7 @@ class Texture {
                       GLsizei width, GLsizei height, GLenum format, GLenum type,
                       const void *pixels);
 
- private:
+  // TODO private:
   Object texture_;
 };
 

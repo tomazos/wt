@@ -153,13 +153,14 @@ class CholmodBase : internal::noncopyable {
   typedef typename MatrixType::Index Index;
 
  public:
-  CholmodBase() : m_cholmodFactor(0), m_info(Success), m_isInitialized(false) {
+  CholmodBase()
+      : m_cholmodFactor(0), m_info(ComputationSuccess), m_isInitialized(false) {
     m_shiftOffset[0] = m_shiftOffset[1] = RealScalar(0.0);
     cholmod_start(&m_cholmod);
   }
 
   CholmodBase(const MatrixType& matrix)
-      : m_cholmodFactor(0), m_info(Success), m_isInitialized(false) {
+      : m_cholmodFactor(0), m_info(ComputationSuccess), m_isInitialized(false) {
     m_shiftOffset[0] = m_shiftOffset[1] = RealScalar(0.0);
     cholmod_start(&m_cholmod);
     compute(matrix);
@@ -178,7 +179,7 @@ class CholmodBase : internal::noncopyable {
 
   /** \brief Reports whether previous computation was successful.
     *
-    * \returns \c Success if computation was succesful,
+    * \returns \c ComputationSuccess if computation was succesful,
     *          \c NumericalIssue if the matrix.appears to be negative.
     */
   ComputationInfo info() const {
@@ -239,7 +240,7 @@ class CholmodBase : internal::noncopyable {
     m_cholmodFactor = cholmod_analyze(&A, &m_cholmod);
 
     this->m_isInitialized = true;
-    this->m_info = Success;
+    this->m_info = ComputationSuccess;
     m_analysisIsOk = true;
     m_factorizationIsOk = false;
   }
@@ -259,7 +260,7 @@ class CholmodBase : internal::noncopyable {
     // If the factorization failed, minor is the column at which it did. On
     // success minor == n.
     this->m_info =
-        (m_cholmodFactor->minor == m_cholmodFactor->n ? Success
+        (m_cholmodFactor->minor == m_cholmodFactor->n ? ComputationSuccess
                                                       : NumericalIssue);
     m_factorizationIsOk = true;
   }

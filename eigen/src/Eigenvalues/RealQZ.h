@@ -169,7 +169,8 @@ class RealQZ {
 
   /** \brief Reports whether previous computation was successful.
    *
-   * \returns \c Success if computation was succesful, \c NoConvergence
+   * \returns \c ComputationSuccess if computation was succesful, \c
+   *NoConvergence
    *otherwise.
    */
   ComputationInfo info() const {
@@ -592,7 +593,7 @@ RealQZ<MatrixType>& RealQZ<MatrixType>::compute(const MatrixType& A_in,
     }
   }
   // check if we converged before reaching iterations limit
-  m_info = (local_iter < m_maxIters) ? Success : NoConvergence;
+  m_info = (local_iter < m_maxIters) ? ComputationSuccess : NoConvergence;
   return *this;
 }  // end compute
 

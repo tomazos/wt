@@ -225,7 +225,7 @@ class PastixBase : internal::noncopyable {
 
   /** \brief Reports whether previous computation was successful.
    *
-   * \returns \c Success if computation was succesful,
+   * \returns \c ComputationSuccess if computation was succesful,
    *          \c NumericalIssue if the PaStiX reports a problem
    *          \c InvalidInput if the input matrix is invalid
    *
@@ -324,7 +324,7 @@ void PastixBase<Derived>::init() {
     m_info = InvalidInput;
     m_initisOk = false;
   } else {
-    m_info = Success;
+    m_info = ComputationSuccess;
     m_initisOk = true;
   }
 }
@@ -364,7 +364,7 @@ void PastixBase<Derived>::analyzePattern(ColSpMatrix &mat) {
     m_info = NumericalIssue;
     m_analysisIsOk = false;
   } else {
-    m_info = Success;
+    m_info = ComputationSuccess;
     m_analysisIsOk = true;
   }
 }
@@ -390,7 +390,7 @@ void PastixBase<Derived>::factorize(ColSpMatrix &mat) {
     m_factorizationIsOk = false;
     m_isInitialized = false;
   } else {
-    m_info = Success;
+    m_info = ComputationSuccess;
     m_factorizationIsOk = true;
     m_isInitialized = true;
   }
@@ -418,7 +418,8 @@ bool PastixBase<Base>::_solve(const MatrixBase<Rhs> &b,
   }
 
   // Check the returned error
-  m_info = m_iparm(IPARM_ERROR_NUMBER) == 0 ? Success : NumericalIssue;
+  m_info =
+      m_iparm(IPARM_ERROR_NUMBER) == 0 ? ComputationSuccess : NumericalIssue;
 
   return m_iparm(IPARM_ERROR_NUMBER) == 0;
 }

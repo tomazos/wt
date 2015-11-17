@@ -164,7 +164,7 @@ class LLT {
 
   /** \brief Reports whether previous computation was successful.
     *
-    * \returns \c Success if computation was succesful,
+    * \returns \c ComputationSuccess if computation was succesful,
     *          \c NumericalIssue if the matrix.appears to be negative.
     */
   ComputationInfo info() const {
@@ -403,7 +403,7 @@ LLT<MatrixType, _UpLo>& LLT<MatrixType, _UpLo>::compute(const MatrixType& a) {
 
   m_isInitialized = true;
   bool ok = Traits::inplace_decomposition(m_matrix);
-  m_info = ok ? Success : NumericalIssue;
+  m_info = ok ? ComputationSuccess : NumericalIssue;
 
   return *this;
 }
@@ -424,7 +424,7 @@ LLT<_MatrixType, _UpLo> LLT<_MatrixType, _UpLo>::rankUpdate(
           m_matrix, v, sigma) >= 0)
     m_info = NumericalIssue;
   else
-    m_info = Success;
+    m_info = ComputationSuccess;
 
   return *this;
 }

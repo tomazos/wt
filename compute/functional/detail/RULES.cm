@@ -1,0 +1,9 @@
+library{
+  name = "detail",
+  headers = {
+    "unpack.h",
+    "nvidia_ballot.h",
+    "nvidia_popcount.h",
+    "macros.h",
+  },
+};

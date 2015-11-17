@@ -215,7 +215,8 @@ class ComplexEigenSolver {
 
   /** \brief Reports whether previous computation was successful.
     *
-    * \returns \c Success if computation was succesful, \c NoConvergence
+    * \returns \c ComputationSuccess if computation was succesful, \c
+    *NoConvergence
     *otherwise.
     */
   ComputationInfo info() const {
@@ -261,7 +262,7 @@ ComplexEigenSolver<MatrixType>& ComplexEigenSolver<MatrixType>::compute(
   // The eigenvalues are on the diagonal of T.
   m_schur.compute(matrix, computeEigenvectors);
 
-  if (m_schur.info() == Success) {
+  if (m_schur.info() == ComputationSuccess) {
     m_eivalues = m_schur.matrixT().diagonal();
     if (computeEigenvectors) doComputeEigenvectors(matrix.norm());
     sortEigenvalues(computeEigenvectors);

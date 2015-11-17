@@ -1,0 +1,13 @@
+library{
+  name = "lambda",
+  headers = {
+    "placeholders.h",
+    "context.h",
+    "placeholder.h",
+    "result_of.h",
+    "make_pair.h",
+    "make_tuple.h",
+    "functional.h",
+    "get.h",
+  },
+};

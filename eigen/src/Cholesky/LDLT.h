@@ -228,12 +228,12 @@ class LDLT {
 
   /** \brief Reports whether previous computation was successful.
     *
-    * \returns \c Success if computation was succesful,
+    * \returns \c ComputationSuccess if computation was succesful,
     *          \c NumericalIssue if the matrix.appears to be negative.
     */
   ComputationInfo info() const {
     eigen_assert(m_isInitialized && "LDLT is not initialized.");
-    return Success;
+    return ComputationSuccess;
   }
 
  protected:

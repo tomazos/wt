@@ -343,7 +343,7 @@ GeneralizedEigenSolver<MatrixType>& GeneralizedEigenSolver<MatrixType>::compute(
   // A = Q S Z and B = Q T Z
   m_realQZ.compute(A, B, computeEigenvectors);
 
-  if (m_realQZ.info() == Success) {
+  if (m_realQZ.info() == ComputationSuccess) {
     m_matS = m_realQZ.matrixS();
     if (computeEigenvectors) m_eivec = m_realQZ.matrixZ().transpose();
 

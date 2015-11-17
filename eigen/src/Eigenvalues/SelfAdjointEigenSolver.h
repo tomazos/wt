@@ -322,7 +322,8 @@ class SelfAdjointEigenSolver {
 
   /** \brief Reports whether previous computation was successful.
     *
-    * \returns \c Success if computation was succesful, \c NoConvergence
+    * \returns \c ComputationSuccess if computation was succesful, \c
+    *NoConvergence
     *otherwise.
     */
   ComputationInfo info() const {
@@ -428,7 +429,7 @@ SelfAdjointEigenSolver<MatrixType>& SelfAdjointEigenSolver<MatrixType>::compute(
   if (n == 1) {
     m_eivalues.coeffRef(0, 0) = numext::real(matrix.coeff(0, 0));
     if (computeEigenvectors) m_eivec.setOnes(n, n);
-    m_info = Success;
+    m_info = ComputationSuccess;
     m_isInitialized = true;
     m_eigenvectorsOk = computeEigenvectors;
     return *this;
@@ -477,14 +478,14 @@ SelfAdjointEigenSolver<MatrixType>& SelfAdjointEigenSolver<MatrixType>::compute(
   }
 
   if (iter <= m_maxIterations * n)
-    m_info = Success;
+    m_info = ComputationSuccess;
   else
     m_info = NoConvergence;
 
   // Sort eigenvalues and corresponding vectors.
   // TODO make the sort optional ?
   // TODO use a better sort algorithm !!
-  if (m_info == Success) {
+  if (m_info == ComputationSuccess) {
     for (Index i = 0; i < n - 1; ++i) {
       Index k;
       m_eivalues.segment(i, n - i).minCoeff(&k);
@@ -676,7 +677,7 @@ struct direct_selfadjoint_eigenvalues<SolverType, 3, false> {
     eivals *= scale;
     eivals.array() += shift;
 
-    solver.m_info = Success;
+    solver.m_info = ComputationSuccess;
     solver.m_isInitialized = true;
     solver.m_eigenvectorsOk = computeEigenvectors;
   }
@@ -746,7 +747,7 @@ struct direct_selfadjoint_eigenvalues<SolverType, 2, false> {
     // Rescale back to the original size.
     eivals *= scale;
 
-    solver.m_info = Success;
+    solver.m_info = ComputationSuccess;
     solver.m_isInitialized = true;
     solver.m_eigenvectorsOk = computeEigenvectors;
   }

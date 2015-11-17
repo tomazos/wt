@@ -6,3 +6,6 @@ wiring
 experimental/sdl
 gl
 sdl
+experimental/freetype
+font
+compute

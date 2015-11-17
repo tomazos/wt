@@ -1,0 +1,8 @@
+library{
+  name = "async",
+  headers = {
+    "wait_guard.h",
+    "future.h",
+    "wait.h",
+  },
+};

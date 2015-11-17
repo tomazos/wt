@@ -128,7 +128,7 @@ class PardisoImpl {
 
   /** \brief Reports whether previous computation was successful.
     *
-    * \returns \c Success if computation was succesful,
+    * \returns \c ComputationSuccess if computation was succesful,
     *          \c NumericalIssue if the matrix appears to be negative.
     */
   ComputationInfo info() const {
@@ -247,7 +247,7 @@ class PardisoImpl {
   void manageErrorCode(Index error) {
     switch (error) {
       case 0:
-        m_info = Success;
+        m_info = ComputationSuccess;
         break;
       case -4:
       case -7:

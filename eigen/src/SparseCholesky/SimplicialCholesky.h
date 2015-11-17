@@ -49,13 +49,13 @@ class SimplicialCholeskyBase : internal::noncopyable {
  public:
   /** Default constructor */
   SimplicialCholeskyBase()
-      : m_info(Success),
+      : m_info(ComputationSuccess),
         m_isInitialized(false),
         m_shiftOffset(0),
         m_shiftScale(1) {}
 
   SimplicialCholeskyBase(const MatrixType& matrix)
-      : m_info(Success),
+      : m_info(ComputationSuccess),
         m_isInitialized(false),
         m_shiftOffset(0),
         m_shiftScale(1) {
@@ -72,7 +72,7 @@ class SimplicialCholeskyBase : internal::noncopyable {
 
   /** \brief Reports whether previous computation was successful.
     *
-    * \returns \c Success if computation was succesful,
+    * \returns \c ComputationSuccess if computation was succesful,
     *          \c NumericalIssue if the matrix.appears to be negative.
     */
   ComputationInfo info() const {
@@ -180,7 +180,7 @@ class SimplicialCholeskyBase : internal::noncopyable {
                  "must first call either compute() or symbolic()/numeric()");
     eigen_assert(m_matrix.rows() == b.rows());
 
-    if (m_info != Success) return;
+    if (m_info != ComputationSuccess) return;
 
     if (m_P.size() > 0)
       dest = m_P * b;
@@ -589,7 +589,7 @@ class SimplicialCholesky
                  "must first call either compute() or symbolic()/numeric()");
     eigen_assert(Base::m_matrix.rows() == b.rows());
 
-    if (Base::m_info != Success) return;
+    if (Base::m_info != ComputationSuccess) return;
 
     if (Base::m_P.size() > 0)
       dest = Base::m_P * b;

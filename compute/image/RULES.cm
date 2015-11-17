@@ -1,0 +1,11 @@
+library{
+  name = "image",
+  headers = {
+    "image2d.h",
+    "image_sampler.h",
+    "image_format.h",
+    "image1d.h",
+    "image_object.h",
+    "image3d.h",
+  },
+};

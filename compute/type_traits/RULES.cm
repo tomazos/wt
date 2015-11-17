@@ -1,0 +1,15 @@
+library{
+  name = "type_traits",
+  headers = {
+    "scalar_type.h",
+    "is_device_iterator.h",
+    "type_definition.h",
+    "common_type.h",
+    "type_name.h",
+    "result_of.h",
+    "is_vector_type.h",
+    "make_vector_type.h",
+    "is_fundamental.h",
+    "vector_size.h",
+  },
+};

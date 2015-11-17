@@ -225,8 +225,9 @@ class BiCGSTAB
                               m_iterations, m_error))
         failed = true;
     }
-    m_info = failed ? NumericalIssue
-                    : m_error <= Base::m_tolerance ? Success : NoConvergence;
+    m_info = failed ? NumericalIssue : m_error <= Base::m_tolerance
+                                           ? ComputationSuccess
+                                           : NoConvergence;
     m_isInitialized = true;
   }
 

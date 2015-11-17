@@ -224,7 +224,7 @@ class ConjugateGradient
     }
 
     m_isInitialized = true;
-    m_info = m_error <= Base::m_tolerance ? Success : NoConvergence;
+    m_info = m_error <= Base::m_tolerance ? ComputationSuccess : NoConvergence;
   }
 
   /** \internal */

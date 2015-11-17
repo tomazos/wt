@@ -1,0 +1,7 @@
+library{
+  name = "detail",
+  headers = {
+    "swizzle_iterator.h",
+    "get_base_iterator_buffer.h",
+  },
+};

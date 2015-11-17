@@ -21,15 +21,17 @@ while (my $file = readdir(DIR)) {
 
 if (scalar(@files) > 0) {
   print "/$dir/$rulename\n";
-  open(RULE, ">$dir/RULES") or die $!;
+  open(RULE, ">$dir/RULES.cm") or die $!;
 
-  print(RULE "library:\n");
-  print(RULE "  name = $rulename\n");
-  print(RULE "  headers:\n");
+  print(RULE "library{\n");
+  print(RULE "  name = \"$rulename\",\n");
+  print(RULE "  headers = \{\n");
 
   for my $file (@files) {
-    print(RULE "    $file\n");
+    print(RULE "    \"$file\",\n");
   }
+  print(RULE "  },\n");
+  print(RULE "};\n");
 }
 
 close(RULE);

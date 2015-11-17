@@ -1,0 +1,8 @@
+library{
+  name = "opencv",
+  headers = {
+    "ocl.h",
+    "core.h",
+    "highgui.h",
+  },
+};

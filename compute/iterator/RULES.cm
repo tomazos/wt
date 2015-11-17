@@ -1,0 +1,15 @@
+library{
+  name = "iterator",
+  headers = {
+    "transform_iterator.h",
+    "constant_iterator.h",
+    "buffer_iterator.h",
+    "strided_iterator.h",
+    "permutation_iterator.h",
+    "constant_buffer_iterator.h",
+    "zip_iterator.h",
+    "counting_iterator.h",
+    "discard_iterator.h",
+    "function_input_iterator.h",
+  },
+};

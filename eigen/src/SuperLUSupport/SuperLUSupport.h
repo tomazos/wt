@@ -303,7 +303,7 @@ class SuperLUBase : internal::noncopyable {
 
   /** \brief Reports whether previous computation was successful.
     *
-    * \returns \c Success if computation was succesful,
+    * \returns \c ComputationSuccess if computation was succesful,
     *          \c NumericalIssue if the matrix.appears to be negative.
     */
   ComputationInfo info() const {
@@ -356,7 +356,7 @@ class SuperLUBase : internal::noncopyable {
     */
   void analyzePattern(const MatrixType & /*matrix*/) {
     m_isInitialized = true;
-    m_info = Success;
+    m_info = ComputationSuccess;
     m_analysisIsOk = true;
     m_factorizationIsOk = false;
   }
@@ -595,7 +595,7 @@ void SuperLU<MatrixType>::factorize(const MatrixType &a) {
   m_extractedDataAreDirty = true;
 
   // FIXME how to better check for errors ???
-  m_info = info == 0 ? Success : NumericalIssue;
+  m_info = info == 0 ? ComputationSuccess : NumericalIssue;
   m_factorizationIsOk = true;
 }
 
@@ -635,7 +635,7 @@ void SuperLU<MatrixType>::_solve(const MatrixBase<Rhs> &b,
                 NULL, 0, &m_sluB, &m_sluX, &recip_pivot_growth, &rcond,
                 &m_sluFerr[0], &m_sluBerr[0], &m_sluStat, &info, Scalar());
   StatFree(&m_sluStat);
-  m_info = info == 0 ? Success : NumericalIssue;
+  m_info = info == 0 ? ComputationSuccess : NumericalIssue;
 }
 
 // the code of this extractData() function has been adapted from the SuperLU's
@@ -887,7 +887,7 @@ void SuperILU<MatrixType>::factorize(const MatrixType &a) {
   StatFree(&m_sluStat);
 
   // FIXME how to better check for errors ???
-  m_info = info == 0 ? Success : NumericalIssue;
+  m_info = info == 0 ? ComputationSuccess : NumericalIssue;
   m_factorizationIsOk = true;
 }
 
@@ -929,7 +929,7 @@ void SuperILU<MatrixType>::_solve(const MatrixBase<Rhs> &b,
                 &m_sluStat, &info, Scalar());
   StatFree(&m_sluStat);
 
-  m_info = info == 0 ? Success : NumericalIssue;
+  m_info = info == 0 ? ComputationSuccess : NumericalIssue;
 }
 #endif
 
