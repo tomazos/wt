@@ -47,6 +47,8 @@ constexpr auto vertex_shader_code = R"(
   void main(void)
   {
     gl_Position = transform * position;
+    vec2 planepos = position.xy;
+    planepos -= 2*floor((planepos+1)/2);
     texpos = vec2((1+position.x)/2,(1-position.y)/2);
   }
 
@@ -69,10 +71,19 @@ constexpr auto fragment_shader_code = R"(
 
 constexpr auto board_kernel_code = R"(
 
-  constant int W = 128;
+  #define kRows 2048
+  #define kBitWidth kRows
+  #define kByteWidth (kBitWidth / 8)
+  #define kByteArea (kRows * kByteWidth)
+  #define kCacheInner 8
+  #define kCacheOuter (kCacheInner + 2)
+  #define kGroupCols (kByteWidth / kCacheInner)
+  #define kGroupRows (kRows / kCacheInner)
 
   bool get_cell(global uchar* board, int2 coord) {
-    int pos = coord.x + coord.y*W;
+    if (coord.x < 0 || coord.x >= kBitWidth || coord.y < 0 || coord.y >= kRows)
+      return false;
+    int pos = coord.x + coord.y*kBitWidth;
     int byte_pos = pos / 8;
     int bit_pos = (1 << (pos %8));
     uchar byte_val = board[byte_pos];
@@ -82,38 +93,93 @@ constexpr auto board_kernel_code = R"(
       return false;
   }
 
-  void set_cell(global uchar* board, int2 coord, bool val) {
-    int pos = coord.x + coord.y*W;
-    if (val) {
-      board[pos / 8] |= (1 << (pos % 8));
-    } else {
-      board[pos / 8] &= ~(1 << (pos % 8));
-    }
-  }
-  
-  kernel void init_board(global uchar* board) {
-    for (int i = 0; i < 8; ++i) {
-      int2 coord = (int2)(get_global_id(0)*8 + i, get_global_id(1));
-      set_cell(board, coord, coord.x % 2 == 0 || coord.y % 2 == 0);
-    }
+  uchar get_board_byte(global uchar* board, int x, int y) {
+    if (x == -1)
+      x = kByteWidth - 1;
+    else if (x == kByteWidth)
+      x = 0;
+
+    if (y == -1)
+      y = kRows - 1;
+    else if (y == kRows)
+      y = 0;
+
+    return board[x + kByteWidth*y];
   }
 
-  kernel void update_board(global uchar* board) {
+  kernel void update_board(global uchar* old_board, global uchar* new_board) {
+    const int outer_cache_x = get_local_id(0);
+    const int outer_cache_y = get_local_id(1);
+    const int inner_cache_x = outer_cache_x-1;
+    const int inner_cache_y = outer_cache_y-1;
+
+    int anchor_x = get_group_id(0)*kCacheInner;
+    int anchor_y = get_group_id(1)*kCacheInner;
+
+    int global_x = anchor_x + inner_cache_x;
+    int global_y = anchor_y + inner_cache_y;
+
+    local uchar input_cache[kCacheOuter][kCacheOuter];
+
+    input_cache[outer_cache_x][outer_cache_y] = get_board_byte(old_board, global_x, global_y);
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    if (inner_cache_x >= 0 && inner_cache_x < kCacheInner && inner_cache_y >= 0 && inner_cache_y < kCacheInner) {
+        uchar z = 0;
+        int oy = outer_cache_y;
+		for (int i = 0; i < 8; ++i) {
+          int ox = outer_cache_x*8+i;
+		  int neighbours = 0;
+		  for (int dx = -1; dx <= +1; ++dx)
+			for (int dy = -1; dy <= +1; ++dy) {
+              int x = ox + dx;
+              int y = oy + dy;
+              if (input_cache[x/8][y] & (1 << (x % 8)))
+                neighbours++;
+            }
+          if ((neighbours == 3) || (neighbours == 4 && (input_cache[ox/8][oy] & (1 << (ox % 8)))))
+            z |= (1 << (ox % 8));
+		}
+        new_board[global_x + kByteWidth*global_y] = z;
+    }
   }
 
   kernel void draw_board(global uchar* board, write_only image2d_t board_image) {
     int2 coord = (int2)(get_global_id(0), get_global_id(1));
     if (get_cell(board, coord)) {
-      write_imagef(board_image, coord, (float4)(255, 255, 255, 255));
+      write_imagef(board_image, coord, (float4)(0.5, 1.0, 0.5, 1.0));
     } else {
-      write_imagef(board_image, coord, (float4)(0, 0, 0, 255));
+      write_imagef(board_image, coord, (float4)(0.5, 0, 0, 1.0));
     }
   }
 
 )";
 
+template <typename Integral, Integral numerator, Integral denominator>
+constexpr Integral checked_div() {
+  STATIC_ASSERT(numerator % denominator == 0);
+  return numerator / denominator;
+}
+
 void Main(const std::vector<string>& args) {
-  constexpr size_t W = 128;
+  constexpr size_t kRows = 2048;
+  constexpr size_t kBitWidth = kRows;
+  constexpr size_t kByteWidth = checked_div<size_t, kBitWidth, 8>();
+  constexpr size_t kByteArea = kRows * kByteWidth;
+  constexpr size_t kCacheInner = 8;
+  constexpr size_t kCacheOuter = kCacheInner + 2;
+  constexpr size_t kGroupCols = checked_div<size_t, kByteWidth, kCacheInner>();
+  constexpr size_t kGroupRows = checked_div<size_t, kRows, kCacheInner>();
+
+  LOGEXPR(kRows);
+  LOGEXPR(kBitWidth);
+  LOGEXPR(kByteWidth);
+  LOGEXPR(kByteArea);
+  LOGEXPR(kCacheInner);
+  LOGEXPR(kCacheOuter);
+  LOGEXPR(kGroupCols);
+  LOGEXPR(kGroupRows);
+
   sdl::POV pov("cl_texture",
                {
                 {SDL_GL_RED_SIZE, 8},
@@ -146,17 +212,19 @@ void Main(const std::vector<string>& args) {
     throw;
   }
 
-  compute::kernel init_board = board_program.create_kernel("init_board");
   compute::kernel update_board = board_program.create_kernel("update_board");
   compute::kernel draw_board = board_program.create_kernel("draw_board");
 
-  compute::buffer board(context, W * W / 8);
+  std::vector<uint8> init_board(kByteArea);
+  std::random_device random_device;
+  for (uint8& x : init_board) x = random_device();
+  compute::buffer board0(context, kByteArea);
+  compute::buffer board1(context, kByteArea);
 
   compute::command_queue command_queue(context, device);
 
-  init_board.set_arg(0, board);
-  command_queue.enqueue_nd_range_kernel(init_board, dim(0, 0), dim(W / 8, W),
-                                        dim(1, 1));
+  command_queue.enqueue_write_buffer(board0, 0 /*offset*/, kByteArea,
+                                     init_board.data());
   command_queue.finish();
 
   gl::Texture board_texture;
@@ -166,23 +234,13 @@ void Main(const std::vector<string>& args) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  gl::Texture::Image2D(GL_TEXTURE_2D, 0, GL_RGBA, W, W, GL_RGBA,
+  gl::Texture::Image2D(GL_TEXTURE_2D, 0, GL_RGBA, kBitWidth, kRows, GL_RGBA,
                        GL_UNSIGNED_BYTE, 0);
 
   compute::opengl_texture board_compute_texture(context, GL_TEXTURE_2D, 0,
                                                 board_texture.texture_);
-
-  compute::opengl_enqueue_acquire_gl_objects(1, &board_compute_texture.get(),
-                                             command_queue);
-  draw_board.set_arg(0, board);
-  draw_board.set_arg(1, board_compute_texture);
-  command_queue.enqueue_nd_range_kernel(draw_board, dim(0, 0), dim(W, W),
-                                        dim(1, 1));
-  compute::opengl_enqueue_release_gl_objects(1, &board_compute_texture.get(),
-                                             command_queue);
-  command_queue.finish();
 
   gl::Shader vertex_shader(GL_VERTEX_SHADER, vertex_shader_code);
   gl::Shader fragment_shader(GL_FRAGMENT_SHADER, fragment_shader_code);
@@ -197,16 +255,25 @@ void Main(const std::vector<string>& args) {
   program.Use();
 
   constexpr float64 period = 1 / 60.0;
-  const GLfloat background_color[] = {1, 1, 1};
+  const GLfloat background_color[] = {0, 0, 0};
 
   gl::Enable(GL_DEPTH_TEST);
 
-  std::vector<gl::vec4> vertexes = {{-1, -1, 0, 1},
-                                    {-1, 1, 0, 1},
-                                    {1, -1, 0, 1},
-                                    {-1, 1, 0, 1},
-                                    {1, -1, 0, 1},
-                                    {1, 1, 0, 1}};
+  const std::vector<gl::vec4> square = {{-1, -1, 0, 1},
+                                        {-1, 1, 0, 1},
+                                        {1, -1, 0, 1},
+                                        {-1, 1, 0, 1},
+                                        {1, -1, 0, 1},
+                                        {1, 1, 0, 1}};
+
+  std::vector<gl::vec4> vertexes;
+
+  constexpr int G = 100;
+
+  for (int x = -G; x <= +G; ++x)
+    for (int y = -G; y <= +G; ++y)
+      for (int i = 0; i < 6; ++i)
+        vertexes.emplace_back(square[i](0) + 2 * x, square[i](1) + 2 * y, 0, 1);
 
   float64 target_timepoint = now_secs();
   float64 start_time = target_timepoint;
@@ -216,16 +283,22 @@ void Main(const std::vector<string>& args) {
 
     if (!pov.ProcessEvents()) return;
 
-    //    std::vector<cl::Memory> globjects{image};
-    //    command_queue.enqueueAcquireGLObjects(&globjects);
+    update_board.set_arg(frame_num % 2, board0);
+    update_board.set_arg((frame_num + 1) % 2, board1);
+    command_queue.enqueue_nd_range_kernel(
+        update_board, dim(0, 0),
+        dim(kGroupCols * kCacheOuter, kGroupRows * kCacheOuter),
+        dim(kCacheOuter, kCacheOuter));
 
-    //    kernel_functor(cl::EnqueueArgs(command_queue, cl::NDRange(0, 0),
-    //                                   cl::NDRange(100, 200), cl::NDRange(1,
-    //                                   1)),
-    //                   0.5 + 0.5 * sin(target_timepoint), image);
-
-    //    command_queue.enqueueReleaseGLObjects(&globjects);
-    //    command_queue.finish();
+    compute::opengl_enqueue_acquire_gl_objects(1, &board_compute_texture.get(),
+                                               command_queue);
+    draw_board.set_arg(0, (frame_num % 2) ? board1 : board0);
+    draw_board.set_arg(1, board_compute_texture);
+    command_queue.enqueue_nd_range_kernel(draw_board, dim(0, 0),
+                                          dim(kBitWidth, kRows), dim(1, 1));
+    compute::opengl_enqueue_release_gl_objects(1, &board_compute_texture.get(),
+                                               command_queue);
+    command_queue.finish();
 
     program.Uniform("transform", pov.transform());
     program.Uniform("cat_texture", 0);
