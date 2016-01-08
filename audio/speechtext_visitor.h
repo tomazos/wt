@@ -3,8 +3,8 @@
 #include <eigen/Eigen>
 #include <sqlite3.h>
 
-#include "database/connection.h"
-#include "database/statement.h"
+#include "database/sqlite/connection.h"
+#include "database/sqlite/statement.h"
 
 namespace audio {
 

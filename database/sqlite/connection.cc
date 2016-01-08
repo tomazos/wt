@@ -1,8 +1,9 @@
-#include "database/connection.h"
+#include "database/sqlite/connection.h"
 
-#include "database/sqlite3_wrapper.h"
+#include "database/sqlite/sqlite3_wrapper.h"
 
 namespace database {
+namespace sqlite {
 
 void Initialize() { S3CALL(config, SQLITE_CONFIG_SERIALIZED); }
 
@@ -46,4 +47,5 @@ Statement Connection::Prepare(string_view sql) {
   return Statement(stmt);
 }
 
+}  // namespace sqlite
 }  // namespace database

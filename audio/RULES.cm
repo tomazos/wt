@@ -51,7 +51,7 @@ program{
     "srtproto_file",
     "wave_file",
     "/core/must",
-    "/database/database",
+    "/database/sqlite/sqlite",
     "/main/args",
   },
 };
@@ -66,7 +66,7 @@ program{
     "/core/file_functions",
     "/core/must",
     "/core/sequence_file",
-    "/database/database",
+    "/database/sqlite/sqlite",
     "/main/noargs",
   },
 };
@@ -81,7 +81,7 @@ program{
     "srtproto_file",
     "wave_file",
     "/core/must",
-    "/database/database",
+    "/database/sqlite/sqlite",
     "/main/args",
   },
 };
@@ -93,7 +93,7 @@ program{
   },
   dependencies = {
     "/core/must",
-    "/database/database",
+    "/database/sqlite/sqlite",
     "/main/noargs",
   },
 };
@@ -144,7 +144,7 @@ library{
   dependencies = {
     "/eigen/eigen",
     "/core/must",
-    "/database/database",
+    "/database/sqlite/sqlite",
   },
 };
 
@@ -189,7 +189,7 @@ program{
     "speechtext_visitor",
     "/core/must",
     "/core/regex",
-    "/database/database",
+    "/database/sqlite/sqlite",
     "/main/noargs",
   },
 };

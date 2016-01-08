@@ -1,4 +1,4 @@
-#include "database/connection.h"
+#include "database/sqlite/connection.h"
 
 #include <boost/filesystem.hpp>
 
@@ -8,11 +8,12 @@
 #include "gtest/gtest.h"
 
 namespace database {
+namespace sqlite {
 
 TEST(Sqlite3Test, Connection) {
   filesystem::path source_root = GetEnv("SOURCE_ROOT");
   filesystem::path english_words_path =
-      source_root / "database/testdata/english-words.txt";
+      source_root / "database/sqlite/testdata/english-words.txt";
 
   filesystem::path tmpfile =
       filesystem::temp_directory_path() / filesystem::unique_path();
@@ -51,4 +52,5 @@ TEST(Sqlite3Test, Connection) {
   filesystem::remove(tmpfile);
 }
 
+}  // namespace sqlite
 }  // namespace database

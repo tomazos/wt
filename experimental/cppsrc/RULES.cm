@@ -1,0 +1,63 @@
+p = {
+  "native",
+};
+
+program{
+  name = "file_checker",
+  sources = {
+    "file_checker.cc",
+  },
+  dependencies = {
+    "/core/file_functions",
+    "/core/must",
+    "/core/utf8",
+    "/database/postgresql/postgresql",
+    "/main/noargs",
+  },
+  platforms = p,
+};
+
+program{
+  name = "file_indexer",
+  sources = {
+    "file_indexer.cc",
+  },
+  dependencies = {
+    "/core/file_functions",
+    "/core/must",
+    "/core/process",
+    "/core/utf8",
+    "/database/postgresql/postgresql",
+    "/main/args",
+  },
+  platforms = p,
+};
+
+program{
+  name = "file_unpacker",
+  sources = {
+    "file_unpacker.cc",
+  },
+  dependencies = {
+    "/core/file_functions",
+    "/core/must",
+    "/core/process",
+    "/database/postgresql/postgresql",
+    "/main/args",
+  },
+  platforms = p,
+};
+
+program{
+  name = "sources_parser",
+  sources = {
+    "sources_parser.cc",
+  },
+  dependencies = {
+    "/core/file_functions",
+    "/core/must",
+    "/database/postgresql/postgresql",
+    "/main/args",
+  },
+  platforms = p,
+};

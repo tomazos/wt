@@ -11,8 +11,12 @@ namespace sdl {
 
 class POV {
  public:
-  POV(const string& name, const std::map<SDL_GLattr, int>& glattributes)
-      : forward_direction_(0, 0, -1, 0),
+  POV(const string& name, const std::map<SDL_GLattr, int>& glattributes,
+      float32 uroll = 0.03, float32 uforward = .1, float32 uright = 0.05)
+      : uroll_(uroll),
+        uforward_(uforward),
+        uright_(uright),
+        forward_direction_(0, 0, -1, 0),
         up_direction_(0, 1, 0, 0),
         right_direction_(1, 0, 0, 0),
         viewer_location_(0, 0, 4) {
@@ -63,16 +67,16 @@ class POV {
     }
 
     float32 droll = 0;
-    if (keys_down_.count(SDLK_q)) droll -= 0.03;
-    if (keys_down_.count(SDLK_e)) droll += 0.03;
+    if (keys_down_.count(SDLK_q)) droll -= uroll_;
+    if (keys_down_.count(SDLK_e)) droll += uroll_;
 
     float32 dright = 0;
-    if (keys_down_.count(SDLK_a)) dright -= 0.05;
-    if (keys_down_.count(SDLK_d)) dright += 0.05;
+    if (keys_down_.count(SDLK_a)) dright -= uright_;
+    if (keys_down_.count(SDLK_d)) dright += uright_;
 
     float32 dforward = 0;
-    if (keys_down_.count(SDLK_w)) dforward += 0.1;
-    if (keys_down_.count(SDLK_s)) dforward -= 0.1;
+    if (keys_down_.count(SDLK_w)) dforward += uforward_;
+    if (keys_down_.count(SDLK_s)) dforward -= uforward_;
 
     gl::mat4 dfacing =
         gl::rotate(gl::resize<gl::vec3>(up_direction_), -dyaw) *
@@ -117,6 +121,8 @@ class POV {
   Application application_;
   optional<Window> window_;
   optional<GLContext> glcontext_;
+
+  float32 uroll_, uforward_, uright_;
 
   gl::vec4 forward_direction_, up_direction_, right_direction_;
 

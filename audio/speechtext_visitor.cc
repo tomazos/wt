@@ -18,8 +18,9 @@ void VisitSpeechText(SpeechTextVisitor& visitor, int64 begin_sample,
         int64 begin_block = index * samples_per_thread;
         int64 end_block = begin_block + samples_per_thread;
 
-        database::Connection db("/data/speechtext.db", SQLITE_OPEN_READONLY);
-        database::Statement select = db.Prepare(
+        database::sqlite::Connection db("/data/speechtext.db",
+                                        SQLITE_OPEN_READONLY);
+        database::sqlite::Statement select = db.Prepare(
             "select id-1, written, spoken from speechtext where ? <= (id-1) "
             "and "
             "id-1 "

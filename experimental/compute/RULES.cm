@@ -1,0 +1,18 @@
+p = {
+  "native",
+};
+
+program{
+  name = "mat_mul",
+  sources = {
+    "mat_mul.cc",
+  },
+  dependencies = {
+    "/compute/compute",
+    "/core/must",
+    "/core/random",
+    "/eigen/eigen",
+    "/main/noargs",
+  },
+  platforms = p,
+};

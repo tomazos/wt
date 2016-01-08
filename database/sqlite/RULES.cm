@@ -1,10 +1,10 @@
 test{
-  name = "database_test",
+  name = "sqlite_test",
   sources = {
-    "database_test.cc",
+    "sqlite_test.cc",
   },
   dependencies = {
-    "database",
+    "sqlite",
     "/core/env",
     "/core/file_functions",
     "/core/must",
@@ -13,7 +13,7 @@ test{
 };
 
 library{
-  name = "database",
+  name = "sqlite",
   headers = {
     "connection.h",
     "statement.h",

@@ -2,11 +2,12 @@
 
 //#include <boost/filesystem.hpp>
 
-#include "database/type.h"
+#include "database/sqlite/type.h"
 
 struct sqlite3_stmt;
 
 namespace database {
+namespace sqlite {
 
 class Statement {
  public:
@@ -44,4 +45,5 @@ class Statement {
   friend class Connection;
 };
 
+}  // namespace sqlite
 }  // namespace database

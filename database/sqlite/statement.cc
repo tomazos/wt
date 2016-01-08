@@ -1,8 +1,9 @@
-#include "database/statement.h"
+#include "database/sqlite/statement.h"
 
-#include "database/sqlite3_wrapper.h"
+#include "database/sqlite/sqlite3_wrapper.h"
 
 namespace database {
+namespace sqlite {
 
 Statement::Statement(sqlite3_stmt* stmt) : stmt_(stmt) {}
 
@@ -100,4 +101,5 @@ void Statement::Close() {
   stmt_ = nullptr;
 }
 
+}  // namespace sqlite
 }  // namespace database

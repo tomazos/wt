@@ -4,8 +4,11 @@
 
 #include "audio/audio_functions.h"
 #include "core/must.h"
-#include "database/connection.h"
-#include "database/statement.h"
+#include "database/sqlite/connection.h"
+#include "database/sqlite/statement.h"
+
+using database::sqlite::Connection;
+using database::sqlite::Statement;
 
 void Main(const std::vector<string>& args) {
   if (args.size() < 1) FAIL("usage: search_speechtext <query>");
@@ -16,9 +19,9 @@ void Main(const std::vector<string>& args) {
   }
   std::cout << query << std::endl;
 
-  database::Connection db("/data/speechtext.db", SQLITE_OPEN_READONLY);
+  Connection db("/data/speechtext.db", SQLITE_OPEN_READONLY);
 
-  database::Statement select = db.Prepare(query);
+  Statement select = db.Prepare(query);
 
   while (select.Step()) {
     int64 id = select.ColumnInteger(0);

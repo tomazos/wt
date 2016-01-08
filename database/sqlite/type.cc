@@ -1,4 +1,4 @@
-#include "database/type.h"
+#include "database/sqlite/type.h"
 
 #include <ostream>
 

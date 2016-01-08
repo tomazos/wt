@@ -1,0 +1,34 @@
+test{
+  name = "postgresql_test",
+  sources = {
+    "postgresql_test.cc",
+  },
+  dependencies = {
+    "postgresql",
+    "/core/env",
+    "/core/file_functions",
+    "/core/hex",
+    "/core/must",
+    "/main/gtest",
+  },
+};
+
+library{
+  name = "postgresql",
+  headers = {
+    "connection.h",
+    "result.h",
+    "type_handlers.h",
+  },
+  sources = {
+    "connection.cc",
+    "result.cc",
+  },
+  dependencies = {
+    "/core/must",
+  },
+  syslibs = {
+    "-lpq",
+  },
+};
+

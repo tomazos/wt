@@ -191,7 +191,8 @@ void Main(const std::vector<string>& args) {
                 {SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE},
                 {SDL_GL_MULTISAMPLEBUFFERS, 1},
                 {SDL_GL_MULTISAMPLESAMPLES, 4},
-               });
+               },
+               0.015 /*uroll*/, 0.05 /*uforward*/, 0.25 /*uright*/);
 
   auto platform_device_pair = GetGPU();
   compute::platform platform = platform_device_pair.first;

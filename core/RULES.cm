@@ -347,3 +347,27 @@ test{
   },
 };
 
+library{
+  name = "utf8",
+  headers = {
+    "utf8.h",
+  },
+  sources = {
+    "utf8.cc",
+  },
+  dependencies = {
+    "/core/must",
+  },
+};
+
+test{
+  name = "utf8_test",
+  sources = {
+    "utf8_test.cc",
+  },
+  dependencies = {
+    "utf8",
+    "/main/gtest",
+  },
+};
+

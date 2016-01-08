@@ -2,11 +2,12 @@
 
 #include <boost/filesystem.hpp>
 
-#include "database/statement.h"
+#include "database/sqlite/statement.h"
 
 typedef struct sqlite3 sqlite3;
 
 namespace database {
+namespace sqlite {
 
 void Initialize();
 
@@ -30,4 +31,5 @@ class Connection {
   Connection& operator=(const Connection&) = delete;
 };
 
+}  // namespace sqlite
 }  // namespace database

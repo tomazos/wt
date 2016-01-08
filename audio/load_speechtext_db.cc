@@ -3,15 +3,18 @@
 #include "audio/srtproto_file.pb.h"
 #include "core/must.h"
 #include "core/sequence_file.h"
-#include "database/connection.h"
-#include "database/statement.h"
+#include "database/sqlite/connection.h"
+#include "database/sqlite/statement.h"
+
+using database::sqlite::Connection;
+using database::sqlite::Statement;
 
 void Main() {
   SequenceReader reader("/data/all.speechtext");
-  database::Connection db("/data/speechtext.db");
+  Connection db("/data/speechtext.db");
 
   db("begin");
-  database::Statement insert =
+  Statement insert =
       db.Prepare("insert into speechtext (text,wave) values (?,?)");
   int64 total = 0;
   while (true) {

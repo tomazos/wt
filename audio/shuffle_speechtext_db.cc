@@ -3,22 +3,24 @@
 #include <sqlite3.h>
 
 #include "core/must.h"
-#include "database/connection.h"
-#include "database/statement.h"
+#include "database/sqlite/connection.h"
+#include "database/sqlite/statement.h"
+
+using database::sqlite::Connection;
+using database::sqlite::Statement;
 
 void Main() {
-  database::Connection olddb("/data/speechtext.db", SQLITE_OPEN_READONLY);
-  database::Connection newdb("/data/speechtext_shuffled.db");
+  Connection olddb("/data/speechtext.db", SQLITE_OPEN_READONLY);
+  Connection newdb("/data/speechtext_shuffled.db");
 
   constexpr size_t nsamples = 1948919;
   std::vector<int64> shuffled_indexes(nsamples + 1);
   for (size_t i = 1; i <= nsamples; i++) shuffled_indexes[i] = i;
   std::random_shuffle(shuffled_indexes.begin() + 1, shuffled_indexes.end());
 
-  database::Statement select =
-      olddb.Prepare("select rowid, text, wave from speechtext");
+  Statement select = olddb.Prepare("select rowid, text, wave from speechtext");
   newdb("begin");
-  database::Statement insert = newdb.Prepare(
+  Statement insert = newdb.Prepare(
       "insert into speechtext (id, written, spoken) values (?,?,?)");
 
   while (select.Step()) {

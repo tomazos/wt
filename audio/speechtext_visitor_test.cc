@@ -18,7 +18,7 @@ struct SpeechTextLengthTotaler : SpeechTextVisitor {
 };
 
 TEST(SpeechTextVisitorTest, Basic) {
-  database::Initialize();
+  database::sqlite::Initialize();
   SpeechTextLengthTotaler totaler;
   VisitSpeechText(totaler, 0, 10000, 20);
   EXPECT_EQ(totaler.total_written_length, 342244);
