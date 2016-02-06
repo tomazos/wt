@@ -78,3 +78,17 @@ program{
   platforms = p,
 };
 
+program{
+  name = "snake",
+  sources = {
+    "snake.cc",
+  },
+  dependencies = {
+    "/gl/gl",
+    "/sdl/sdl",
+    "/core/must",
+    "/core/random",
+    "/main/noargs",
+  },
+  platforms = p,
+};
