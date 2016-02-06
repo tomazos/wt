@@ -28,3 +28,28 @@ begin
   end if;
 end
 $$ language plpgsql;
+
+CREATE OR REPLACE VIEW exts as
+select 
+
+create or replace view exts as
+select substring(relpath from '\.([^\.]*)$') as ext from files;
+
+create or replace view cpackages as
+select package, sum(1) as nfiles, sum(size) as total_size from files where cext group by package;
+
+create table ext_counts as
+select ext, sum(1) as count from exts group by ext;
+
+copy (select ext, count from ext_counts order by count desc) to '/home/zos/inbox/ext_counts';
+
+'h', 'c', 'cpp', 'cc', 'hpp', 'cxx', 'hxx', 'C'
+
+create table ngrams (
+  ngram bytea,
+  cext boolean,
+  numerator int8,
+  denominator int8
+);
+
+select encode(ngram, 'escape'), numerator, denominator from ngrams where cext order by numerator desc;

@@ -3,6 +3,21 @@ p = {
 };
 
 program{
+  name = "cext_feature_finder",
+  sources = {
+    "cext_feature_finder.cc",
+  },
+  dependencies = {
+    "/core/file_functions",
+    "/core/must",
+    "/core/utf8",
+    "/database/postgresql/postgresql",
+    "/main/noargs",
+  },
+  platforms = p,
+};
+
+program{
   name = "file_checker",
   sources = {
     "file_checker.cc",
@@ -34,6 +49,23 @@ program{
 };
 
 program{
+  name = "file_lister",
+  sources = {
+    "file_lister.cc",
+  },
+  dependencies = {
+    "tokenizer",
+    "/core/file_functions",
+    "/core/must",
+    "/core/process",
+    "/core/utf8",
+    "/database/postgresql/postgresql",
+    "/main/noargs",
+  },
+  platforms = p,
+};
+
+program{
   name = "file_unpacker",
   sources = {
     "file_unpacker.cc",
@@ -44,6 +76,38 @@ program{
     "/core/process",
     "/database/postgresql/postgresql",
     "/main/args",
+  },
+  platforms = p,
+};
+
+program{
+  name = "files_tokenizer",
+  sources = {
+    "files_tokenizer.cc",
+  },
+  dependencies = {
+    "tokenizer",
+    "/core/file_functions",
+    "/core/must",
+    "/core/process",
+    "/core/utf8",
+    "/database/postgresql/postgresql",
+    "/main/noargs",
+  },
+  platforms = p,
+};
+
+program{
+  name = "set_files_id",
+  sources = {
+    "set_files_id.cc",
+  },
+  dependencies = {
+    "/core/file_functions",
+    "/core/must",
+    "/core/utf8",
+    "/database/postgresql/postgresql",
+    "/main/noargs",
   },
   platforms = p,
 };
@@ -61,3 +125,29 @@ program{
   },
   platforms = p,
 };
+
+program{
+  name = "token_counts_parser",
+  sources = {
+    "token_counts_parser.cc",
+  },
+  dependencies = {
+    "/core/must",
+    "/main/noargs",
+  },
+  platforms = p,
+};
+
+library{
+  name = "tokenizer",
+  headers = {
+    "tokenizer.h",
+  },
+  sources = {
+    "tokenizer.cc",
+  },
+  dependencies = {
+  },
+  platforms = p,
+};
+
