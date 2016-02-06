@@ -31,9 +31,22 @@ void Renderer::SetDrawColor(gl::vec4 rgba) {
     FAIL(SDL_GetError());
 }
 
+void Renderer::DrawPoint(int x, int y) {
+  if (SDL_RenderDrawPoint(renderer_.get(), x, y) != 0) FAIL(SDL_GetError());
+}
+
 void Renderer::DrawLine(int x1, int y1, int x2, int y2) {
   if (SDL_RenderDrawLine(renderer_.get(), x1, y1, x2, y2) != 0)
     FAIL(SDL_GetError());
+}
+
+void Renderer::DrawRect(int x1, int y1, int x2, int y2) {
+  SDL_Rect rect;
+  rect.x = x1;
+  rect.y = y1;
+  rect.w = x2 - x1;
+  rect.h = y2 - y1;
+  if (SDL_RenderFillRect(renderer_.get(), &rect) != 0) FAIL(SDL_GetError());
 }
 
 void Renderer::Render(Texture& texture, const optional<Rect>& src,

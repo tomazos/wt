@@ -22,7 +22,9 @@ class Renderer {
 
   void SetDrawColor(gl::vec4 rgba);
 
+  void DrawPoint(int x, int y);
   void DrawLine(int x1, int y1, int x2, int y2);
+  void DrawRect(int x1, int y1, int x2, int y2);
 
   void Render(Texture& texture, const optional<Rect>& src,
               const optional<Rect>& dest);
