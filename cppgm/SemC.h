@@ -4,18 +4,16 @@
 
 struct SemCParser;
 
-struct SemC
-{
-	SemCParser* parser;
+struct SemC {
+  SemCParser* parser;
 
-	SemC();
-	~SemC();
+  SemC();
+  ~SemC();
 
-	void parse(const string& srcfile, vector<PToken>&& tokens);
+  void parse(const string& srcfile, vector<PToken>&& tokens);
 
-	void dump(ostream& out);
-	void mock_nsinit(ostream& out);
+  void dump(ostream& out);
+  void mock_nsinit(ostream& out);
 
-	pair<string, size_t> error_loc();
+  pair<string, size_t> error_loc();
 };
-
